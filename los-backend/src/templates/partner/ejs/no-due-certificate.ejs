@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loan No Dues Certificate</title>
+    <style>
+      body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #2c3e50;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+      }
+
+      .certificate-container {
+        max-width: 800px;
+        margin: 40px auto;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header-image img,
+      .footer-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .content-container {
+        padding: 40px 30px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin: 0;
+        color: #1a1a1a;
+      }
+
+      .content {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .content p {
+        margin-bottom: 16px;
+      }
+
+      .details {
+        margin: 30px 0;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+      }
+
+      .details td {
+        padding: 10px 8px;
+        vertical-align: top;
+      }
+
+      .details td.label {
+        font-weight: 600;
+        width: 35%;
+        color: #444;
+      }
+
+      .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .note {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 13px;
+        color: #999;
+      }
+
+      .certificate-id {
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 40px;
+        color: #444;
+      }
+
+      a {
+        color: #2e86de;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="certificate-container">
+      <!-- Header Image -->
+      <div class="header-image">
+        <% if (headerImageUrl) { %>
+          <img src="<%= headerImageUrl %>" alt="Header" />
+        <% } %>
+      </div>
+
+      <!-- Certificate Body -->
+      <div class="content-container">
+        <div class="header">
+          <h1>NO DUES CERTIFICATE</h1>
+        </div>
+
+        <div class="content">
+          <p>To,</p>
+          <p><strong><%= customerName %></strong></p>
+          <p><strong><%= customerAddress %></strong></p>
+
+          <p>
+            This is to certify that the loan account bearing number
+            <strong><%= loanId %></strong>, held by you with
+            <strong><%= lenderName %></strong>, has been fully repaid and closed as of
+            <strong><%= closureDate %></strong>.
+          </p>
+
+          <p>
+            After reviewing your repayment history, we confirm that there are no pending dues as of the closure date.
+          </p>
+
+          <table class="details">
+            <tr>
+              <td class="label">Loan ID:</td>
+              <td><%= loanId %></td>
+            </tr>
+            <tr>
+              <td class="label">Loan Amount:</td>
+              <td>₹<%= loanAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Paid Amount:</td>
+              <td>₹<%= paidAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Start Date:</td>
+              <td><%= startDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Closure Date:</td>
+              <td><%= closureDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Outstanding Dues:</td>
+              <td>₹0.00</td>
+            </tr>
+            <tr>
+              <td class="label">Loan Status:</td>
+              <td>Closed - No Dues</td>
+            </tr>
+          </table>
+
+          <p>
+            Thank you for choosing <strong><%= lenderName %></strong> for your financial needs and for maintaining a timely repayment record.
+          </p>
+        </div>
+
+        <div class="footer">
+          <p>
+            For assistance, contact us at
+            <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> or call
+            <%= supportPhone %>.
+          </p>
+        </div>
+
+        <div class="note">
+          This is a system-generated certificate and does not require a signature.
+        </div>
+
+        <div class="certificate-id">
+          No Dues Certificate ID: <%= certificateId %>
+        </div>
+      </div>
+
+      <!-- Footer Image -->
+      <div class="footer-image">
+        <% if (footerImageUrl) { %>
+          <img src="<%= footerImageUrl %>" alt="Footer" />
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

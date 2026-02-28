@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loan No Dues Certificate</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+      body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #2c3e50;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .certificate-container {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* UPDATED HEADER IMAGE SECTION */
+      .header-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        z-index: 1;
+        height: 80px;          /* FIXED HEIGHT */
+        overflow: hidden;
+      }
+
+      .header-image img {
+        height: 80px;          /* FIXED HEIGHT */
+        width: auto;
+        object-fit: contain;   /* NO DISTORTION */
+        display: block;
+        margin: 0 auto;
+      }
+
+      .footer-image {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-top: 20px;
+      }
+
+      .footer-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+      }
+
+      /* Adjust top padding because header is now 80px */
+      .content-container {
+        padding: 110px 25px 20px 25px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .header h1 {
+        font-size: 18px;
+        margin: 0;
+        color: #1a1a1a;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .content {
+        font-size: 12px;
+        line-height: 1.4;
+        color: #333;
+      }
+
+      .content p {
+        margin-bottom: 8px;
+      }
+
+      .address-section {
+        margin-bottom: 15px;
+      }
+
+      .details {
+        margin: 20px 0;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .details td {
+        padding: 6px 8px;
+        vertical-align: top;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .details td.label {
+        font-weight: 600;
+        width: 30%;
+        color: #444;
+        background-color: #f8f9fa;
+      }
+
+      .details td:last-child {
+        color: #333;
+      }
+
+      .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 11px;
+        color: #666;
+      }
+
+      .note {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 10px;
+        color: #999;
+        font-style: italic;
+      }
+
+      .certificate-id {
+        font-size: 11px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+        color: #444;
+        padding: 8px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+      }
+
+      a {
+        color: #2e86de;
+        text-decoration: none;
+      }
+
+      .certification-text {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 15px 0;
+        border-left: 4px solid #2e86de;
+      }
+
+      .compact-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin: 15px 0;
+      }
+
+      .compact-section .left,
+      .compact-section .right {
+        flex: 1;
+      }
+
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .certificate-container {
+          box-shadow: none;
+          border: 1px solid #ddd;
+        }
+
+        .header-image,
+        .footer-image {
+          width: 100%;
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="certificate-container">
+
+      <!-- Header Image -->
+      <% if (headerImageUrl) { %>
+      <div class="header-image">
+        <img src="<%= headerImageUrl %>" alt="Header" />
+      </div>
+      <% } %>
+
+      <!-- Certificate Body -->
+      <div class="content-container">
+        <div class="header">
+          <h1>NO DUES CERTIFICATE</h1>
+        </div>
+
+        <div class="content">
+          <div class="address-section">
+            <p><strong>To:</strong></p>
+            <p><strong><%= customerName %></strong></p>
+            <p><%= customerAddress %></p>
+          </div>
+
+          <div class="certification-text">
+            <p>
+              This is to certify that the loan account bearing number
+              <strong><%= loanId %></strong>, held by you with
+              <strong><%= lenderName %></strong>, has been fully repaid and closed as of
+              <strong><%= closureDate %></strong>.
+            </p>
+            <p style="margin-bottom: 0;">
+              After reviewing your repayment history, we confirm that there are no pending dues as of the closure date.
+            </p>
+          </div>
+
+          <table class="details">
+            <tr>
+              <td class="label">Loan ID:</td>
+              <td><%= loanId %></td>
+            </tr>
+            <tr>
+              <td class="label">Loan Amount:</td>
+              <td>₹<%= loanAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Paid Amount:</td>
+              <td>₹<%= paidAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Start Date:</td>
+              <td><%= startDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Closure Date:</td>
+              <td><%= closureDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Outstanding Dues:</td>
+              <td><strong>₹0.00</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Loan Status:</td>
+              <td><strong>Closed - No Dues</strong></td>
+            </tr>
+          </table>
+
+          <p style="margin-top: 15px;">
+            Thank you for choosing <strong><%= lenderName %></strong> for your financial needs and for maintaining a timely repayment record.
+          </p>
+        </div>
+
+        <div class="footer">
+          <p>
+            For assistance, contact us at
+            <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> or call
+            <%= supportPhone %>.
+          </p>
+        </div>
+
+        <div class="certificate-id">
+          No Dues Certificate ID: <%= certificateId %>
+        </div>
+
+        <div class="note">
+          This is a system-generated certificate and does not require a signature.
+        </div>
+      </div>
+
+      <!-- Footer Image -->
+      <% if (footerImageUrl) { %>
+      <div class="footer-image">
+        <img src="<%= footerImageUrl %>" alt="Footer" />
+      </div>
+      <% } %>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Install Alpine dependencies for Prisma and other tools
+RUN apk add --no-cache openssl python3 make g++ libc6-compat
+
+COPY prisma ./prisma
+
+RUN npx prisma generate
+
+COPY . .
+
+EXPOSE 4002
+
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
+ENV PRISMA_ERD_ENABLED=false
+
+CMD ["npm", "run", "start:dev"]

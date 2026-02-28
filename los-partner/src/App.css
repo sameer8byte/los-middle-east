@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-active: var(--primary-active);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-contrast: var(--primary-contrast);
+  --color-primary-focus: var(--primary-focus);
+  --color-primary-light: var(--primary-light);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-active: var(--secondary-active);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-contrast: var(--secondary-contrast);
+  --color-secondary-focus: var(--secondary-focus);
+  --color-secondary-light: var(--secondary-light);
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+
+  --color-on-background: var(--on-background);
+  --color-on-surface: var(--on-surface);
+  --color-on-primary: var(--on-primary);
+  --color-on-secondary: var(--on-secondary);
+
+  --font-brand: var(--font-family);
+  --text-base: var(--base-font-size);
+  --radius-brand: var(--rounded-corners);
+  --dark-mode-enabled: var(--dark-mode);
+
+  --color-muted: var(--muted);
+}
+
+/* Global Design Tokens */
+:root {
+  --base-font-size: 16px;
+  --rounded-corners: 0;
+  --dark-mode: false;
+  --muted: #c8c8c8;
+
+  --primary: #ea5e18;
+  --primary-active: #bf360c;
+  --primary-hover: #e65100;
+  --primary-contrast: #ffffff;
+  --primary-focus: #ffab40;
+  --primary-light: #ffe0b2;
+
+  --secondary: #000000;
+  --secondary-active: #000000;
+  --secondary-hover: #1c1c1c;
+  --secondary-contrast: #ffffff;
+  --secondary-focus: #333333;
+  --secondary-light: #aaaaaa;
+
+  --background: #ffffff;
+  --on-background: #212529;
+  --surface: #f8f9fa;
+  --on-surface: #212529;
+  --on-primary: #212529;
+  --on-secondary: #495057;
+
+  --success: #28a745;
+  --warning: #ffc107;
+  --error: #dc3545;
+
+  --font-family: "Montserrat", sans-serif;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}

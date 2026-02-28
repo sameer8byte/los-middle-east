@@ -1,0 +1,3902 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PartnerLoginToken {
+  id            String      @id @default(uuid())
+  partnerUserId String
+  accessToken   String      @unique
+  refreshToken  String      @unique
+  expiresAt     DateTime
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deviceId      String?     @db.VarChar(255)
+  isLoggedOut   Boolean?    @default(false)
+  isLogoutAt    DateTime?
+  partner_user  PartnerUser @relation("PartnerUserToLoginTokens", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@map("partner_login_tokens")
+}
+
+model PartnerRole {
+  id            Int                     @id @default(autoincrement())
+  name          String                  @unique
+  description   String?
+  role_group_id String?                 @db.VarChar(16)
+  notifications notifications[]
+  brandRoles    PartnerUserBrandRole[]
+  globalRoles   PartnerUserGlobalRole[]
+
+  @@map("partner_roles")
+}
+
+model PartnerUser {
+  id                                 String                                @id @default(uuid())
+  email                              String                                @unique
+  password                           String
+  createdAt                          DateTime                              @default(now())
+  updatedAt                          DateTime
+  name                               String?
+  deletedAt                          DateTime?
+  isActive                           Boolean                               @default(true)
+  reportsToId                        String?
+  isReloanSupport                    Boolean                               @default(false)
+  old_id                             String?                               @db.VarChar(50)
+  is_fresh_loan_support              Boolean                               @default(true)
+  is_disabled                        Boolean                               @default(false)
+  phone_number                       String?                               @db.VarChar(10)
+  loanAllottedPartnerUsers           LoanAllottedPartnerUser[]
+  loan_collection_allocated_partner  loan_collection_allocated_partner[]   @relation("PartnerUserToLoanCollections")
+  loanStatusHistories                LoanStatusHistory[]                   @relation("PartnerUserToLoanStatusHistories")
+  notification_targets               notification_targets[]
+  createdNotifications               notifications[]
+  onboardingJourneys                 OnboardingJourney[]
+  loginTokens                        PartnerLoginToken[]                   @relation("PartnerUserToLoginTokens")
+  unavailabilityDates                PartnerUnavailabilityDate[]           @relation("PartnerToUnavailabilityDates")
+  activitySessions                   PartnerUserActivitySession[]          @relation("PartnerUserToActivitySessions")
+  brandRoles                         PartnerUserBrandRole[]
+  codeAuditLogs                      partner_user_code_audit_logs[]        @relation("PartnerUserToCodeAudits")
+  performedCodeAudits                partner_user_code_audit_logs[]        @relation("PartnerUserPerformedCodeAudits")
+  deactivatedCodes                   partner_user_codes[]                  @relation("PartnerUserDeactivatedCodes")
+  generatedCodes                     partner_user_codes[]                  @relation("PartnerUserGeneratedCodes")
+  partnerCodes                       partner_user_codes[]                  @relation("PartnerUserToCodes")
+  globalRoles                        PartnerUserGlobalRole[]
+  inactivityAlerts                   PartnerUserInactivityAlert[]          @relation("PartnerUserToInactivityAlerts")
+  loginLogs                          PartnerUserLoginLog[]                 @relation("PartnerUserToLoginLogs")
+  partner_user_password_reset_tokens PartnerUserPasswordResetToken[]
+  userPermissions                    PartnerUserPermission[]
+  primaryPermission                  PartnerUserPrimaryPermission?         @relation("PrimaryPermissionRelation")
+  reportLogs                         PartnerUserReportLog[]                @relation("PartnerUserToReportLogs")
+  partner_user_rules                 partner_user_rules?
+  reportsTo                          PartnerUser?                          @relation("PartnerUserHierarchy", fields: [reportsToId], references: [id])
+  subordinates                       PartnerUser[]                         @relation("PartnerUserHierarchy")
+  createdAutopayTransactions         payment_autopay_transaction[]         @relation("PaymentAutopayTransactionCreatedBy")
+  createdCollectionTransactions      PaymentCollectionTransaction[]        @relation("PaymentCollectionTransactionCreatedBy")
+  opsCollectionTransactions          PaymentCollectionTransaction[]        @relation("PaymentCollectionTransactionOpsBy")
+  createdDisbursalTransactions       PaymentDisbursalTransaction[]         @relation("PaymentDisbursalTransactionCreatedBy")
+  opsDisbursalTransactions           PaymentDisbursalTransaction[]         @relation("PaymentDisbursalTransactionOpsBy")
+  createdPartialTransactions         PaymentPartialCollectionTransaction[] @relation("PaymentPartialCollectionTransactionCreatedBy")
+  opsPartialTransactions             PaymentPartialCollectionTransaction[] @relation("PaymentPartialCollectionTransactionOpsBy")
+  repaymentTimelines                 RepaymentTimeline[]
+  serviceRequestLogs                 ServiceRequestLog[]
+  user_allotted_partner_user_logs    user_allotted_partner_user_logs[]
+  userCalls                          UserCall[]
+
+  @@index([isActive], map: "idx_partner_user_is_active")
+  @@index([createdAt], map: "idx_partner_user_created_at")
+  @@map("partner_users")
+}
+
+model PartnerUserLoginLog {
+  id            String      @id @default(uuid())
+  partnerUserId String
+  date          DateTime    @db.Date
+  firstLogin    DateTime
+  lastLogout    DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  partnerUser   PartnerUser @relation("PartnerUserToLoginLogs", fields: [partnerUserId], references: [id])
+
+  @@unique([partnerUserId, date])
+  @@index([partnerUserId, date], map: "idx_partner_login_log_partner_date")
+  @@index([date], map: "idx_partner_login_log_date")
+  @@map("partner_user_login_logs")
+}
+
+model PartnerUserActivitySession {
+  id               String                   @id @default(uuid())
+  partnerUserId    String
+  sessionId        String                   @unique
+  startTime        DateTime
+  endTime          DateTime?
+  totalEvents      Int                      @default(0)
+  inactiveTimeMs   Int                      @default(0)
+  pageViews        String[]                 @default([])
+  userAgent        String?
+  screenResolution String?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  activityLogs     PartnerUserActivityLog[]
+  partnerUser      PartnerUser              @relation("PartnerUserToActivitySessions", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@index([partnerUserId, startTime])
+  @@index([sessionId])
+  @@map("partner_user_activity_sessions")
+}
+
+model PartnerUserActivityLog {
+  id        String                     @id @default(uuid())
+  sessionId String
+  timestamp DateTime
+  eventType String
+  pageUrl   String
+  mouseX    Int?
+  mouseY    Int?
+  scrollPos Int?
+  createdAt DateTime                   @default(now())
+  session   PartnerUserActivitySession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+
+  @@index([sessionId, timestamp])
+  @@index([eventType])
+  @@map("partner_user_activity_logs")
+}
+
+model PartnerUserInactivityAlert {
+  id                  String      @id @default(uuid())
+  partnerUserId       String
+  inactiveTimeSeconds Int
+  lastActivityTime    DateTime
+  currentPage         String
+  alertSentAt         DateTime    @default(now())
+  createdAt           DateTime    @default(now())
+  partnerUser         PartnerUser @relation("PartnerUserToInactivityAlerts", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@index([partnerUserId, alertSentAt])
+  @@map("partner_user_inactivity_alerts")
+}
+
+model PaymentProviderLog {
+  id                             String                        @id @default(uuid())
+  paymentRequestId               String?
+  paymentDisbursalTransactionId  String?
+  paymentCollectionTransactionId String?
+  provider                       String                        @db.VarChar(50)
+  apiEndpoint                    String                        @db.VarChar(100)
+  correlationId                  String                        @db.VarChar(100)
+  requestHeaders                 Json?
+  requestBody                    String?
+  responseBody                   String?
+  responseStatus                 Int?
+  errorMessage                   String?
+  createdAt                      DateTime                      @default(now())
+  paymentCollectionTransaction   PaymentCollectionTransaction? @relation(fields: [paymentCollectionTransactionId], references: [id])
+  paymentDisbursalTransaction    PaymentDisbursalTransaction?  @relation(fields: [paymentDisbursalTransactionId], references: [id])
+  paymentRequest                 PaymentRequest?               @relation(fields: [paymentRequestId], references: [id])
+
+  @@map("payment_provider_log")
+}
+
+model PartnerUserPasswordResetToken {
+  id            String      @id @default(uuid())
+  token         String      @unique
+  partnerUserId String
+  expiresAt     DateTime
+  usedAt        DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  redirectLink  String      @db.VarChar(255)
+  partner_users PartnerUser @relation(fields: [partnerUserId], references: [id], map: "partner_user_password_reset_tokens_userId_fkey")
+
+  @@map("partner_user_password_reset_tokens")
+}
+
+model PartnerPermission {
+  id                  Int                            @id @default(autoincrement())
+  name                String                         @unique
+  description         String?
+  permission_group_id String?                        @db.VarChar(32)
+  userPermissions     PartnerUserPermission[]
+  primaryPermissions  PartnerUserPrimaryPermission[]
+
+  @@map("partner_permissions")
+}
+
+model PartnerUserPermission {
+  partnerUserId         String
+  partnerPermissionId   Int
+  partnerPermissionType PermissionType    @default(ALL)
+  partnerPermission     PartnerPermission @relation(fields: [partnerPermissionId], references: [id])
+  partnerUser           PartnerUser       @relation(fields: [partnerUserId], references: [id])
+
+  @@id([partnerUserId, partnerPermissionId])
+  @@index([partnerUserId], map: "idx_partner_user_perm_partner_user_id")
+  @@index([partnerPermissionId], map: "idx_partner_user_perm_permission_id")
+  @@map("partner_user_permissions")
+}
+
+model PartnerUserPrimaryPermission {
+  partnerUserId       String            @unique
+  partnerPermissionId Int
+  partnerPermission   PartnerPermission @relation(fields: [partnerPermissionId], references: [id])
+  partnerUser         PartnerUser       @relation("PrimaryPermissionRelation", fields: [partnerUserId], references: [id])
+
+  @@map("partner_user_primary_permissions")
+}
+
+model PartnerUserBrandRole {
+  partnerUserId String
+  brandId       String
+  roleId        Int
+  brand         Brand       @relation(fields: [brandId], references: [id])
+  user          PartnerUser @relation(fields: [partnerUserId], references: [id])
+  role          PartnerRole @relation(fields: [roleId], references: [id])
+
+  @@id([brandId, partnerUserId])
+  @@index([partnerUserId, brandId], map: "idx_partner_brand_role_partner_brand")
+  @@index([roleId], map: "idx_partner_brand_role_role_id")
+  @@map("partner_user_brand_roles")
+}
+
+model PartnerUserGlobalRole {
+  partnerUserId String
+  roleId        Int
+  user          PartnerUser @relation(fields: [partnerUserId], references: [id])
+  role          PartnerRole @relation(fields: [roleId], references: [id])
+
+  @@id([partnerUserId, roleId])
+  @@map("partner_user_global_roles")
+}
+
+model BrandTheme {
+  id                     String   @id @default(uuid())
+  brandId                String   @unique
+  primaryColor           String   @default("#FF6F00")
+  secondaryColor         String   @default("#000000")
+  backgroundColor        String   @default("#FDFDFD")
+  surfaceColor           String   @default("#F8F9FA")
+  primaryTextColor       String   @default("#212529")
+  secondaryTextColor     String   @default("#495057")
+  successColor           String   @default("#28A745")
+  warningColor           String   @default("#FFC107")
+  errorColor             String   @default("#DC3545")
+  fontFamily             String   @default("system-ui")
+  baseFontSize           Int      @default(16)
+  roundedCorners         Boolean  @default(true)
+  darkMode               Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  primaryHoverColor      String   @default("#E65100")
+  primaryFocusColor      String   @default("#FFAB40")
+  primaryActiveColor     String   @default("#BF360C")
+  primaryLightColor      String   @default("#FFE0B2")
+  primaryContrastColor   String   @default("#FFFFFF")
+  secondaryHoverColor    String   @default("#1C1C1C")
+  secondaryFocusColor    String   @default("#333333")
+  secondaryActiveColor   String   @default("#000000")
+  secondaryLightColor    String   @default("#AAAAAA")
+  secondaryContrastColor String   @default("#FFFFFF")
+  surfaceTextColor       String   @default("#212529")
+  backgroundTextColor    String   @default("#212529")
+  brand                  Brand    @relation("BrandToTheme", fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_themes")
+}
+
+model DigitapSomeTable {
+  id                      String   @id @default(uuid())
+  userId                  String
+  brandId                 String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  panDetailsPlus          Json?
+  mobilePrefill           Json?
+  mobileAccountLookup     Json?
+  pennyDropResponse       Json?
+  intiateKycAuto          Json?
+  submitOtp               Json?
+  pennyDropStatus         Json?
+  kycUnifiedv1GenerateUrl Json?
+  kycUnifiedv1Details     Json?
+  brand                   Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, brandId])
+  @@map("digitap_some_table")
+}
+
+model BankAccountStatement {
+  id                String             @id @default(uuid())
+  userId            String
+  userBankAccountId String
+  filePrivateKey    String
+  fromDate          DateTime?
+  toDate            DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  filePassword      String?            @db.VarChar(255)
+  message           String?            @db.VarChar(255)
+  isFraud           Boolean            @default(false) @map(" isFraud")
+  fraudScore        Int                @default(0)
+  user_bank_account UserBankAccount    @relation(fields: [userBankAccountId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartSomeTable     CartSomeTable[]
+  FinboxSomeTable   FinboxSomeTable[]
+  scoreMeSomeTable  ScoreMeSomeTable[]
+
+  @@map("bank_account_statement")
+}
+
+model FinboxSomeTable {
+  id                     String               @id @default(uuid())
+  userId                 String
+  userBankAccountId      String
+  bankAccountStatementId String
+  sessionResponse        Json?
+  statementUploadSession Json?
+  sessionId              String               @unique(map: "finbox_some_table_index_2")
+  statementId            String?
+  uploadedAt             DateTime             @default(now())
+  createdAt              DateTime             @default(now())
+  initiateProcessing     Json?
+  bank_account_statement BankAccountStatement @relation(fields: [bankAccountStatementId], references: [id], onDelete: Cascade)
+  user_bank_account      UserBankAccount      @relation(fields: [userBankAccountId], references: [id], onDelete: Cascade)
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finbox_some_table")
+}
+
+model ScoreMeSomeTable {
+  id                      String                @id @default(uuid())
+  userId                  String
+  userBankAccountId       String?
+  uploadedAt              DateTime              @default(now())
+  createdAt               DateTime              @default(now())
+  referenceId             String?               @unique(map: "scoreme_some_table_index_2")
+  uploadJson              Json?
+  bsaReportJson           Json?
+  bankAccountStatementId  String?
+  bsaReportDownloadJson   Json?
+  bsaReportXlsxPrivateKey String?               @db.VarChar(255)
+  intiateKycAuto          Json?
+  intiateKycDocumentId    String?               @db.VarChar(255)
+  submitOtp               Json?
+  bank_account_statement  BankAccountStatement? @relation(fields: [bankAccountStatementId], references: [id], onDelete: Cascade)
+  user_bank_account       UserBankAccount?      @relation(fields: [userBankAccountId], references: [id], onDelete: Cascade)
+  user                    User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, userBankAccountId, bankAccountStatementId], map: "scoreme_some_table_index_3")
+  @@unique([userId, intiateKycDocumentId], map: "scoreme_some_table_index_4")
+  @@map("scoreme_some_table")
+}
+
+model CartSomeTable {
+  id                      String               @id @default(uuid())
+  userId                  String
+  userBankAccountId       String
+  uploadedAt              DateTime             @default(now())
+  createdAt               DateTime             @default(now())
+  referenceId             String               @unique(map: "cart_some_table_reference_id_unique")
+  uploadJson              Json?
+  bankAccountStatementId  String
+  bsaReportDownloadJson   Json?
+  bsaReportXlsxPrivateKey String?              @db.VarChar(255)
+  bsaReportJson           Json?
+  bankAccountStatement    BankAccountStatement @relation(fields: [bankAccountStatementId], references: [id], onDelete: Cascade)
+  userBankAccount         UserBankAccount      @relation(fields: [userBankAccountId], references: [id], onDelete: Cascade)
+  user                    User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, userBankAccountId, bankAccountStatementId], map: "cart_some_table_index_3")
+  @@map("cart_some_table")
+}
+
+model EquifaxSomeTable {
+  id                              String   @id @default(uuid())
+  userId                          String
+  braReportJson                   Json?
+  documentUrl                     String?
+  uploadedAt                      DateTime @default(now())
+  createdAt                       DateTime @default(now())
+  errorCode                       String?  @db.VarChar(10)
+  errorMessage                    String?  @db.VarChar(255)
+  encodedPdf                      Bytes?
+  password                        String?  @default("1229Oct2025") @db.VarChar(64)
+  cibil_pdf_key                   String?  @db.VarChar(255)
+  cibil_json_gz_key               String?  @db.VarChar(255)
+  generated_cibil_report_html_key String?  @db.VarChar(255)
+  metadata                        Json?
+  user                            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("equifax_some_table")
+}
+
+model CirProV2SomeTable {
+  id                              String   @id @default(uuid())
+  userId                          String
+  rawReportJson                   Json?
+  reportDocumentUrl               String?
+  uploadedAt                      DateTime @default(now())
+  createdAt                       DateTime @default(now())
+  errorCode                       String?  @db.VarChar(10)
+  errorMessage                    String?  @db.VarChar(255)
+  formattedReport                 String?
+  cibil_html_key                  String?  @db.VarChar(255)
+  cibil_json_gz_key               String?  @db.VarChar(255)
+  generated_cibil_report_html_key String?  @db.VarChar(255)
+  metadata                        Json?
+  user                            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("cirprov2_some_table")
+}
+
+model SignDeskSomeTable {
+  id                       String                 @id @default(uuid())
+  userId                   String
+  loanId                   String
+  loanAgreementsId         String
+  responseJson             Json?
+  uploadedAt               DateTime               @default(now())
+  createdAt                DateTime               @default(now())
+  loanAgreementReferenceId String
+  documentId               String?
+  callbackResponse         Json?
+  manualSyncResponse       Json?
+  pdfBlob                  Bytes?
+  workflowUrl              String?
+  loanAgreementReference   LoanAgreementReference @relation(fields: [loanAgreementReferenceId], references: [id], onDelete: SetNull)
+  loanAgreement            LoanAgreement          @relation(fields: [loanAgreementsId], references: [id])
+  loan                     Loan                   @relation(fields: [loanId], references: [id])
+  user                     User                   @relation(fields: [userId], references: [id])
+
+  @@map("signdesk_some_table")
+}
+
+model UserBankAccount {
+  id                   String                         @id @default(uuid())
+  userId               String
+  accountHolderName    String?
+  accountNumber        String?
+  ifscCode             String?
+  bankName             String?
+  accountType          String
+  isVerified           Boolean                        @default(false)
+  verificationMethod   user_bank_verification_method?
+  verificationStatus   user_bank_verification_status  @default(PENDING)
+  verifiedAt           DateTime?
+  createdAt            DateTime                       @default(now())
+  updatedAt            DateTime                       @default(now())
+  userDataStatus       user_data_status               @default(NOT_VERIFIED)
+  bankAddress          String?                        @db.VarChar(255)
+  isPrimary            Boolean                        @default(false)
+  pennyDropResponse    Json?
+  pennyDropStatus      Json?
+  pennyVerifiedName    String?                        @db.VarChar(255)
+  BankAccountStatement BankAccountStatement[]
+  cartSomeTable        CartSomeTable[]
+  FinboxSomeTable      FinboxSomeTable[]
+  pennyDropLogs        penny_drop_log[]
+  scoreMeSomeTable     ScoreMeSomeTable[]
+  user                 User                           @relation(fields: [userId], references: [id], map: "user_bank_account_user_id_fkey")
+
+  @@unique([userId, accountNumber], map: "user_bank_account_index_2")
+  @@map("user_bank_account")
+}
+
+model AlternateAddress {
+  id               String            @id @default(uuid())
+  userId           String
+  address          String
+  city             String
+  state            String
+  pincode          String
+  country          String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
+  residenceType    ResidenceTypeEnum @default(OWNED)
+  filePrivateKey   String?
+  addressProofType AddressProofEnum?
+  isActive         Boolean           @default(true)
+  isDisabled       Boolean           @default(false)
+  remarks          String?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("alternate_addresses")
+}
+
+model Payslip {
+  id             String     @id @default(uuid())
+  userId         String
+  employmentId   String
+  month          Int
+  year           Int
+  filePrivateKey String
+  fileName       String?
+  uploadedAt     DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  filePassword   String?    @db.VarChar(255)
+  employment     Employment @relation(fields: [employmentId], references: [id], onDelete: Cascade)
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, employmentId, month, year], name: "unique_payslip_per_month")
+  @@map("payslips")
+}
+
+model AlternatePhoneNumber {
+  id               String            @id @default(uuid())
+  userId           String
+  phone            String            @db.VarChar(20)
+  label            String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
+  isVerified       Boolean           @default(false)
+  verifiedAt       DateTime?
+  name             String?
+  otp              String?           @db.VarChar(6)
+  relationship     RelationshipEnum?
+  verificationType VerificationType  @default(OTP)
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, phone], map: "alternate_phone_numbers_index_2")
+  @@map("alternate_phone_numbers")
+}
+
+model CallMeRequest {
+  id          String    @id @default(uuid())
+  userId      String
+  brandId     String
+  message     String
+  createdAt   DateTime  @default(now())
+  phoneNumber String    @db.VarChar(15)
+  isResolved  Boolean   @default(false)
+  updatedAt   DateTime
+  resolvedAt  DateTime?
+  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("call_me_requests")
+}
+
+model previous_employments {
+  id                String    @id @default(uuid())
+  userId            String
+  brandId           String
+  customerName      String
+  uanNumber         String?   @db.VarChar(12)
+  memberId          String?   @db.VarChar(50)
+  joiningDate       DateTime?
+  exitDate          DateTime?
+  guardianName      String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  establishmentName String?   @db.VarChar(255)
+  brand             Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PanAadhaarVerification {
+  id               String             @id @default(uuid())
+  documentId       String             @unique
+  httpResponseCode Int
+  resultCode       Int
+  requestId        String
+  clientRefNum     String
+  pan              String
+  panType          String
+  fullname         String
+  firstName        String
+  middleName       String
+  lastName         String
+  gender           String
+  aadhaarNumber    String
+  aadhaarLinked    Boolean
+  dob              DateTime
+  mobile           String?
+  email            String?
+  createdAt        DateTime           @default(now())
+  address          PanAadhaarAddress?
+  document         Document           @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("pan_aadhaar_verification")
+}
+
+model MobileToPanVerification {
+  id             String    @id @default(uuid())
+  userId         String
+  brandId        String
+  mobile         String
+  firstName      String
+  lastName       String?
+  pan            String?
+  fullName       String?
+  gender         String?
+  dateOfBirth    DateTime?
+  profilePicUrl  String?
+  responseCode   Int?
+  message        String?
+  status         Int?
+  timestamp      DateTime
+  transactionId  String
+  statusCode     Int
+  statusText     String
+  success        Boolean
+  packageVersion String?
+  msg            String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+  brand          Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, brandId], map: "unique_user_brand")
+  @@map("mobile_to_pan_verifications")
+}
+
+model PanAadhaarAddress {
+  id             String                 @id @default(uuid())
+  verificationId String                 @unique
+  buildingName   String
+  locality       String
+  streetName     String
+  pincode        String
+  city           String
+  state          String
+  country        String
+  createdAt      DateTime               @default(now())
+  verification   PanAadhaarVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+
+  @@map("pan_aadhaar_address")
+}
+
+model User {
+  id                                                  String                            @id @default(uuid())
+  email                                               String?                           @db.VarChar(255)
+  phoneNumber                                         String?                           @db.VarChar(13)
+  createdAt                                           DateTime                          @default(now())
+  updatedAt                                           DateTime                          @default(now())
+  onboardingStep                                      Int                               @default(1)
+  isEmailVerified                                     Boolean                           @default(false)
+  brandId                                             String?
+  isPhoneVerified                                     Boolean?                          @default(false)
+  googleId                                            String?                           @db.VarChar(255)
+  isWhatsappVerified                                  Boolean                           @default(false)
+  emailVerifiedAt                                     DateTime?
+  phoneVerifiedAt                                     DateTime?
+  whatsappVerifiedAt                                  DateTime?
+  formattedUserId                                     String?                           @unique(map: "users_index_5") @db.VarChar(255)
+  isActive                                            Boolean                           @default(false)
+  legacy_id                                           String?                           @unique @db.VarChar(24)
+  migrationStatus                                     MigrationStatus                   @default(ONBOARDED_NEW)
+  brandSubDomainId                                    String?
+  phoneNumberAge                                      String?                           @db.VarChar(64)
+  signUpVersion                                       String                            @default("V1") @db.Char(2)
+  allocated_partner_user_id                           String?                           @db.Uuid
+  allocated_at                                        DateTime?
+  alternate_phone_1                                   String?                           @db.VarChar(10)
+  alternate_phone_2                                   String?                           @db.VarChar(10)
+  status_id                                           BigInt?                           @default(1)
+  occupation_type_id                                  BigInt?                           @default(7)
+  rejected_by_id                                      BigInt?
+  is_terms_accepted                                   Boolean                           @default(false)
+  is_auto_rejected                                    Boolean?
+  aa_consent_requests                                 aa_consent_requests[]
+  aadhaarDigiLockerLogs                               aadhaar_digi_locker_log[]
+  alternateAddresses                                  AlternateAddress[]
+  alternatePhoneNumbers                               AlternatePhoneNumber[]
+  BankAccountStatement                                BankAccountStatement[]
+  callMeRequests                                      CallMeRequest[]
+  cartSomeTable                                       CartSomeTable[]
+  cirProV2SomeTable                                   CirProV2SomeTable[]
+  digitap_esign_some_table                            digitap_esign_some_table[]
+  digitapSomeTables                                   DigitapSomeTable[]
+  documents                                           Document[]
+  employment                                          Employment?
+  equifaxSomeTable                                    EquifaxSomeTable[]
+  evaluations                                         Evaluation[]
+  FinboxSomeTable                                     FinboxSomeTable[]
+  kyccart_some_tables                                 kyccart_some_table[]              @relation("UserToKyccart")
+  leadMatches                                         lead_matches[]
+  loans                                               Loan[]
+  mobileToPanVerifications                            MobileToPanVerification[]
+  mobile_verification_logs                            mobile_verification_logs[]
+  notifications                                       notifications[]
+  onboardingJourneys                                  OnboardingJourney[]
+  otherDocuments                                      OtherDocument[]
+  panDetailsLogs                                      pan_details_log[]
+  paymentRequests                                     PaymentRequest[]
+  payslips                                            Payslip[]
+  pennyDropLogs                                       penny_drop_log[]
+  phoneToUanLogs                                      phone_to_uan_log[]
+  previous_employments                                previous_employments[]
+  repaymentTimelines                                  RepaymentTimeline[]
+  bdaReports                                          BdaReport[]
+  scoreMeSomeTable                                    ScoreMeSomeTable[]
+  serviceRequestLogs                                  ServiceRequestLog[]
+  signDeskEntries                                     SignDeskSomeTable[]
+  signzySomeTables                                    signzy_some_table[]
+  uanToEmploymentLogs                                 uan_to_employment_log[]
+  user_allotted_partner_user_logs                     user_allotted_partner_user_logs[]
+  user_bank_account                                   UserBankAccount[]
+  userCalls                                           UserCall[]
+  userDetails                                         UserDetails?                      @relation("UserToUserDetails")
+  userGeoTags                                         UserGeoTag[]
+  loginTokens                                         UserLoginToken[]
+  userNotifications                                   UserNotification[]
+  otpVerifications                                    UserOtpVerification[]
+  userRejections                                      UserRejection[]
+  userReloans                                         UserReloan[]
+  user_reminders                                      user_reminders[]
+  user_status                                         user_status?
+  user_status_brand_reasons                           user_status_brand_reasons[]
+  master_value_users_occupation_type_idTomaster_value master_value?                     @relation("users_occupation_type_idTomaster_value", fields: [occupation_type_id], references: [id], onDelete: Restrict, map: "fk_users_occupation_type")
+  master_value_users_rejected_by_idTomaster_value     master_value?                     @relation("users_rejected_by_idTomaster_value", fields: [rejected_by_id], references: [id], onDelete: Restrict, map: "fk_users_rejection_type")
+  master_value_users_status_idTomaster_value          master_value?                     @relation("users_status_idTomaster_value", fields: [status_id], references: [id], onDelete: Restrict, map: "fk_users_status")
+  brand                                               Brand?                            @relation(fields: [brandId], references: [id])
+  brandSubDomain                                      brand_sub_domains?                @relation(fields: [brandSubDomainId], references: [id])
+  utmTracking                                         UTMTracking[]
+  whatsapp_message_logs                               whatsapp_message_logs[]
+
+  @@unique([phoneNumber, brandId], map: "users_index_2")
+  @@unique([email, brandId], map: "users_index_3")
+  @@index([allocated_partner_user_id, isActive, brandId], map: "idx_user_allocated_partner_active_brand")
+  @@index([allocated_partner_user_id, allocated_at], map: "idx_user_allocated_partner_allocated_at")
+  @@index([brandId, allocated_partner_user_id], map: "idx_user_brand_allocated_partner")
+  @@index([occupation_type_id], map: "idx_users_occupation_type_id")
+  @@index([status_id], map: "idx_users_status_id")
+  @@index([rejected_by_id], map: "idx_users_rejected_by_id")
+  @@index([brandId, isActive, createdAt(sort: Desc)], map: "idx_users_brand_active_created")
+  @@index([email(ops: raw("gin_trgm_ops"))], map: "idx_users_email_trgm", type: Gin)
+  @@index([id, isActive], map: "idx_users_id_active")
+  @@index([isActive], map: "idx_users_isactive")
+  @@index([phoneNumber(ops: raw("gin_trgm_ops"))], map: "idx_users_phone_trgm", type: Gin)
+  @@index([id, isActive], map: "idx_users_active")
+  @@map("users")
+}
+
+model UserReloan {
+  id             String       @id @default(uuid())
+  userId         String
+  previousLoanId String
+  status         ReloanStatus @default(PENDING)
+  reason         String?
+  remarks        String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+  isResolved     Boolean      @default(false)
+  previousLoan   Loan         @relation("PreviousLoanRelation", fields: [previousLoanId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([previousLoanId])
+  @@map("user_reloan")
+}
+
+model UTMTracking {
+  id             String   @id @default(uuid())
+  userId         String?
+  brandId        String?
+  sessionId      String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmTerm        String?
+  utmContent     String?
+  landingPageUrl String?
+  referrerUrl    String?
+  capturedAt     DateTime @default(now())
+  fbclid         String?
+  utmId          String?
+  clickid        String?  @db.VarChar(255)
+  brand          Brand?   @relation(fields: [brandId], references: [id])
+  user           User?    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, utmMedium], map: "utm_tracking_index_2")
+  @@map("utm_tracking")
+}
+
+model UserNotification {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String
+  payload   Json
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+  updatedAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@map("user_notifications")
+}
+
+model BdaReport {
+  id                      String   @id @default(uuid())
+  userId                  String
+  referenceId             String   @unique
+  jsonUrl                 String?
+  excelUrl                String?
+  generatedAt             DateTime @default(now())
+  generatedMonth          DateTime
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  brandId                 String?
+  jsonResponse            Json?
+  bdaReportXlsxPrivateKey String?  @db.VarChar(255)
+  status                  String?  @db.VarChar(255)
+  brand                   Brand?   @relation(fields: [brandId], references: [id])
+  user                    User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, generatedMonth])
+  @@map("scoreme_bda_report")
+}
+
+model UserCall {
+  id                        String              @id @default(uuid())
+  brandId                   String
+  partnerUserId             String
+  userId                    String
+  alternate_phone_number_id String?             @db.VarChar(255)
+  loan_id                   String?             @db.VarChar(255)
+  repaymentTimelines        RepaymentTimeline[]
+  events                    UserCallEvent[]
+  recordings                UserCallRecording[]
+  brand                     Brand               @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  partnerUser               PartnerUser         @relation(fields: [partnerUserId], references: [id], onDelete: Cascade)
+  user                      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_calls")
+}
+
+model UserCallEvent {
+  id                String   @id @default(uuid())
+  userCallId        String
+  endCallCause      String?
+  actorType         String?
+  original          Boolean?
+  isVideoCall       Boolean?
+  peerToPeer        Boolean?
+  timestampMs       BigInt?
+  endedBy           String?
+  type              String?
+  callType          String?
+  callId            String?
+  actor             String?
+  duration          Int?
+  callCreatedReason String?
+  callStatus        String?
+  eventId           String?
+  projectId         Int?
+  serial            Int?
+  answerDuration    Int?
+  requestFromUserId String?
+  accountSid        String?
+  clientCustomData  String?
+  fromNumber        String?
+  fromAlias         String?
+  fromIsOnline      Boolean?
+  fromType          String?
+  toNumber          String?
+  toAlias           String?
+  toIsOnline        Boolean?
+  toType            String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
+  userCall          UserCall @relation(fields: [userCallId], references: [id], onDelete: Cascade)
+
+  @@map("user_call_events")
+}
+
+model UserCallRecording {
+  id             String    @id @default(uuid())
+  userCallId     String
+  recordingUrl   String?
+  callId         String?
+  type           String?
+  projectId      Int?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+  startTime      DateTime?
+  endTime        DateTime?
+  recordMessage  Boolean?  @default(false)
+  filePrivateUrl String?   @db.VarChar(255)
+  userCall       UserCall  @relation(fields: [userCallId], references: [id], onDelete: Cascade)
+
+  @@map("user_call_recordings")
+}
+
+model RepaymentTimeline {
+  id            String      @id @default(uuid())
+  userId        String
+  brandId       String
+  partnerUserId String
+  fileUrl       String?
+  message       String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  loanId        String?
+  userCallId    String?
+  brand         Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  loan          Loan?       @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  partnerUser   PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade)
+  userCall      UserCall?   @relation(fields: [userCallId], references: [id])
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("repayment_timeline")
+}
+
+model Evaluation {
+  id                      String            @id @default(uuid())
+  userId                  String
+  createdAt               DateTime          @default(now())
+  loanId                  String
+  autoGeneratedFeedback   String?           @db.VarChar(255)
+  isBsaReportAvailable    Boolean           @default(false)
+  isCreditReportAvailable Boolean           @default(false)
+  isAaAvailable           Boolean           @default(false)
+  is_cam_available        Boolean           @default(false)
+  evaluation_item         evaluation_item[]
+  loans                   Loan              @relation(fields: [loanId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "evaluations_relation_2")
+  user                    User              @relation(fields: [userId], references: [id])
+
+  @@unique([userId, loanId], map: "evaluations_index_2")
+  @@map("evaluations")
+}
+
+model UserGeoTag {
+  id          String   @id @default(uuid())
+  userId      String
+  latitude    Float
+  longitude   Float
+  address     String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  city        String?
+  country     String?
+  district    String?
+  postalCode  String?
+  state       String?
+  street      String?
+  sublocality String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_geo_tags")
+}
+
+model UserRejection {
+  id               String          @id @default(uuid())
+  userId           String
+  rejectionType    RejectionType
+  reason           String
+  rejectedBy       RejectionSource
+  rejectionEndDate DateTime?
+  createdAt        DateTime        @default(now())
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_rejections")
+}
+
+model Employment {
+  id                   String                @id @default(uuid())
+  userId               String                @unique
+  companyName          String?               @db.VarChar(255)
+  designation          String?               @db.VarChar(255)
+  joiningDate          DateTime?
+  salary               Int?
+  companyAddress       String?               @db.VarChar(512)
+  pinCode              String?               @db.VarChar(6)
+  uanNumber            String?               @db.VarChar(255)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @default(now())
+  modeOfSalary         ModeOfSalary?
+  userDataStatus       user_data_status      @default(NOT_VERIFIED)
+  expectedDateOfSalary Int?                  @default(5) @db.SmallInt
+  salaryExceedsBase    Boolean               @default(true)
+  officialEmail        String?               @db.VarChar(255)
+  employmenttype       employment_type_enum? @default(FULL_TIME)
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payslips             Payslip[]
+
+  @@map("employment")
+}
+
+model Document {
+  id                     String                  @id @default(uuid())
+  userId                 String
+  frontDocumentUrl       String?
+  verificationNotes      String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @default(now())
+  documentNumber         String?                 @db.VarChar(255)
+  userDataStatus         user_data_status        @default(NOT_VERIFIED)
+  backDocumentUrl        String?
+  verifiedAt             DateTime?
+  isApprovedByAdmin      Boolean                 @default(false)
+  providerData           Json?
+  backPassword           String?                 @db.VarChar(255)
+  frontPassword          String?                 @db.VarChar(255)
+  type                   DocumentTypeEnum?
+  status                 document_status_enum    @default(PENDING)
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leadMatches            lead_matches[]
+  panAadhaarVerification PanAadhaarVerification?
+
+  @@unique([userId, type], map: "documents_unique")
+  @@index([documentNumber(ops: raw("gin_trgm_ops"))], map: "idx_documents_number_trgm", type: Gin)
+  @@map("documents")
+}
+
+model OtherDocument {
+  id                String           @id @default(uuid())
+  userId            String
+  frontDocumentUrl  String
+  verificationNotes String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
+  type              String?          @db.VarChar(255)
+  documentNumber    String?          @db.VarChar(255)
+  status            String           @default("PENDING") @db.VarChar(255)
+  userDataStatus    user_data_status @default(NOT_VERIFIED)
+  backDocumentUrl   String?
+  verifiedAt        DateTime?
+  isApprovedByAdmin Boolean          @default(false)
+  providerData      Json?
+  backPassword      String?          @db.VarChar(255)
+  frontPassword     String?          @db.VarChar(255)
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("other_documents")
+}
+
+model Brand {
+  id                           String                          @id @default(uuid())
+  name                         String                          @unique
+  logoUrl                      String?
+  createdAt                    DateTime                        @default(now())
+  updatedAt                    DateTime                        @default(now())
+  domain                       String?                         @unique(map: "brands_domain") @db.VarChar(255)
+  defaultLoanRiskCategory      LoanRiskCategory?
+  onPartner                    Boolean                         @default(false)
+  loanPrefix                   String?                         @unique(map: "brands_index_4") @db.VarChar(255)
+  customerPrefix               String?                         @db.VarChar(255)
+  isUATServices                Boolean                         @default(false)
+  partner_version              String?                         @db.VarChar(10)
+  force_refresh                Boolean?                        @default(false)
+  web_version                  String?                         @db.VarChar(10)
+  aa_consent_requests          aa_consent_requests[]
+  aadhaarDigiLockerLogs        aadhaar_digi_locker_log[]
+  brand_api_keys               brand_api_keys[]                @relation("BrandToApiKeys")
+  brandBankAccounts            BrandBankAccount[]
+  blocklistedAadhaars          BrandBlocklistedAadhar[]
+  blocklistedAccountNumbers    BrandBlocklistedAccountNumber[]
+  blocklistedMobiles           BrandBlocklistedMobile[]
+  blocklistedPans              BrandBlocklistedPan[]
+  brand_blocklisted_pincode    brand_blocklisted_pincode[]
+  brandBlogs                   BrandBlog[]                     @relation("BrandToBlogs")
+  brandCards                   BrandCard[]                     @relation("BrandToCards")
+  brandConfig                  BrandConfig?
+  brandDetails                 BrandDetails?                   @relation("BrandToDetails")
+  brand_evaluation_items       brand_evaluation_items[]
+  brand_loan_agreement_configs brand_loan_agreement_configs?   @relation("BrandToLoanAgreementConfig")
+  brandNonRepaymentDates       BrandNonRepaymentDate[]         @relation("BrandToNonRepaymentDates")
+  brand_paths                  brand_paths[]
+  brandPolicyLinks             BrandPolicyLinks?
+  brandProviders               BrandProvider[]
+  brand_status_reasons         brand_status_reasons[]
+  brand_sub_domains            brand_sub_domains[]
+  brand_themes                 BrandTheme?                     @relation("BrandToTheme")
+  callMeRequests               CallMeRequest[]
+  digitapSomeTables            DigitapSomeTable[]
+  emailReminderConfigs         EmailReminderConfig[]           @relation("BrandToEmailReminderConfigs")
+  kyccart_some_tables          kyccart_some_table[]            @relation("BrandToKyccart")
+  lead_forms                   lead_forms[]
+  leadMatches                  lead_matches[]
+  loanRules                    LoanRule[]
+  loanXlsxFiles                LoanXlsxFile[]
+  loans                        Loan[]
+  mobileToPanVerifications     MobileToPanVerification[]
+  mobile_verification_logs     mobile_verification_logs[]
+  notifications                notifications[]
+  onboardingJourneys           OnboardingJourney[]
+  panDetailsLogs               pan_details_log[]
+  partnerUserBrandRoles        PartnerUserBrandRole[]
+  partnerUserReportLogs        PartnerUserReportLog[]
+  paymentRequests              PaymentRequest[]
+  pennyDropLogs                penny_drop_log[]
+  phoneToUanLogs               phone_to_uan_log[]
+  previous_employments         previous_employments[]
+  repaymentTimelines           RepaymentTimeline[]
+  bdaReports                   BdaReport[]
+  serviceRequestLogs           ServiceRequestLog[]
+  uanToEmploymentLogs          uan_to_employment_log[]
+  userCalls                    UserCall[]
+  users                        User[]
+  utmTracking                  UTMTracking[]
+  whatsapp_message_logs        whatsapp_message_logs[]
+  whatsapp_reminder_configs    whatsapp_reminder_configs[]
+
+  @@map("brands")
+}
+
+model brand_api_keys {
+  id                 String    @id @default(uuid())
+  brand_id           String
+  name               String    @db.VarChar(255)
+  key                String    @unique @db.VarChar(255)
+  description        String?   @db.VarChar(500)
+  is_active          Boolean   @default(true)
+  last_used_at       DateTime?
+  expires_at         DateTime?
+  created_by_user_id String?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  brand              Brand     @relation("BrandToApiKeys", fields: [brand_id], references: [id], onDelete: Cascade)
+
+  @@index([brand_id])
+  @@index([is_active])
+  @@index([expires_at])
+  @@index([brand_id, is_active])
+  @@index([brand_id, key])
+}
+
+model partner_user_audit_logs {
+  id                           String   @id @default(uuid())
+  partner_user_id              String?
+  brand_id                     String
+  action                       String
+  changes                      Json?
+  status                       String
+  error_message                String?
+  metadata                     Json?
+  created_at                   DateTime @default(now())
+  performed_by_partner_user_id String?  @db.VarChar(255)
+
+  @@index([partner_user_id], map: "partner_user_audit_logs_partnerUserId_idx")
+  @@index([performed_by_partner_user_id], map: "partner_user_audit_logs_performedByUserId_idx")
+  @@index([created_at], map: "partner_user_audit_logs_createdAt_idx")
+  @@index([brand_id], map: "partner_user_audit_logs_brandId_idx")
+  @@map("partner_user_audit_logs")
+}
+
+model partner_user_codes {
+  id                  String       @id @default(uuid())
+  partnerUserId       String
+  encryptedCode       String
+  encryptionIv        String
+  encryptionSalt      String
+  isActive            Boolean      @default(true)
+  generatedByUserId   String?
+  deactivatedByUserId String?
+  deactivatedAt       DateTime?
+  expiresAt           DateTime
+  metadata            Json?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  deactivatedByUser   PartnerUser? @relation("PartnerUserDeactivatedCodes", fields: [deactivatedByUserId], references: [id])
+  generatedByUser     PartnerUser? @relation("PartnerUserGeneratedCodes", fields: [generatedByUserId], references: [id])
+  partnerUser         PartnerUser  @relation("PartnerUserToCodes", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@index([partnerUserId])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@map("partner_user_codes")
+}
+
+model partner_user_code_audit_logs {
+  id                String       @id @default(uuid())
+  partnerUserId     String
+  performedByUserId String?
+  action            String
+  status            String
+  errorMessage      String?
+  metadata          Json?
+  createdAt         DateTime     @default(now())
+  partnerUser       PartnerUser  @relation("PartnerUserToCodeAudits", fields: [partnerUserId], references: [id], onDelete: Cascade)
+  performedByUser   PartnerUser? @relation("PartnerUserPerformedCodeAudits", fields: [performedByUserId], references: [id])
+
+  @@index([partnerUserId])
+  @@index([action])
+  @@index([status])
+  @@index([createdAt])
+  @@map("partner_user_code_audit_logs")
+}
+
+model brand_setting_audit_logs {
+  id                           String   @id @default(uuid())
+  brand_id                     String
+  setting_type                 String
+  performed_by_partner_user_id String?  @db.VarChar(255)
+  action                       String
+  changes                      Json?
+  status                       String
+  error_message                String?
+  metadata                     Json?
+  created_at                   DateTime @default(now())
+
+  @@index([brand_id])
+  @@index([setting_type])
+  @@index([performed_by_partner_user_id], map: "brand_setting_audit_logs_performed_by_user_id_idx")
+  @@index([created_at])
+  @@map("brand_setting_audit_logs")
+}
+
+model brand_loan_agreement_configs {
+  id                                     String  @id @default(uuid())
+  brandId                                String  @unique
+  lenderName                             String
+  nameOfDigitalLendingApplication        String
+  nameOfLendingServiceProvider           String
+  nameOfLoanServiceProviderRecoveryAgent String
+  sectionManagerName                     String
+  sectionManagerAddress                  String
+  sectionManagerEmail                    String
+  grievanceOfficerName                   String
+  grievanceOfficerAddress                String
+  grievanceOfficerEmail                  String
+  grievanceOfficerPhone                  String
+  sectionManagerPhone                    String
+  lenderAddress                          String? @db.VarChar(255)
+  nodalOfficerAddress                    String? @db.VarChar(255)
+  nodalOfficerEmail                      String? @db.VarChar(255)
+  nodalOfficerName                       String? @db.VarChar(255)
+  nodalOfficerPhone                      String? @db.VarChar(255)
+  brand                                  Brand   @relation("BrandToLoanAgreementConfig", fields: [brandId], references: [id])
+}
+
+model BrandBankAccount {
+  id               String                @id @default(uuid())
+  brandId          String
+  bankName         String
+  accountNumber    String
+  ifscCode         String
+  branchName       String?
+  upiId            String?
+  isPrimaryAccount Boolean               @default(false)
+  isActive         Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @default(now())
+  type             BrandBankAccountType?
+  brand            Brand                 @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_bank_account")
+}
+
+model BrandProvider {
+  id         String            @id @default(uuid())
+  brandId    String
+  type       BrandProviderType
+  provider   BrandProviderName
+  isActive   Boolean           @default(true)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @default(now()) @updatedAt
+  isPrimary  Boolean           @default(false)
+  isDisabled Boolean           @default(false)
+  brand      Brand             @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, type, provider], map: "brand_providers_unique")
+  @@index([brandId, type, isPrimary], map: "brand_providers_primary_idx")
+  @@map("brand_providers")
+}
+
+model BrandBlocklistedPan {
+  id              Int      @id @default(autoincrement())
+  pancard         String
+  customer_name   String?
+  reason          String?
+  dpd             Int?
+  brandId         String
+  createdAt       DateTime @default(now())
+  partnerUserName String?  @db.VarChar(255)
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([pancard, brandId])
+  @@map("brand_blocklisted_pan")
+}
+
+model BrandBlocklistedMobile {
+  id              Int      @id @default(autoincrement())
+  mobile          String
+  customerName    String?  @db.VarChar(255)
+  reason          String?  @db.VarChar(255)
+  dpd             Int?
+  brandId         String
+  createdAt       DateTime @default(now())
+  partnerUserName String?  @db.VarChar(255)
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([mobile, brandId])
+  @@map("brand_blocklisted_mobile")
+}
+
+model BrandBlocklistedAadhar {
+  id              Int      @id @default(autoincrement())
+  aadharNumber    String
+  customerName    String?  @db.VarChar(255)
+  reason          String?  @db.VarChar(255)
+  dpd             Int?
+  brandId         String
+  createdAt       DateTime @default(now())
+  partnerUserName String?  @db.VarChar(255)
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([aadharNumber, brandId])
+  @@map("brand_blocklisted_aadhar")
+}
+
+model BrandBlocklistedAccountNumber {
+  id              Int      @id @default(autoincrement())
+  accountNumber   String
+  customerName    String?  @db.VarChar(255)
+  reason          String?  @db.VarChar(255)
+  dpd             Int?
+  brandId         String
+  createdAt       DateTime @default(now())
+  partnerUserName String?  @db.VarChar(255)
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([accountNumber, brandId])
+  @@map("brand_blocklisted_account_number")
+}
+
+model BrandConfig {
+  id                                 String   @id @default(uuid())
+  brandId                            String   @unique
+  createdAt                          DateTime @default(now())
+  updatedAt                          DateTime @updatedAt
+  salaryThresholdAmount              Int
+  rejectionDuration                  Int      @default(15)
+  bankStatementHistoryMonths         Int      @default(3)
+  esignFinalCopyRecipients           String?  @db.VarChar(255)
+  esignNotificationEmailList         String?  @db.VarChar(255)
+  esignDocketTitle                   String?  @db.VarChar(255)
+  esignExpiryDayCount                Int      @default(2)
+  sectionManagerName                 String?  @db.VarChar(255)
+  sectionManagerPhoneNumber          String?  @db.VarChar(255)
+  sectionManagerAddress              String?  @db.VarChar(255)
+  noDueCopyRecipients                String?  @db.VarChar(255)
+  isAA                               Boolean  @default(true)
+  isAlternateNumber                  Boolean  @default(true)
+  loanAgreementVersion               Int      @default(1)
+  isCCReminderEmail                  Boolean  @default(false)
+  ccReminderEmail                    String?  @db.VarChar(255)
+  loanAgreementHeader                String?  @db.VarChar(255)
+  loanAgreementFooter                String?  @db.VarChar(255)
+  isTestReminderEmail                Boolean  @default(true)
+  isUserReminderEmail                Boolean  @default(false)
+  minLoanAmountRequired              Int      @default(15000)
+  forceEmployment                    Boolean  @default(true)
+  isAadharImageRequired              Boolean  @default(false)
+  loanNoDueCertificateFooter         String?  @db.VarChar(255)
+  loanNoDueCertificateHeader         String?  @db.VarChar(255)
+  sectionManagerEmail                String?  @db.VarChar(64)
+  autoAllocationType                 String   @default("LOGIN") @db.VarChar(255)
+  evaluationVersion                  String   @default("V1") @db.VarChar(16)
+  fmsBlockStatus                     Boolean  @default(false)
+  isAadhaarNumberRequired            Boolean  @default(false)
+  signUpVersion                      String?  @default("V1") @db.VarChar(16)
+  requiresUserPhoto                  Boolean  @default(true)
+  requiresUserVideo                  Boolean  @default(true)
+  forceSkipEmployment                Boolean  @default(false)
+  user_rejection_type                String?  @default("WITH_LOAN") @db.VarChar(50)
+  collection_auto_allocation         Boolean  @default(false)
+  loan_auto_allocation               Boolean  @default(false)
+  user_auto_allocation               Boolean  @default(false)
+  skip_user_onboarding_completed     Boolean  @default(false)
+  enable_multiple_salary             Boolean  @default(false)
+  autoGenerateNOC                    Boolean? @default(false)
+  enable_central_dedup               Boolean  @default(false)
+  max_age                            Int      @default(54)
+  min_age                            Int      @default(22)
+  loan_ops_version                   String?  @default("V1") @db.VarChar(16)
+  is_cam_pricing_update              Boolean  @default(false)
+  loan_collection_version            String?  @default("V1") @db.VarChar(16)
+  sunday_off                         Boolean  @default(true)
+  skip_loan_evaluation_approval_days Int      @default(0)
+  is_cam_calculation_required        Boolean  @default(false)
+  field_visit                        Boolean? @default(false)
+  is_loan_onboarding                 Boolean  @default(false)
+  is_user_remindar                   Boolean  @default(false)
+  is_automated_reloan                Boolean  @default(false)
+  dashboard_version                  String   @default("V1") @db.VarChar(16)
+  brand                              Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_configs")
+}
+
+model BrandDetails {
+  id                String   @id @default(uuid())
+  brandId           String   @unique
+  address           String?
+  contactEmail      String?
+  contactPhone      String?
+  website           String?
+  gstNumber         String?
+  cinNumber         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
+  lenderName        String?  @db.VarChar(255)
+  description       String?  @db.VarChar(255)
+  title             String?  @db.VarChar(255)
+  rbiRegistrationNo String?  @db.VarChar(16)
+  brand             Brand    @relation("BrandToDetails", fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_details")
+}
+
+model BrandPolicyLinks {
+  id                        String   @id @default(uuid())
+  brandId                   String   @unique
+  termsConditionUrl         String   @db.VarChar(255)
+  privacyPolicyUrl          String   @db.VarChar(255)
+  faqUrl                    String   @db.VarChar(255)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @default(now())
+  htw                       String?  @db.VarChar(255)
+  contactUs                 String?  @db.VarChar(255)
+  brandloanDetailsPolicyUrl String?  @db.VarChar(255)
+  brand                     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_policy_links")
+}
+
+model BrandNonRepaymentDate {
+  id        String               @id @default(uuid())
+  brandId   String
+  date      DateTime             @db.Date
+  reason    String               @db.VarChar(255)
+  state     String               @db.VarChar(50)
+  type      NonRepaymentDateType @default(BRAND_NON_REPAYMENT)
+  isActive  Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @default(now()) @updatedAt
+  brand     Brand                @relation("BrandToNonRepaymentDates", fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, date, type])
+  @@map("brand_non_repayment_dates")
+}
+
+model PartnerUnavailabilityDate {
+  id            String               @id @default(uuid())
+  partnerUserId String
+  date          DateTime             @db.Date
+  reason        String               @db.VarChar(255)
+  type          NonRepaymentDateType @default(PARTNER_UNAVAILABILITY)
+  isActive      Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @default(now()) @updatedAt
+  partnerUser   PartnerUser          @relation("PartnerToUnavailabilityDates", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@unique([partnerUserId, date])
+  @@index([partnerUserId, date, isActive], map: "idx_partner_unavail_partner_date_active")
+  @@index([date, isActive], map: "idx_partner_unavail_date_active")
+  @@map("partner_unavailability_dates")
+}
+
+model BrandCard {
+  id          String   @id @default(uuid())
+  brandId     String
+  imageUrl    String
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  brand       Brand    @relation("BrandToCards", fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_cards")
+}
+
+model EmailReminderConfig {
+  id              String    @id @default(uuid())
+  brandId         String
+  reminderType    String
+  daysBeforeDue   Int       @default(0)
+  isEnabled       Boolean   @default(true)
+  frequency       String    @default("once")
+  loanStatuses    String[]
+  subjectTemplate String
+  bodyTemplate    String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now())
+  emailType       EmailType @default(CUSTOM_REMINDER)
+  brand           Brand     @relation("BrandToEmailReminderConfigs", fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, reminderType])
+  @@map("email_reminder_configs")
+}
+
+model LoanRule {
+  id                   String               @id @default(uuid())
+  brandId              String
+  isActive             Boolean              @default(true)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @default(now())
+  maxAmount            Float
+  minAmount            Float
+  ruleType             LoanRiskCategory
+  maxCompleteLoanCount Int                  @default(4)
+  isDisabled           Boolean              @default(false)
+  isVisible            Boolean              @default(true)
+  loan_charge_config   loan_charge_config[]
+  loanPenalty          LoanPenalty[]        @relation("LoanRuleToLoanPenalty")
+  tenures              Tenure?
+  brand                Brand                @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, ruleType], map: "loan_rules_index_2")
+  @@map("loan_rules")
+}
+
+model Tenure {
+  id                           String               @id @default(uuid())
+  loanRuleId                   String               @unique(map: "loan_rule_tenures_index_2")
+  minTermDays                  Int                  @default(7)
+  isActive                     Boolean              @default(true)
+  createdAt                    DateTime             @default(now())
+  updatedAt                    DateTime             @default(now())
+  loan_type                    LoanTypeEnum         @default(EMI)
+  allowPrepayment              Boolean              @default(true)
+  gracePeriod                  Int                  @default(0)
+  minPostActiveTermDays        Int                  @default(10)
+  maxTermDays                  Int                  @default(40)
+  minRepaymentDays             Int                  @default(7)
+  is_fee_always_principal      Boolean              @default(false)
+  is_skip_disbursement_day_fee Boolean              @default(false)
+  loan_charge_config           loan_charge_config[]
+  loanPenalty                  LoanPenalty[]        @relation("TenureToLoanPenalty")
+  loanRule                     LoanRule             @relation(fields: [loanRuleId], references: [id], onDelete: Cascade)
+
+  @@map("loan_rule_tenures")
+}
+
+model UserLoginToken {
+  id           String   @id @default(uuid())
+  userId       String
+  accessToken  String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deviceId     String?  @db.VarChar(255)
+  isLoggedOut  Boolean? @default(false)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt], map: "idx_user_login_tokens_createdat")
+  @@index([userId, deviceId], map: "idx_user_login_tokens_userid_deviceid")
+  @@index([userId, deviceId, isLoggedOut], map: "idx_user_login_tokens_userid_deviceid_isloggedout")
+  @@map("user_login_tokens")
+}
+
+model UserOtpVerification {
+  id        String   @id @default(uuid())
+  userId    String
+  otpCode   String   @db.VarChar(6)
+  type      String
+  isUsed    Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_otp_verifications")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model UserDetails {
+  id                              String               @id @default(uuid())
+  userId                          String               @unique
+  firstName                       String?
+  lastName                        String?
+  gender                          gender_enum?
+  dateOfBirth                     DateTime?            @db.Date
+  address                         String?
+  city                            String?
+  state                           String?
+  pincode                         String?
+  createdAt                       DateTime             @default(now())
+  updatedAt                       DateTime             @default(now())
+  profilePicUrl                   String?              @db.VarChar(516)
+  fathersName                     String?
+  maritalStatus                   marital_status_enum?
+  spouseName                      String?
+  isCommunicationAddress          Boolean?             @default(true)
+  middleName                      String?
+  profileVideoUrl                 String?              @db.VarChar(516)
+  userDataStatus                  user_data_status     @default(NOT_VERIFIED)
+  religion                        ReligionEnum         @default(HINDUISM)
+  residenceType                   ResidenceTypeEnum    @default(OWNED)
+  filePrivateKey                  String?
+  addressProofType                AddressProofEnum?
+  mothersName                     String?
+  creditScore                     Int                  @default(0)
+  aAdharName                      String?              @db.VarChar(255)
+  aAdharDOB                       DateTime?            @db.Date
+  userBlockAlert                  String?              @db.VarChar(255)
+  age                             Int?
+  aadhaarPanLinkedByPanPlus       Boolean              @default(false)
+  geoLatitude                     Float?
+  geoLongitude                    Float?
+  isFraudulentByCMS               Boolean              @default(false)
+  isGoaAndPanMatching             Boolean              @default(false)
+  isServicablePinCodesByCMS       Boolean              @default(false)
+  linkedAadhaarNumberByDigiLocker String?              @db.VarChar(16)
+  linkedAadhaarNumberByPanPlus    String?              @db.VarChar(16)
+  user                            User                 @relation("UserToUserDetails", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([firstName(ops: raw("gin_trgm_ops"))], map: "idx_userdetails_name_trgm", type: Gin)
+  @@map("user_details")
+}
+
+model OnboardingJourney {
+  id            String       @id @default(uuid())
+  stepNumber    Int
+  brandId       String
+  userId        String
+  createdAt     DateTime     @default(now())
+  partnerUserId String?
+  reason        String?      @db.VarChar(255)
+  updatedAt     DateTime?
+  brand         Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  partnerUser   PartnerUser? @relation(fields: [partnerUserId], references: [id])
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, stepNumber])
+  @@map("onboarding_journey")
+}
+
+model devices {
+  id           String        @id @default(uuid())
+  brandId      String?       @db.VarChar(255)
+  fpId         String
+  deviceType   String
+  os           String?
+  appVersion   String?
+  fcmToken     String?
+  ipAddress    String?
+  userAgent    String?
+  lastActiveAt DateTime?
+  platformType platform_type
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
+
+  @@unique([brandId, fpId, platformType], map: "devices_index_2")
+}
+
+model LoanPenalty {
+  id             String       @id @default(uuid())
+  type           PenaltyType
+  valueType      FeeValueType
+  chargeValue    Float
+  taxType        TaxType
+  taxChargeValue Float
+  isTaxInclusive Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+  loanRuleId     String?
+  tenureId       String?
+  taxValueType   FeeValueType @default(percentage)
+  loanRule       LoanRule?    @relation("LoanRuleToLoanPenalty", fields: [loanRuleId], references: [id], onDelete: Cascade)
+  tenure         Tenure?      @relation("TenureToLoanPenalty", fields: [tenureId], references: [id], onDelete: Cascade)
+
+  @@map("loan_penalty")
+}
+
+model Loan {
+  id                                       String                              @id @default(uuid())
+  userId                                   String
+  brandId                                  String
+  amount                                   Float
+  purpose                                  String?                             @db.VarChar(512)
+  applicationDate                          DateTime?                           @default(dbgenerated("CURRENT_DATE")) @db.Date
+  approvalDate                             DateTime?                           @db.Date
+  disbursementDate                         DateTime?                           @db.Date
+  closureDate                              DateTime?                           @db.Date
+  createdAt                                DateTime                            @default(now())
+  updatedAt                                DateTime                            @default(now())
+  status                                   loan_status_enum                    @default(PENDING)
+  xlsxCount                                Int                                 @default(0)
+  formattedLoanId                          String?                             @unique(map: "loans_index_2") @db.VarChar(15)
+  noDuesCertificate                        String?                             @db.VarChar(255)
+  loanType                                 String                              @default("LOAN-1") @db.VarChar(64)
+  closingType                              closingTypeEnum                     @default(NORMAL)
+  isActive                                 Boolean                             @default(true)
+  ruleType                                 LoanRiskCategory                    @default(poor)
+  isMigratedloan                           Boolean                             @default(false)
+  oldLoanId                                String?                             @db.VarChar(255)
+  forceBsaReportByPass                     Boolean                             @default(false)
+  forceCreditReportByPass                  Boolean                             @default(false)
+  loan_applied_amount                      Float?
+  loan_cx_approved_amount                  Float?
+  loan_sm_sh_approved_amount               Float?
+  skip_auto_pay_consent                    Boolean                             @default(false)
+  is_repeat_loan                           Boolean                             @default(false)
+  is_skip_evaluation_approval              Boolean                             @default(false)
+  is_cam_calculation_required              Boolean                             @default(false)
+  is_email_reminder                        Boolean                             @default(true)
+  loan_collection_assigned_partner_user_id String?                             @db.Uuid
+  loan_cx_approved_by_partner_user_id      String?                             @db.Uuid
+  loan_cx_assigned_partner_user_id         String?                             @db.Uuid
+  loan_due_date                            DateTime?                           @db.Date
+  loan_repayment_type_id                   Int?
+  loan_sm_sh_approved_by_partner_user_id   String?                             @db.Uuid
+  loan_status_id                           Int?
+  loan_tenure_days                         Int?
+  is_workflow_automated                    Boolean?
+  costSummary                              CostSummary?
+  digitap_esign_some_table                 digitap_esign_some_table[]
+  disbursement                             Disbursement?
+  earlyRepayment                           EarlyRepaymentDiscount?
+  evaluations                              Evaluation[]
+  field_visit                              field_visit[]
+  agreement                                LoanAgreement?
+  allottedPartners                         LoanAllottedPartnerUser[]
+  loan_collection_allocated_partner        loan_collection_allocated_partner[] @relation("LoanToCollectionPartners")
+  loanDetails                              LoanDetails?
+  emailLogs                                LoanEmailLog[]
+  noDueCertificate                         LoanNoDueCertificate?
+  loanStatusHistory                        LoanStatusHistory[]
+  xlsxFiles                                LoanXlsxFile[]
+  brand                                    Brand                               @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user                                     User                                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notifications                            notifications[]
+  paymentRequests                          PaymentRequest[]
+  penalties                                Penalty[]
+  repaymentTimelines                       RepaymentTimeline[]
+  repayment                                Repayment?
+  signDeskEntries                          SignDeskSomeTable[]
+  signzySomeTables                         signzy_some_table[]
+  usedAsReloanBase                         UserReloan[]                        @relation("PreviousLoanRelation")
+  whatsapp_message_logs                    whatsapp_message_logs[]
+
+  @@index([disbursementDate], map: "idx_loan_disbursement")
+  @@index([applicationDate], map: "idx_loans_applicationdate")
+  @@index([approvalDate], map: "idx_loans_approvaldate")
+  @@index([brandId, isActive], map: "idx_loans_brand_active")
+  @@index([brandId, isActive, createdAt(sort: Desc)], map: "idx_loans_brand_active_created")
+  @@index([brandId, isActive, userId], map: "idx_loans_brandid_isactive_userid")
+  @@index([closureDate], map: "idx_loans_closuredate")
+  @@index([status], map: "idx_loans_status")
+  @@index([userId], map: "idx_loans_userid")
+  @@map("loans")
+}
+
+model LoanEmailLog {
+  id        String    @id @default(uuid())
+  loanId    String
+  sentAt    DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  error     String?
+  recipient String?
+  success   Boolean
+  emailType EmailType
+  loan      Loan      @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@index([loanId, emailType])
+  @@index([sentAt])
+  @@map("loan_email_logs")
+}
+
+model LoanAllottedPartnerUser {
+  id            String      @id @default(uuid())
+  loanId        String
+  partnerUserId String
+  allottedAt    DateTime    @default(now())
+  amount        Float       @default(0)
+  loan          Loan        @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  partnerUser   PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@map("loan_allotted_partner_user")
+}
+
+model LoanStatusHistory {
+  id                        String                      @id @default(uuid())
+  loanId                    String
+  status                    loan_status_enum
+  message                   String?                     @db.VarChar(500)
+  createdAt                 DateTime                    @default(now())
+  partnerUserId             String?
+  loan_status_brand_reasons loan_status_brand_reasons[]
+  loan                      Loan                        @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  partnerUser               PartnerUser?                @relation("PartnerUserToLoanStatusHistories", fields: [partnerUserId], references: [id])
+
+  @@map("loan_status_history")
+}
+
+model LoanNoDueCertificate {
+  id                 String                 @id @default(uuid())
+  loanId             String                 @unique
+  issuedDate         DateTime               @default(now())
+  issuedBy           String?
+  recipientEmail     String?                @db.VarChar(255)
+  remarks            String?                @db.VarChar(255)
+  certificateFileUrl String?                @db.VarChar(255)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @default(now())
+  sentAt             DateTime?
+  formattedNoDueId   String?                @db.VarChar(255)
+  certificateType    certificate_type_enum?
+  loan               Loan                   @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("loan_no_due_certificates")
+}
+
+model cam_calculators {
+  id                String   @id @default(uuid())
+  loanId            String   @unique
+  partnerUserId     String
+  userId            String
+  brandId           String
+  salaryCreditDate1 String?
+  salaryCreditDate2 String?
+  salaryCreditDate3 String?
+  salaryAmount1     Float?
+  salaryAmount2     Float?
+  salaryAmount3     Float?
+  nextPayDate       String?
+  salaryVariance    Float?
+  actualSalary      Float?
+  eligibleFoir      Float?
+  loanApplied       Float?
+  eligibleLoan      Float?
+  loanRecommended   Float?
+  disbursalDate     String?
+  repayDate         String?
+  tenure            String?
+  tenureId          String?
+  avgSalary         Float?
+  foirAchieved      Float?
+  roi               Float?
+  obligations       Float?
+  repaymentData     Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdBy         String?
+  proposedFoir      Float?
+  repaymentDetails  Json?
+
+  @@index([loanId, brandId])
+  @@index([userId, brandId])
+  @@index([partnerUserId, brandId])
+  @@map("cam_calculators")
+}
+
+model loan_collection_allocated_partner {
+  id            String      @id @default(uuid())
+  loanId        String
+  partnerUserId String
+  allocatedAt   DateTime    @default(now())
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  remarks       String?
+  amount        Float?
+  deallocatedAt DateTime?
+  isDeallocated Boolean     @default(false)
+  loan          Loan        @relation("LoanToCollectionPartners", fields: [loanId], references: [id], onDelete: Cascade)
+  partnerUser   PartnerUser @relation("PartnerUserToLoanCollections", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@index([loanId, partnerUserId, isActive])
+  @@index([loanId, isDeallocated, isActive])
+  @@index([partnerUserId, isDeallocated, isActive])
+}
+
+model PaymentRequest {
+  id                            String                                @id @default(uuid())
+  userId                        String
+  brandId                       String
+  loanId                        String
+  type                          TransactionTypeEnum
+  currency                      String                                @default("INR")
+  status                        TransactionStatusEnum                 @default(PENDING)
+  description                   String?
+  createdAt                     DateTime                              @default(now())
+  updatedAt                     DateTime                              @updatedAt
+  payment_autopay_transaction   payment_autopay_transaction[]
+  collectionTransactions        PaymentCollectionTransaction[]
+  disbursalTransactions         PaymentDisbursalTransaction[]
+  partialCollectionTransactions PaymentPartialCollectionTransaction[]
+  providerLogs                  PaymentProviderLog[]
+  brand                         Brand                                 @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  loan                          Loan                                  @relation(fields: [loanId], references: [id], onDelete: SetNull)
+  user                          User                                  @relation(fields: [userId], references: [id])
+
+  @@unique([loanId, type], map: "payment_request_index_2")
+  @@index([status, type], map: "idx_payment_request_status_type")
+  @@map("payment_request")
+}
+
+model PaymentDisbursalTransaction {
+  id                 String                @id @default(uuid())
+  paymentRequestId   String
+  status             TransactionStatusEnum
+  amount             Decimal               @db.Decimal(12, 2)
+  currency           String                @default("INR")
+  externalRef        String?
+  retryCount         Int                   @default(0)
+  failureReason      String?
+  completedAt        DateTime?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @default(now())
+  externalUrl        String?               @db.VarChar(255)
+  receiptId          String
+  method             PaymentMethodEnum?
+  note               String?               @db.VarChar(255)
+  accountHolderName  String?               @db.VarChar(100)
+  bankAccountNumber  String?               @db.VarChar(30)
+  bankName           String?               @db.VarChar(100)
+  ifscCode           String?               @db.VarChar(15)
+  createdByPartnerId String?
+  opsPartnerId       String?
+  transferMode       String?               @db.VarChar(20)
+  responseJSON       Json?
+  pdt_loan_id        String?               @db.Uuid
+  createdByPartner   PartnerUser?          @relation("PaymentDisbursalTransactionCreatedBy", fields: [createdByPartnerId], references: [id])
+  opsByPartner       PartnerUser?          @relation("PaymentDisbursalTransactionOpsBy", fields: [opsPartnerId], references: [id])
+  paymentRequest     PaymentRequest        @relation(fields: [paymentRequestId], references: [id], map: "payment_disbursal_transaction_paymentRequestId_fkey")
+  providerLogs       PaymentProviderLog[]
+
+  @@map("payment_disbursal_transaction")
+}
+
+model PaymentPartialCollectionTransaction {
+  id                          String                      @id @default(uuid())
+  paymentRequestId            String
+  status                      TransactionStatusEnum
+  amount                      Decimal                     @db.Decimal(12, 2)
+  currency                    String                      @default("INR")
+  externalRef                 String?
+  retryCount                  Int                         @default(0)
+  failureReason               String?
+  completedAt                 DateTime?
+  createdAt                   DateTime                    @default(now())
+  updatedAt                   DateTime                    @default(now())
+  externalUrl                 String?                     @db.VarChar(255)
+  receiptId                   String
+  method                      PaymentMethodEnum?
+  note                        String?                     @db.VarChar(255)
+  opsApprovalStatus           OpsApprovalStatusEnum       @default(PENDING)
+  penaltyDiscount             Float                       @default(0)
+  paymentDetails              Json?
+  totalFees                   Float                       @default(0)
+  totalPenalties              Float                       @default(0)
+  totalTaxes                  Float                       @default(0)
+  isPrincipalAmountOverridden Boolean                     @default(false)
+  closingType                 closingTypeEnum             @default(NORMAL)
+  principalAmount             Float                       @default(0)
+  isPaymentComplete           Boolean                     @default(false)
+  isReloanApplicable          Boolean                     @default(false)
+  excessAmount                Float                       @default(0)
+  roundOffDiscount            Float                       @default(0)
+  reloanRemark                String?                     @db.VarChar(255)
+  amountJson                  Json?
+  opsRemark                   String?
+  createdByPartnerId          String?
+  opsPartnerId                String?
+  paymentLink                 String?                     @db.VarChar(500)
+  platformType                platform_type               @default(PARTNER)
+  brand_bank_id               String?                     @db.Uuid
+  ppct__approved_at           DateTime?                   @map("ppct_ approved_at")
+  ppct_loan_id                String?                     @db.Uuid
+  ppct_rejected_at            DateTime?
+  createdByPartner            PartnerUser?                @relation("PaymentPartialCollectionTransactionCreatedBy", fields: [createdByPartnerId], references: [id])
+  opsByPartner                PartnerUser?                @relation("PaymentPartialCollectionTransactionOpsBy", fields: [opsPartnerId], references: [id])
+  paymentRequest              PaymentRequest              @relation(fields: [paymentRequestId], references: [id], map: "payment_partial_collection_transaction_paymentRequestId_fkey")
+  receipt                     PaymentTransactionReceipt[] @relation("PaymentPartialCollectionTransactionToReceipt")
+
+  @@map("payment_partial_collection_transaction")
+}
+
+model PaymentCollectionTransaction {
+  id                 String                      @id(map: "payment_transaction_pkey")
+  paymentRequestId   String
+  status             TransactionStatusEnum
+  amount             Decimal                     @db.Decimal(12, 2)
+  currency           String                      @default("INR")
+  externalRef        String?
+  retryCount         Int                         @default(0)
+  failureReason      String?
+  completedAt        DateTime?
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @default(now())
+  externalUrl        String?                     @db.VarChar(255)
+  receiptId          String
+  method             PaymentMethodEnum?
+  note               String?                     @db.VarChar(255)
+  paymentDetails     Json?
+  totalFees          Float                       @default(0)
+  totalTaxes         Float                       @default(0)
+  totalPenalties     Float                       @default(0)
+  penaltyDiscount    Float                       @default(0)
+  opsApprovalStatus  OpsApprovalStatusEnum       @default(PENDING)
+  closingType        closingTypeEnum             @default(NORMAL)
+  principalAmount    Float                       @default(0)
+  isPaymentComplete  Boolean                     @default(false)
+  isReloanApplicable Boolean                     @default(false)
+  roundOffDiscount   Float                       @default(0)
+  excessAmount       Float                       @default(0)
+  reloanRemark       String?                     @db.VarChar(255)
+  amountJson         Json?
+  opsRemark          String?
+  createdByPartnerId String?
+  opsPartnerId       String?
+  paymentLink        String?                     @db.VarChar(500)
+  platformType       platform_type               @default(PARTNER)
+  brand_bank_id      String?                     @db.Uuid
+  pct__approved_at   DateTime?                   @map("pct_ approved_at")
+  pct_loan_id        String?                     @db.Uuid
+  pct_rejected_at    DateTime?
+  createdByPartner   PartnerUser?                @relation("PaymentCollectionTransactionCreatedBy", fields: [createdByPartnerId], references: [id])
+  opsByPartner       PartnerUser?                @relation("PaymentCollectionTransactionOpsBy", fields: [opsPartnerId], references: [id])
+  paymentRequest     PaymentRequest              @relation(fields: [paymentRequestId], references: [id], map: "payment_transaction_paymentRequestId_fkey")
+  providerLogs       PaymentProviderLog[]
+  receipt            PaymentTransactionReceipt[] @relation("PaymentCollectionTransactionToReceipt")
+
+  @@map("payment_collection_transaction")
+}
+
+model payment_autopay_transaction {
+  id                  String                @id @default(uuid())
+  paymentRequestId    String
+  status              TransactionStatusEnum
+  currency            String                @default("INR")
+  externalRef         String?
+  retryCount          Int                   @default(0)
+  failureReason       String?
+  completedAt         DateTime?
+  metadata            Json?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now())
+  createdByPartnerId  String?
+  failedAt            DateTime?
+  maxAuthorizedAmount Decimal               @db.Decimal(12, 2)
+  responseData        Json?
+  createdByPartner    PartnerUser?          @relation("PaymentAutopayTransactionCreatedBy", fields: [createdByPartnerId], references: [id])
+  paymentRequest      PaymentRequest        @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+
+  @@map("payment_autopay_transaction")
+}
+
+model PaymentTransactionReceipt {
+  id                   String                               @id @default(uuid())
+  receiptKey           String?                              @db.VarChar(255)
+  issuedAt             DateTime                             @default(now())
+  createdAt            DateTime                             @default(now())
+  updatedAt            DateTime                             @default(now())
+  transactionId        String?
+  partialTransactionId String?
+  partialTransaction   PaymentPartialCollectionTransaction? @relation("PaymentPartialCollectionTransactionToReceipt", fields: [partialTransactionId], references: [id], map: "payment_transaction_receipt_partialTransactionId_fkey")
+  transaction          PaymentCollectionTransaction?        @relation("PaymentCollectionTransactionToReceipt", fields: [transactionId], references: [id], map: "payment_transaction_receipt_transactionId_fkey")
+
+  @@map("payment_transaction_receipt")
+}
+
+model LoanXlsxFile {
+  id             String           @id @default(uuid())
+  brandId        String?
+  loanId         String
+  fileName       String
+  filePrivateUrl String
+  fileType       LoanXlsxFileType
+  uploadedAt     DateTime         @default(now())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  brand          Brand?           @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  loan           Loan             @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("loan_xlsx_files")
+}
+
+model LoanAgreement {
+  id                       String                     @id @default(uuid())
+  loanId                   String                     @unique
+  status                   agreement_status_enum      @default(NOT_SENT)
+  signedByUser             Boolean                    @default(false)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @default(now())
+  signedFilePrivateKey     String?                    @db.VarChar(255)
+  signed                   String?
+  signedAt                 DateTime?
+  aadhaarSuffix            String?                    @db.VarChar(32)
+  unsignedData             String?
+  digitap_esign_some_table digitap_esign_some_table[]
+  references               LoanAgreementReference[]
+  loan                     Loan                       @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  signDeskEntries          SignDeskSomeTable[]
+  signzySomeTables         signzy_some_table[]
+
+  @@map("loan_agreements")
+}
+
+model LoanAgreementReference {
+  id                       String                    @id @default(uuid())
+  loanAgreementId          String
+  referenceId              String                    @default(uuid())
+  referenceDocId           String                    @default(uuid())
+  sentAt                   DateTime?
+  signedAt                 DateTime?
+  rejectedAt               DateTime?
+  expiredAt                DateTime?
+  createdAt                DateTime                  @default(now())
+  unSignedFilePrivateKey   String?                   @db.VarChar(255)
+  provider                 ContractSigningProvider   @default(SIGNDESK)
+  is_active                Boolean                   @default(true)
+  is_disabled              Boolean                   @default(false)
+  loan_recommended_amount  Int                       @default(0)
+  digitap_esign_some_table digitap_esign_some_table?
+  loanAgreement            LoanAgreement             @relation(fields: [loanAgreementId], references: [id], onDelete: Cascade)
+  signDeskEntries          SignDeskSomeTable[]
+  signzySomeTables         signzy_some_table?
+
+  @@map("loan_agreement_references")
+}
+
+model LoanDetails {
+  id                     String    @id @default(uuid())
+  principal              Float     @default(0)
+  type                   String
+  durationDays           Int
+  dueDate                DateTime
+  loanId                 String    @unique
+  allowPrepayment        Boolean   @default(true)
+  grossPeriod            Int       @default(0)
+  minActiveTermDays      Int       @default(0)
+  minPostActiveTermDays  Int       @default(3)
+  postActiveDate         DateTime? @db.Date
+  maxActiveTermDays      Int       @default(0)
+  minActiveRepaymentDays Int       @default(0)
+  loan                   Loan      @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("loan_details")
+}
+
+model Disbursement {
+  id              String      @id @default(uuid())
+  grossAmount     Float
+  totalDeductions Float
+  netAmount       Float
+  loanId          String      @unique
+  processing_fee  Float?
+  deductions      Deduction[]
+  loan            Loan        @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("disbursements")
+}
+
+model Deduction {
+  id                    String         @id @default(uuid())
+  type                  String
+  calculationValueType  String
+  calculationBaseAmount Float
+  calculationTaxAmount  Float
+  chargeMode            String
+  total                 Float
+  disbursementId        String
+  chargeValue           Float          @default(0)
+  isRecurringDaily      Boolean        @default(false)
+  disbursement          Disbursement   @relation(fields: [disbursementId], references: [id], onDelete: Cascade)
+  taxes                 TaxDeduction[]
+
+  @@map("deductions")
+}
+
+model TaxDeduction {
+  id          String       @id @default(uuid())
+  type        String
+  chargeValue Float
+  amount      Float
+  isInclusive Boolean
+  deductionId String
+  valueType   FeeValueType @default(percentage)
+  deduction   Deduction    @relation(fields: [deductionId], references: [id], onDelete: Cascade)
+
+  @@map("tax_deductions")
+}
+
+model Repayment {
+  id              String         @id @default(uuid())
+  totalObligation Float
+  totalFees       Float
+  loanId          String         @unique
+  feeBreakdowns   FeeBreakdown[]
+  loan            Loan           @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("repayments")
+}
+
+model FeeBreakdown {
+  id                    String            @id @default(uuid())
+  type                  String
+  calculationValueType  String
+  calculationBaseAmount Float
+  calculationTaxAmount  Float
+  chargeMode            String
+  total                 Float
+  repaymentId           String
+  chargeValue           Float             @default(0)
+  isRecurringDaily      Boolean           @default(false)
+  repayment             Repayment         @relation(fields: [repaymentId], references: [id], onDelete: Cascade)
+  taxes                 TaxFeeBreakdown[]
+
+  @@map("fee_breakdowns")
+}
+
+model TaxFeeBreakdown {
+  id             String       @id @default(uuid())
+  type           String
+  chargeValue    Float
+  amount         Float
+  isInclusive    Boolean
+  feeBreakdownId String
+  valueType      FeeValueType @default(percentage)
+  feeBreakdown   FeeBreakdown @relation(fields: [feeBreakdownId], references: [id], onDelete: Cascade)
+
+  @@map("tax_fee_breakdowns")
+}
+
+model CostSummary {
+  id           String @id @default(uuid())
+  totalTaxes   Float
+  effectiveAPR Float
+  loanId       String @unique
+  loan         Loan   @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("cost_summaries")
+}
+
+model EarlyRepaymentDiscount {
+  id          String @id @default(uuid())
+  totalAmount Float
+  loanId      String @unique
+  loan        Loan   @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("early_repayment_discounts")
+}
+
+model Penalty {
+  id             String       @id @default(uuid())
+  chargeValue    Float
+  taxChargeValue Float?
+  isTaxInclusive Boolean?
+  loanId         String
+  taxValueType   FeeValueType @default(percentage)
+  valueType      FeeValueType @default(percentage)
+  type           PenaltyType  @default(SIMPLE)
+  taxType        TaxType      @default(GST)
+  loan           Loan         @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@map("penalties")
+}
+
+model evaluation_item {
+  id                     String                  @id @default(uuid())
+  evaluationId           String
+  parameter              String
+  requiredValue          String
+  actualValue            String
+  source                 String
+  status                 EligibilityStatusEnum
+  override               Boolean                 @default(false)
+  comments               String?
+  availableSources       String[]
+  brandEvaluationItemId  String?
+  stage                  evaluation_stage_enum   @default(ONE)
+  evaluations            Evaluation              @relation(fields: [evaluationId], references: [id], map: "EvaluationItem_evaluationId_fkey")
+  brand_evaluation_items brand_evaluation_items? @relation(fields: [brandEvaluationItemId], references: [id])
+}
+
+model brand_evaluation_items {
+  id              String                @id @default(uuid())
+  brandId         String
+  parameter       String
+  requiredValue   String
+  sources         String[]
+  stage           evaluation_stage_enum @default(ONE)
+  isActive        Boolean               @default(true)
+  priority        Int                   @default(0)
+  description     String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  brand           Brand                 @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  evaluationItems evaluation_item[]
+
+  @@unique([brandId, parameter])
+  @@map("brand_evaluation_items")
+}
+
+model loan_charge_config {
+  id                String              @id(map: "external_fees_pkey")
+  loanRuleId        String?
+  tenureId          String?
+  type              FeeType
+  valueType         FeeValueType
+  chargeValue       Float
+  isActive          Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  chargeMode        ChargeMode
+  isRecurringDaily  Boolean             @default(false)
+  loan_rules        LoanRule?           @relation(fields: [loanRuleId], references: [id], onDelete: Cascade, map: "external_fees_loanRuleId_fkey")
+  loan_rule_tenures Tenure?             @relation(fields: [tenureId], references: [id], onDelete: Cascade, map: "external_fees_tenureId_fkey")
+  loan_charge_taxes loan_charge_taxes[]
+}
+
+model loan_charge_taxes {
+  id                 String             @id(map: "taxes_pkey")
+  loanChargeConfigId String
+  type               TaxType
+  chargeValue        Float
+  isInclusive        Boolean
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime
+  valueType          FeeValueType       @default(percentage)
+  loan_charge_config loan_charge_config @relation(fields: [loanChargeConfigId], references: [id], onDelete: Cascade, map: "taxes_externalFeeId_fkey")
+}
+
+model PartnerUserReportLog {
+  id             String      @id @default(uuid())
+  partnerUserId  String
+  brandId        String
+  reportType     String
+  action         String
+  reportFormat   String?
+  dateRange      Json?
+  recipientEmail String?
+  fileSize       Int?
+  duration       Int?
+  ipAddress      String?
+  userAgent      String?
+  success        Boolean     @default(true)
+  errorMessage   String?
+  recordCount    Int?
+  metadata       Json?
+  createdAt      DateTime    @default(now())
+  brand          Brand       @relation(fields: [brandId], references: [id])
+  partnerUser    PartnerUser @relation("PartnerUserToReportLogs", fields: [partnerUserId], references: [id])
+
+  @@map("partner_user_report_logs")
+}
+
+model aa_consent_requests {
+  id                         String                       @id
+  userId                     String
+  brandId                    String?
+  clientTransactionId        String                       @unique
+  aaCustomerHandleId         String
+  aaCustomerMobile           String
+  consentHandle              String?
+  redirectionUrl             String?
+  consentStatus              AAConsentStatus              @default(PENDING)
+  consentId                  String?
+  useCaseId                  String
+  sessionId                  String?
+  txnId                      String?
+  purpose                    String?
+  createdAt                  DateTime                     @default(now())
+  updatedAt                  DateTime
+  expiresAt                  DateTime?
+  approvedAt                 DateTime?
+  rejectedAt                 DateTime?
+  revokedAt                  DateTime?
+  retryCount                 Int                          @default(0)
+  provider                   AAProvider?                  @default(FINDUIT)
+  aa_consent_notifications   aa_consent_notifications[]
+  brands                     Brand?                       @relation(fields: [brandId], references: [id])
+  users                      User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aa_data_sessions           aa_data_sessions[]
+  aa_periodic_data_responses aa_periodic_data_responses[]
+}
+
+model aa_consent_notifications {
+  id               String              @id @default(cuid())
+  consentRequestId String
+  txnId            String
+  consentId        String
+  consentHandle    String
+  consentStatus    AAConsentStatus
+  fetchType        String
+  frequency        String
+  consentStartDate DateTime
+  consentEndDate   DateTime
+  notifierId       String?
+  notifierType     String?
+  timestamp        DateTime
+  purpose          String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime?
+  rawData          Json?
+  consentRequest   aa_consent_requests @relation(fields: [consentRequestId], references: [id], onDelete: Cascade)
+}
+
+model aa_periodic_data_responses {
+  id                 String              @id
+  consentRequestId   String
+  txnId              String?
+  statusCode         String?
+  statusMessage      String?
+  referenceId        String?
+  dataSessionId      String?
+  rawData            Json?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime
+  aa_consent_request aa_consent_requests @relation(fields: [consentRequestId], references: [id], onDelete: Cascade)
+
+  @@map("aa_periodic_data_responses")
+}
+
+model aa_data_sessions {
+  id                           String                 @id
+  consentRequestId             String?
+  clientTransactionId          String?
+  txnId                        String?
+  fipId                        String?
+  fipName                      String?
+  maskedAccountNumber          String?
+  accRefNumber                 String?
+  dataType                     String?
+  encryptionEnabled            Boolean                @default(false)
+  status                       AADataStatus           @default(PENDING)
+  rawData                      Json?
+  pdfData                      String?
+  jsonData                     Json?
+  xmlData                      String?
+  csvData                      String?
+  filePrivateKey               String?
+  accountDetails               Json?
+  transactionSummary           Json?
+  balanceInfo                  Json?
+  createdAt                    DateTime               @default(now())
+  updatedAt                    DateTime
+  receivedAt                   DateTime?
+  processedAt                  DateTime?
+  errorMessage                 String?
+  retryCount                   Int                    @default(0)
+  reportData                   String?
+  aa_pdf_key                   String?                @db.VarChar(255)
+  aa_report_key                String?                @db.VarChar(255)
+  generated_aa_report_html_key String?                @db.VarChar(255)
+  aa_json_gz_key               String?                @db.VarChar(255)
+  metadata                     Json?
+  aa_consent_requests          aa_consent_requests?   @relation(fields: [consentRequestId], references: [id], onDelete: Cascade)
+  aa_financial_insights        aa_financial_insights?
+}
+
+model ServiceRequestLog {
+  id             String       @id @default(uuid())
+  userId         String?
+  partnerUserId  String?
+  brandId        String?
+  action         String
+  method         String
+  url            String
+  ipAddress      String?
+  userAgent      String?
+  requestHeaders Json?
+  requestBody    Json?
+  responseStatus Int?
+  responseTime   Int?
+  errorMessage   String?
+  success        Boolean      @default(true)
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  brand          Brand?       @relation(fields: [brandId], references: [id])
+  partnerUser    PartnerUser? @relation(fields: [partnerUserId], references: [id])
+  user           User?        @relation(fields: [userId], references: [id])
+
+  @@map("service_request_logs")
+}
+
+model lead_forms {
+  id                          String         @id
+  brandId                     String
+  createdTime                 DateTime?
+  ad_id                       String?
+  ad_name                     String?
+  adset_id                    String?
+  adset_name                  String?
+  campaign_id                 String?
+  campaign_name               String?
+  form_id                     String?
+  form_name                   String?
+  is_organic                  Boolean?       @default(false)
+  platform                    String?
+  are_you_a_salaried_employee String?
+  what_is_your_monthly_salary String?
+  enter_your_pan_no           String?
+  email                       String?
+  full_name                   String?
+  phone                       String?
+  street_address              String?
+  city                        String?
+  uploadedAt                  DateTime       @default(now())
+  processedAt                 DateTime?
+  status                      LeadFormStatus @default(PENDING)
+  errorMessage                String?
+  createdAt                   DateTime       @default(now())
+  updatedAt                   DateTime
+  brands                      Brand          @relation(fields: [brandId], references: [id])
+  leadMatches                 lead_matches[]
+
+  @@index([brandId])
+}
+
+model lead_matches {
+  id         String          @id @default(uuid())
+  leadFormId String
+  brandId    String
+  entityType LeadMatchEntity
+  userId     String?
+  documentId String?
+  matchType  LeadMatchType
+  matchField LeadMatchField
+  matchValue String
+  confidence Float           @default(1.0)
+  status     LeadMatchStatus @default(ACTIVE)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  brand      Brand           @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  document   Document?       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  leadForm   lead_forms      @relation(fields: [leadFormId], references: [id], onDelete: Cascade)
+  user       User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([leadFormId, entityType, userId, documentId, matchField])
+  @@index([brandId, status])
+  @@index([userId])
+  @@index([documentId])
+  @@index([entityType])
+  @@map("lead_matches")
+}
+
+model brand_sub_domains {
+  id              String   @id @default(uuid())
+  brandId         String
+  subdomain       String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  isPrimary       Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  isDisabled      Boolean  @default(false)
+  marketingSource String?  @db.VarChar(255)
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  users           User[]
+
+  @@index([brandId])
+}
+
+model kyccart_some_table {
+  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId            String
+  brandId           String
+  createdAt         DateTime? @default(now())
+  updatedAt         DateTime? @default(now())
+  mobileAge         Json?
+  employmentHistory Json?
+  brand             Brand     @relation("BrandToKyccart", fields: [brandId], references: [id], onDelete: Cascade)
+  user              User      @relation("UserToKyccart", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([brandId])
+}
+
+model brand_status_reasons {
+  id                        String                      @id @default(uuid())
+  brandId                   String
+  reason                    String
+  isDisabled                Boolean                     @default(false)
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime
+  isActive                  Boolean                     @default(true)
+  type                      rejection_type_enum
+  status                    brand_status_enum           @default(REJECTED)
+  brands                    Brand                       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  loan_status_brand_reasons loan_status_brand_reasons[]
+  user_status_brand_reasons user_status_brand_reasons[]
+
+  @@unique([brandId, reason, type, status], map: "uq_brand_reason_type_status")
+  @@index([brandId])
+  @@index([type])
+}
+
+model loan_status_brand_reasons {
+  id                  String               @id @default(uuid())
+  loanStatusHistoryId String
+  brandStatusReasonId String
+  brandStatusReason   brand_status_reasons @relation(fields: [brandStatusReasonId], references: [id], onDelete: Cascade)
+  loanStatusHistory   LoanStatusHistory    @relation(fields: [loanStatusHistoryId], references: [id], onDelete: Cascade)
+
+  @@unique([loanStatusHistoryId, brandStatusReasonId])
+}
+
+model signzy_some_table {
+  id                       String                 @id @default(uuid())
+  userId                   String
+  loanId                   String
+  loanAgreementId          String
+  loanAgreementReferenceId String                 @unique(map: "signzy_some_table_index_2")
+  documentId               String?
+  responseJson             Json?
+  callbackResponse         Json?
+  manualSyncResponse       Json?
+  uploadedAt               DateTime?              @default(now()) @db.Timestamptz(6)
+  createdAt                DateTime?              @default(now()) @db.Timestamptz(6)
+  pdfBlob                  Bytes?
+  workflowUrl              String?
+  loanAgreement            LoanAgreement          @relation(fields: [loanAgreementId], references: [id], onDelete: Cascade)
+  loanAgreementReference   LoanAgreementReference @relation(fields: [loanAgreementReferenceId], references: [id], onDelete: Cascade)
+  loan                     Loan                   @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  user                     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([loanAgreementId], map: "signzy_some_table_index_3")
+  @@map("signzy_some_table")
+}
+
+model digitap_esign_some_table {
+  id                       String                 @id @default(uuid())
+  userId                   String
+  loanId                   String
+  loanAgreementId          String
+  loanAgreementReferenceId String                 @unique(map: "digitap_esign_some_table_index_2")
+  documentId               String?
+  responseJson             Json?
+  callbackResponse         Json?
+  manualSyncResponse       Json?
+  uploadedAt               DateTime?              @default(now()) @db.Timestamptz(6)
+  createdAt                DateTime?              @default(now()) @db.Timestamptz(6)
+  pdfBlob                  Bytes?
+  workflowUrl              String?
+  loanAgreement            LoanAgreement          @relation(fields: [loanAgreementId], references: [id], onDelete: Cascade)
+  loanAgreementReference   LoanAgreementReference @relation(fields: [loanAgreementReferenceId], references: [id], onDelete: Cascade)
+  loan                     Loan                   @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  user                     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([loanAgreementId], map: "digitap_esign_some_table_index_3")
+  @@map("digitap_esign_some_table")
+}
+
+model user_status_brand_reasons {
+  id                   String               @id
+  userStatusId         String?
+  brandStatusReasonId  String
+  userId               String?
+  users                User?                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_usbr_user")
+  brand_status_reasons brand_status_reasons @relation(fields: [brandStatusReasonId], references: [id], onDelete: Cascade)
+  user_status          user_status?         @relation(fields: [userStatusId], references: [id], onDelete: Cascade)
+
+  @@unique([userStatusId, brandStatusReasonId])
+  @@index([userId], map: "idx_usbr_user")
+}
+
+model penny_drop_log {
+  id                String            @id @default(uuid())
+  userBankAccountId String?
+  userId            String?
+  brandId           String?
+  accountNumber     String
+  ifsc              String
+  beneficiaryName   String?
+  provider          BrandProviderName
+  status            PennyDropStatus
+  request           Json
+  response          Json
+  accountExists     Boolean?
+  accountHolderName String?
+  nameMatch         Boolean?
+  errorMessage      String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  brand             Brand?            @relation(fields: [brandId], references: [id])
+  userBankAccount   UserBankAccount?  @relation(fields: [userBankAccountId], references: [id])
+  user              User?             @relation(fields: [userId], references: [id])
+}
+
+model pan_details_log {
+  id                 String                @id @default(uuid())
+  userId             String?
+  brandId            String?
+  pan                String
+  clientRefNum       String?
+  provider           BrandProviderName
+  status             PanVerificationStatus
+  request            Json
+  response           Json
+  panHolderName      String?
+  isValid            Boolean?
+  errorMessage       String?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  aadhaarLinked      Boolean               @default(false)
+  aadhaarNumber      String?               @db.VarChar(16)
+  cachedResponseData Boolean               @default(false)
+  dob                DateTime?             @db.Date
+  gender             String?               @db.VarChar(16)
+  brand              Brand?                @relation(fields: [brandId], references: [id])
+  user               User?                 @relation(fields: [userId], references: [id])
+}
+
+model phone_to_uan_log {
+  id           String            @id @default(uuid())
+  userId       String?
+  brandId      String?
+  mobileNumber String
+  provider     BrandProviderName
+  status       PhoneToUanStatus
+  request      Json
+  response     Json
+  uan          String?
+  errorMessage String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  brand        Brand?            @relation(fields: [brandId], references: [id])
+  user         User?             @relation(fields: [userId], references: [id])
+}
+
+model uan_to_employment_log {
+  id           String                @id @default(uuid())
+  userId       String?
+  brandId      String?
+  uan          String
+  provider     BrandProviderName
+  status       UanToEmploymentStatus
+  request      Json
+  response     Json
+  errorMessage String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  brand        Brand?                @relation(fields: [brandId], references: [id])
+  user         User?                 @relation(fields: [userId], references: [id])
+}
+
+model aadhaar_digi_locker_log {
+  id           String   @id @default(uuid())
+  userId       String?
+  brandId      String?
+  provider     String?
+  requestType  String?
+  status       String?
+  request      Json?
+  response     Json?
+  digiLockerId String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  callbackData Json?
+  brand        Brand?   @relation(fields: [brandId], references: [id])
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("aadhaar_digi_locker_log")
+}
+
+model notifications {
+  id                 String                     @id @default(uuid())
+  title              String
+  message            String
+  loanId             String?
+  userId             String?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  createdByPartnerId String?
+  acknowledgedAt     DateTime?
+  expiresAt          DateTime?
+  partnerRoleId      Int?
+  readAt             DateTime?
+  scheduledAt        DateTime?
+  sentAt             DateTime?
+  brandId            String?
+  priority           notification_priority_enum @default(LOW)
+  targets            notification_targets[]
+  brand              Brand?                     @relation(fields: [brandId], references: [id])
+  createdByPartner   PartnerUser?               @relation(fields: [createdByPartnerId], references: [id])
+  loan               Loan?                      @relation(fields: [loanId], references: [id])
+  partnerRole        PartnerRole?               @relation(fields: [partnerRoleId], references: [id])
+  user               User?                      @relation(fields: [userId], references: [id])
+}
+
+model notification_targets {
+  id             String        @id @default(uuid())
+  notificationId String
+  partnerUserId  String
+  platform       platform_type
+  isRead         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  acknowledgedAt DateTime?
+  readAt         DateTime?
+  updatedAt      DateTime      @default(now()) @updatedAt
+  notification   notifications @relation(fields: [notificationId], references: [id])
+  partnerUser    PartnerUser   @relation(fields: [partnerUserId], references: [id])
+
+  @@index([partnerUserId])
+  @@index([notificationId])
+  @@index([partnerUserId, isRead])
+  @@index([partnerUserId, acknowledgedAt])
+}
+
+model mobile_verification_logs {
+  id           String            @id
+  userId       String?
+  brandId      String?
+  provider     BrandProviderName
+  serviceType  String
+  request      Json
+  response     Json
+  isValid      Boolean?
+  errorMessage String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime
+  brands       Brand?            @relation(fields: [brandId], references: [id])
+  users        User?             @relation(fields: [userId], references: [id])
+}
+
+model public_loan_inquiries {
+  id             String                      @id @default(uuid())
+  identifier     String                      @db.VarChar(20)
+  identifierType PublicInquiryIdentifierType
+  status         PublicInquiryStatus         @default(INITIATED)
+  otp            String?
+  ipAddress      String?                     @db.VarChar(45)
+  userAgent      String?                     @db.VarChar(255)
+  initiatedAt    DateTime                    @default(now())
+  otpSentAt      DateTime?
+  otpVerifiedAt  DateTime?
+  completedAt    DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  @@index([identifier, identifierType])
+  @@index([status])
+  @@index([initiatedAt])
+  @@map("public_loan_inquiries")
+}
+
+model aa_financial_insights {
+  id               String           @id
+  dataSessionId    String           @unique
+  extractedData    Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime
+  aa_data_sessions aa_data_sessions @relation(fields: [dataSessionId], references: [id], onDelete: Cascade)
+}
+
+model BrandBlog {
+  id            String     @id @default(uuid())
+  brandId       String
+  title         String
+  slug          String
+  content       String
+  excerpt       String?
+  author        String?
+  featuredImage String?
+  status        BlogStatus @default(DRAFT)
+  publishedDate DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  createdBy     String?
+  updatedBy     String?
+  brand         Brand      @relation("BrandToBlogs", fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, slug])
+  @@index([brandId])
+  @@index([status])
+  @@index([publishedDate])
+  @@map("brand_blogs")
+}
+
+model partner_user_rules {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  partnerUserId   String      @unique
+  isActive        Boolean     @default(true)
+  createdAt       DateTime?   @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime?   @default(now()) @db.Timestamp(6)
+  isReloanSupport Boolean     @default(false)
+  isCxAllCustomer Boolean     @default(false)
+  partner_users   PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([partnerUserId], map: "idx_partner_user_rules_partnerUserId")
+}
+
+model unsigned_data_agreement {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  loan_aggreement_id String?
+  unsigned_data      String?
+  created_at         DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model migrations {
+  id                String    @id @db.VarChar(50)
+  description       String
+  executed_at       DateTime? @default(now()) @db.Timestamp(6)
+  execution_time_ms Int?
+  checksum          String?   @db.VarChar(255)
+}
+
+model brand_paths {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  path       String
+  label      String
+  icon       String?
+  isActive   Boolean  @default(true)
+  brandId    String
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @default(now()) @db.Timestamp(6)
+  isDisabled Boolean? @default(false)
+  sort_index Int      @default(1)
+  brands     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_brand_brand_paths")
+
+  @@unique([brandId, path], map: "unique_brand_path")
+}
+
+model user_salaries {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id         String    @db.Uuid
+  partner_user_id String    @db.Uuid
+  salary_amount   Float     @db.Real
+  salary_date     DateTime  @db.Date
+  salary_month    Int?
+  salary_year     Int?
+  notes           String?   @db.VarChar(512)
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at      DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([user_id, partner_user_id, salary_year, salary_month], map: "unique_user_salary_per_month")
+}
+
+model partner_user_dialer_configs {
+  agent_user_id           String   @db.VarChar(36)
+  agent_user_number       String   @db.VarChar(10)
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+  is_active               Boolean  @default(true)
+  agent_allowed_caller_id String   @db.VarChar(10)
+  agent_user_email        String   @db.VarChar(60)
+  is_disabled             Boolean  @default(false)
+  id                      String   @id @default(uuid()) @db.Uuid
+  partner_user_id         String   @unique @db.Uuid
+  agent_skill_id          String?  @db.VarChar(32)
+
+  @@map("partner_user_dialer_configs")
+}
+
+model field_visit {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  loan_id             String    @db.VarChar(255)
+  require_field_visit Boolean   @default(false)
+  created_at          DateTime? @default(now()) @db.Timestamp(6)
+  updated_at          DateTime? @default(now()) @db.Timestamp(6)
+  loans               Loan      @relation(fields: [loan_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loan")
+
+  @@index([loan_id], map: "idx_field_visit_loan_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model brand_acefone_configs {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brand_id           String   @unique @db.Uuid
+  acefone_token      String   @db.VarChar(500)
+  metadata           Json?
+  is_active          Boolean  @default(true)
+  is_disabled        Boolean  @default(false)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now())
+  allowed_caller_ids String[] @default([]) @db.VarChar(10)
+
+  @@index([brand_id])
+  @@index([is_active, is_disabled], map: "brand_acefone_configs_status_idx")
+}
+
+model whatsapp_message_logs {
+  id              String    @id
+  userId          String?
+  loanId          String?
+  brandId         String
+  phoneNumber     String    @db.VarChar(15)
+  templateName    String?   @db.VarChar(100)
+  messageType     String    @db.VarChar(50)
+  status          String    @db.VarChar(20)
+  aiSensyResponse Json?
+  sentAt          DateTime  @default(now())
+  deliveredAt     DateTime?
+  readAt          DateTime?
+  failureReason   String?   @db.VarChar(500)
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now())
+  brands          Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  loans           Loan?     @relation(fields: [loanId], references: [id])
+  users           User?     @relation(fields: [userId], references: [id])
+
+  @@index([brandId])
+  @@index([loanId])
+  @@index([messageType])
+  @@index([phoneNumber])
+  @@index([userId])
+}
+
+model whatsapp_reminder_configs {
+  id             String   @id
+  brandId        String
+  reminderType   String   @db.VarChar(100)
+  templateName   String   @db.VarChar(100)
+  daysBeforeDue  Int      @default(0)
+  isEnabled      Boolean  @default(true)
+  frequency      String   @default("once") @db.VarChar(20)
+  loanStatuses   String[]
+  templateParams Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+  brands         Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, reminderType])
+  @@index([brandId])
+  @@index([isEnabled])
+}
+
+model user_reminder_audit_logs {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_reminder_id String   @db.Uuid
+  event            String   @db.VarChar(32)
+  metadata         Json?
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([event], map: "idx_audit_event")
+  @@index([user_reminder_id], map: "idx_audit_reminder")
+}
+
+model user_reminders {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String
+  template_code       String    @db.VarChar(64)
+  payload             Json?
+  scheduled_at        DateTime  @db.Timestamptz(6)
+  status              String    @default("PENDING") @db.VarChar(16)
+  retry_count         Int       @default(0)
+  provider_message_id String?
+  last_error          String?
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+  channel             String    @db.VarChar(32)
+  loan_id             String?
+  read_at             DateTime? @db.Timestamptz(6)
+  send_at             DateTime? @db.Timestamptz(6)
+  users               User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_reminders_user")
+
+  @@index([channel], map: "idx_reminders_channel")
+  @@index([scheduled_at, status], map: "idx_reminders_scheduled_status")
+  @@index([user_id], map: "idx_reminders_user")
+}
+
+model user_audit_logs {
+  id            String         @id(map: "user_logs_pkey")
+  timestamp     DateTime       @default(now())
+  userId        String
+  partnerUserId String?
+  message       String
+  context       Json?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime
+  brandId       String?
+  type          String?        @db.VarChar(64)
+  platformType  platform_type?
+  serialNumber  Int            @default(0)
+  loanId        String?
+
+  @@unique([userId, serialNumber], map: "user_logs_userId_serialNumber_key")
+  @@index([brandId], map: "user_logs_brandId_idx")
+  @@index([loanId], map: "user_logs_loanId_idx")
+  @@index([partnerUserId], map: "user_logs_partnerUserId_idx")
+  @@index([timestamp], map: "user_logs_timestamp_idx")
+  @@index([userId], map: "user_logs_userId_idx")
+}
+
+model reloan_automation_log {
+  id                         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                    String    @db.VarChar(255)
+  brand_id                   String    @db.VarChar(255)
+  previous_loan_id           String    @db.VarChar(255)
+  request_amount             Decimal   @db.Decimal(15, 2)
+  previous_disbursement_date DateTime? @db.Timestamp(6)
+  previous_due_date          DateTime? @db.Timestamp(6)
+  previous_closure_date      DateTime? @db.Timestamp(6)
+  previous_closure_status    String?   @db.VarChar(50)
+  previous_loan_status       String    @db.VarChar(50)
+  previous_loan_amount       Decimal   @db.Decimal(15, 2)
+  is_migrated_loan           Boolean?  @default(false)
+  aa_available               Boolean
+  eligible                   Boolean?  @default(false)
+  reasons                    String
+  evaluation_rules           String?
+  created_at                 DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([created_at], map: "idx_reloan_automation_log_created_at")
+  @@index([eligible, created_at], map: "idx_reloan_automation_log_eligible_created_at")
+  @@index([previous_loan_id], map: "idx_reloan_automation_log_previous_loan_id")
+  @@index([user_id, brand_id], map: "idx_reloan_automation_log_user_id_brand_id")
+}
+
+model user_allotted_partner_user_logs {
+  userId        String
+  partnerUserId String
+  allottedAt    DateTime    @default(now())
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  partner_users PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade, map: "user_allotted_partner_user_partnerUserId_fkey")
+  users         User        @relation(fields: [userId], references: [id], onDelete: Cascade, map: "user_allotted_partner_user_userId_fkey")
+
+  @@index([userId], map: "idx_uapul_userId")
+  @@index([partnerUserId], map: "idx_uapul_partnerUserId")
+  @@index([allottedAt], map: "idx_uapul_allottedAt")
+  @@index([partnerUserId, allottedAt], map: "idx_uapul_partnerUserId_allottedAt")
+  @@index([userId, allottedAt], map: "idx_uapul_userId_allottedAt")
+  @@map("user_allotted_partner_user_logs")
+}
+
+model master_category {
+  id           BigInt         @id @default(autoincrement())
+  name         String         @db.VarChar(100)
+  code         String         @unique @db.VarChar(50)
+  description  String?        @db.VarChar(255)
+  is_active    Boolean?       @default(true)
+  created_at   DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime?      @default(now()) @db.Timestamptz(6)
+  master_value master_value[]
+
+  @@index([code], map: "idx_master_category_code")
+}
+
+model master_value {
+  id                                           BigInt          @id @default(autoincrement())
+  category_id                                  BigInt
+  name                                         String          @db.VarChar(100)
+  code                                         String          @db.VarChar(50)
+  description                                  String?         @db.VarChar(255)
+  sort_order                                   Int?            @default(0)
+  is_active                                    Boolean?        @default(true)
+  created_at                                   DateTime?       @default(now()) @db.Timestamptz(6)
+  updated_at                                   DateTime?       @default(now()) @db.Timestamptz(6)
+  master_category                              master_category @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_users_occupation_type_idTomaster_value User[]          @relation("users_occupation_type_idTomaster_value")
+  users_users_rejected_by_idTomaster_value     User[]          @relation("users_rejected_by_idTomaster_value")
+  users_users_status_idTomaster_value          User[]          @relation("users_status_idTomaster_value")
+
+  @@unique([category_id, code], map: "uq_category_code")
+  @@index([category_id], map: "idx_master_value_category_id")
+}
+
+model brand_blocklisted_pincode {
+  id              Int      @id @default(autoincrement())
+  pincode         String
+  customerName    String?  @db.VarChar(255)
+  reason          String?  @db.VarChar(255)
+  dpd             Int?
+  brandId         String
+  createdAt       DateTime @default(now())
+  partnerUserName String?  @db.VarChar(255)
+  brands          Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([pincode, brandId])
+}
+
+model brand_category {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String        @unique @db.VarChar(100)
+  name        String        @db.VarChar(150)
+  description String?       @db.VarChar(255)
+  is_active   Boolean       @default(true)
+  created_at  DateTime      @default(now()) @db.Timestamp(6)
+  updated_at  DateTime      @default(now()) @db.Timestamp(6)
+  brand_value brand_value[]
+}
+
+model brand_value {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id    String         @db.Uuid
+  code           String         @db.VarChar(100)
+  value          String         @db.VarChar(150)
+  description    String?        @db.VarChar(255)
+  sort_order     Int?           @default(0)
+  is_active      Boolean        @default(true)
+  metadata       Json?
+  created_at     DateTime       @default(now()) @db.Timestamp(6)
+  updated_at     DateTime       @default(now()) @db.Timestamp(6)
+  brand_category brand_category @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_brand_value_category")
+
+  @@unique([category_id, code], map: "uq_brand_category_code")
+  @@index([category_id, is_active], map: "idx_brand_value_active")
+  @@index([category_id], map: "idx_brand_value_category")
+}
+
+model user_status {
+  id                        String                      @id
+  userId                    String                      @unique
+  kycCompleted              Boolean                     @default(false)
+  loanEligible              Boolean                     @default(false)
+  accountStatus             AccountStatus               @default(PENDING)
+  statusUpdatedAt           DateTime                    @default(now())
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @default(now())
+  termsAccepted             Boolean                     @default(false)
+  currentStatus             current_status_enum         @default(SALARIED)
+  reviewDocumentUrl         String?
+  users                     User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user_status_brand_reasons user_status_brand_reasons[]
+
+  @@index([accountStatus], map: "idx_user_status_account_status")
+  @@index([userId, accountStatus], map: "idx_user_status_user_account_status")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model master_banks {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(200)
+  code       String   @db.VarChar(10)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([code], map: "idx_master_banks_code")
+  @@index([is_active], map: "idx_master_banks_is_active")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model master_pincodes {
+  id               Int              @id @default(autoincrement())
+  pincode          String           @unique @db.VarChar(6)
+  cityId           Int
+  stateId          Int
+  area             String?          @db.VarChar(255)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @default(now())
+  is_blocked       Boolean          @default(false)
+  master_districts master_districts @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  master_states    master_states    @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  @@index([cityId])
+  @@index([stateId])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model master_states {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar(100)
+  code             String             @unique @db.VarChar(2)
+  isUT             Boolean            @default(false)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now())
+  master_districts master_districts[]
+  master_pincodes  master_pincodes[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model master_districts {
+  id              Int               @id(map: "master_cities_pkey") @default(autoincrement())
+  name            String            @db.VarChar(100)
+  stateId         Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+  master_states   master_states     @relation(fields: [stateId], references: [id], onDelete: Cascade, map: "master_cities_stateId_fkey")
+  master_pincodes master_pincodes[]
+
+  @@unique([name, stateId], map: "master_cities_name_stateId_key")
+  @@index([stateId], map: "master_cities_stateId_idx")
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum evaluation_stage_enum {
+  ONE
+  TWO
+  THREE
+  FOUR
+}
+
+enum notification_priority_enum {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum PhoneToUanStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+enum UanToEmploymentStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+enum VerificationType {
+  OTP
+  VOICE_CALL
+}
+
+enum rejection_type_enum {
+  USER
+  LOAN
+}
+
+enum brand_status_enum {
+  APPROVED
+  REJECTED
+  HOLD
+  ACTIVE
+  PENDING
+}
+
+enum LoanXlsxFileType {
+  PAYOUT
+  BENEFICIARY
+}
+
+enum LoanRiskCategory {
+  very_poor
+  poor
+  medium
+  high
+  very_high
+  mig_cat_1
+  mig_cat_2
+  mig_cat_3
+  mig_cat_4
+  mig_cat_5
+  mig_cat_6
+  mig_cat_7
+  mig_cat_8
+  mig_cat_9
+  mig_cat_10
+  mig_cat_11
+  mig_cat_12
+  mig_cat_13
+  mig_cat_14
+  mig_cat_15
+  mig_cat_16
+  mig_cat_17
+  mig_cat_18
+  mig_cat_19
+  mig_cat_20
+  mig_cat_21
+  mig_cat_22
+  mig_cat_23
+  mig_cat_24
+  mig_cat_25
+  mig_cat_26
+  mig_cat_27
+  mig_cat_28
+  mig_cat_29
+  mig_cat_30
+  mig_cat_31
+  mig_cat_32
+  mig_cat_33
+  mig_cat_34
+  mig_cat_35
+  mig_cat_36
+  mig_cat_37
+  mig_cat_38
+  mig_cat_39
+  mig_cat_40
+  mig_cat_41
+  mig_cat_42
+  mig_cat_43
+  mig_cat_44
+  mig_cat_45
+  mig_cat_46
+  mig_cat_47
+  mig_cat_48
+  mig_cat_49
+  mig_cat_50
+  low
+  moderate
+  good
+  excellent
+  exceptional
+  subprime
+  near_prime
+  prime
+  super_prime
+  ultra_prime
+}
+
+enum LoanTypeEnum {
+  EMI
+  PAYDAY_LOAN
+}
+
+enum FeeType {
+  processing
+  convenience
+  documentation
+  interest
+}
+
+enum FeeValueType {
+  fixed
+  percentage
+}
+
+enum ChargeMode {
+  INCLUSIVE
+  EXCLUSIVE
+}
+
+enum gender_enum {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum current_status_enum {
+  SALARIED
+  OTHER
+  SELF_EMPLOYED
+}
+
+enum DocumentTypeEnum {
+  AADHAAR
+  PAN
+}
+
+enum OtherDocumentTypeEnum {
+  VOTER_ID
+  DRIVING_LICENSE
+  PASSPORT
+  RATION_CARD
+  BIRTH_CERTIFICATE
+  ELECTRICITY_BILL
+  WATER_BILL
+  GAS_BILL
+  RENT_AGREEMENT
+  SALARY_SLIP
+  FORM_16
+  ITR_V
+  EMPLOYER_CERTIFICATE
+  COLLEGE_ID
+  MARRIAGE_CERTIFICATE
+  PROPERTY_TAX_RECEIPT
+  INSURANCE_POLICY
+  OTHER
+}
+
+enum document_status_enum {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum marital_status_enum {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum ModeOfSalary {
+  BANK_TRANSFER
+  CASH
+  CHEQUE
+  OTHER
+}
+
+enum user_bank_verification_method {
+  MANUAL
+  PENNY_DROP
+  API
+}
+
+enum user_bank_verification_status {
+  PENDING
+  VERIFIED
+  FAILED
+  RETRYING
+}
+
+enum user_data_status {
+  NOT_VERIFIED
+  VERIFIED_BY_USER
+  VERIFIED_BY_ADMIN
+}
+
+enum platform_type {
+  WEB
+  PARTNER
+}
+
+enum TaxType {
+  GST
+  TDS
+  VAT
+  CESS
+  CUSTOM
+}
+
+enum PenaltyType {
+  SIMPLE
+  COMPOUND
+}
+
+enum RejectionSource {
+  ADMIN
+  SYSTEM
+  AUTOMATED
+  SUPPORT
+  OTHER
+}
+
+enum RejectionType {
+  DOCUMENT_INSUFFICIENT
+  CREDIT_SCORE_LOW
+  INVALID_INFORMATION
+  KYC_FAILED
+  OTHER
+}
+
+enum ReligionEnum {
+  HINDUISM
+  ISLAM
+  CHRISTIANITY
+  SIKHISM
+  BUDDHISM
+  JAINISM
+  JUDAISM
+  ZOROASTRIANISM
+  BAHAI
+  ANIMISM
+  ATHEIST
+  AGNOSTIC
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum ResidenceTypeEnum {
+  RENTED
+  OWNED
+}
+
+enum AddressProofEnum {
+  GAS_BILL
+  WATER_BILL
+  ELECTRICITY_BILL
+  WIFI_BILL
+  POSTPAID_BILL
+  CREDIT_CARD_STATEMENT
+  RENT_AGREEMENT
+  MOBILE_TO_ADDRESS
+  MOBILE_TO_ECOM_ADDRESS
+  MOBILE_TO_LPG_ADDRESS
+  MOBILE_TO_DL_ADDRESS
+}
+
+enum RelationshipEnum {
+  SPOUSE
+  BROTHER
+  SISTER
+  FATHER
+  MOTHER
+  OTHER
+  FRIEND
+  COLLEAGUE
+}
+
+enum loan_status_enum {
+  PENDING
+  APPROVED
+  DISBURSED
+  ACTIVE
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  DEFAULTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+  POST_ACTIVE
+  CREDIT_EXECUTIVE_APPROVED
+  SANCTION_MANAGER_APPROVED
+  SETTLED
+  WRITE_OFF
+  ONBOARDING
+}
+
+enum EvaluationStatusEnum {
+  PASSED
+  FAILED
+  PENDING
+}
+
+enum EligibilityStatusEnum {
+  ELIGIBLE
+  NOT_ELIGIBLE
+}
+
+enum agreement_status_enum {
+  NOT_SENT
+  SENT
+  SIGNED
+  REJECTED
+  EXPIRED
+}
+
+enum TransactionTypeEnum {
+  DISBURSEMENT
+  COLLECTION
+  PARTIAL_COLLECTION
+  AUTOPAY_CONSENT
+}
+
+enum TransactionStatusEnum {
+  PENDING
+  SUCCESS
+  FAILED
+  RETRYING
+  CANCELLED
+  TIMEOUT
+}
+
+enum BrandBankAccountType {
+  INDUSIND_BANK
+  BANDHAN_BANK
+  HDFC_BANK
+  ICICI_BANK
+  IDFC_BANK
+  YASH_BANK
+  YES_BANK
+  BOB_BANK
+  EQUITAS_BANK
+}
+
+enum PaymentMethodEnum {
+  MANUAL
+  PAYTERNING
+  ROZERPAY
+  CASHFREE
+  RAZERPAY
+  RAZORPAY
+  IDFC
+  RAZORPAY_AUTOPAY
+  ICICI
+}
+
+enum employment_type_enum {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  TEMPORARY
+  INTERN
+  FREELANCE
+  CASUAL
+  GIG
+  APPRENTICE
+  COMMISSION_BASED
+}
+
+enum PermissionType {
+  READ
+  WRITE
+  ALL
+}
+
+enum closingTypeEnum {
+  SETTLEMENT
+  WRITE_OFF
+  NORMAL
+}
+
+enum OpsApprovalStatusEnum {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ReloanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum MigrationStatus {
+  ONBOARDED_NEW
+  MIGRATED
+  PARTIALLY_MIGRATED
+}
+
+enum AAConsentStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  PAUSED
+  REVOKED
+  EXPIRED
+}
+
+enum AADataStatus {
+  PENDING
+  RECEIVED
+  PROCESSED
+  FAILED
+  EXPIRED
+}
+
+enum ContractSigningProvider {
+  SIGNDESK
+  SIGNZY
+  DIGITAP
+}
+
+enum LeadFormStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  DUPLICATE
+}
+
+enum LeadMatchType {
+  EXACT
+  PARTIAL
+  FUZZY
+}
+
+enum LeadMatchField {
+  EMAIL
+  PHONE
+  PAN
+  FULL_NAME
+}
+
+enum LeadMatchEntity {
+  USER
+  DOCUMENT
+}
+
+enum LeadMatchStatus {
+  ACTIVE
+  INACTIVE
+  VERIFIED
+  REJECTED
+}
+
+enum EmailType {
+  SEVEN_DAY_REMINDER
+  THREE_DAY_REMINDER
+  ONE_DAY_REMINDER
+  OVERDUE_REMINDER
+  CUSTOM_REMINDER
+  PAYMENT_DUE_REMINDER
+  FINAL_NOTICE
+  TEST_SEVEN_DAY_REMINDER
+  TEST_THREE_DAY_REMINDER
+  TEST_ONE_DAY_REMINDER
+  TEST_OVERDUE_REMINDER
+  TEST_CUSTOM_REMINDER
+  TEST_PAYMENT_DUE_REMINDER
+  TEST_FINAL_NOTICE
+  SAME_DAY_REMINDER
+  TEST_SAME_DAY_REMINDER
+}
+
+enum UserLogType {
+  Home
+  PhoneVerification
+  EmailVerification
+  LoanApplication
+  CurrentStatus
+  LoanApplicationKyc
+  LoanApplicationPersonalInfo
+  LoanApplicationBankDetails
+  LoanApplicationEmploymentInfo
+  LoanApplicationSelfie
+  LoanApplicationAddressVerification
+  LoanApplicationReview
+  LoanApplicationSubmit
+}
+
+enum BrandProviderType {
+  PENNYDROP
+  LOAN_AGREEMENT
+  BRE
+  PAN_DETAILS_PLUS
+  PHONE_TO_UAN
+  UAN_TO_EMPLOYMENT
+  PAN_FD
+  PINCODE_FD
+  MOBILE_TO_ADDRESS
+  MOBILE_TO_ECOM_ADDRESS
+  MOBILE_TO_LPG_ADDRESS
+  MOBILE_TO_DL_ADDRESS
+  UPI_AUTOPAY
+  FULL_PAYMENT
+  PART_PAYMENT
+  AADHAAR_DIGILOCKER
+  DISBURSEMENT
+  SMS
+  EMAIL
+  WHATSAPP
+  ACCOUNT_AGGREGATION
+}
+
+enum BrandProviderName {
+  DIGITAP
+  NEOKRED
+  SIGNDESK
+  SIGNZY
+  FINBOX
+  SCOREME
+  CART
+  EQUIFAX
+  CIRPRO
+  KYCKART
+  CMS_FINTECHCLOUD
+  RAZORPAY
+  CASHFREE
+  PAYTRING
+  ICICI
+  IDFC
+  MANUAL
+  RAZORPAY_AUTOPAY
+  BREVO
+  MAILGUN
+  MSG91
+  SENDGRID
+  ZEPTO
+  NEXMO
+  NIMBUSIT
+  SMSGATEWAYHUB
+  TWILIO
+  FINDUIT
+}
+
+enum PennyDropStatus {
+  SUCCESS
+  FAILED
+  PENDING
+  NAME_MISMATCH
+}
+
+enum PanVerificationStatus {
+  SUCCESS
+  FAILED
+  INVALID
+  PENDING
+}
+
+enum NonRepaymentDateType {
+  BRAND_NON_REPAYMENT
+  PARTNER_UNAVAILABILITY
+}
+
+enum PublicInquiryIdentifierType {
+  MOBILE
+  PAN
+}
+
+enum PublicInquiryStatus {
+  INITIATED
+  OTP_SENT
+  OTP_VERIFIED
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum AAProvider {
+  FINDUIT
+  CART
+}
+
+enum certificate_type_enum {
+  NO_DUE_LETTER
+  WRITE_OFF_LETTER
+  SETTLEMENT_LETTER
+}
+
+enum AccountStatus {
+  ACTIVE
+  HOLD
+  PENDING
+  REJECTED
+}

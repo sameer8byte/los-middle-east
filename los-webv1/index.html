@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- =========================================================
+         Facebook Domain Verification (domain-safe)
+         ========================================================= -->
+    <script>
+      (function () {
+        const host = location.hostname;
+
+        const fbVerificationMap = {
+          'web.salary4sure.com': 'ep1arm46kacff2kdw8p0v86hpkd9pb',
+          'web1.salary4sure.com': 'lwcv54clknbnazhb5hqmmt9c38xga8',
+        };
+
+        if (fbVerificationMap[host]) {
+          const meta = document.createElement('meta');
+          meta.name = 'facebook-domain-verification';
+          meta.content = fbVerificationMap[host];
+          document.head.appendChild(meta);
+        }
+      })();
+    </script>
+
+    <!-- =========================================================
+         Domain-based Analytics Configuration (GTM First)
+         ========================================================= -->
+    <script>
+      (function () {
+        const hostname = location.hostname;
+
+        /**
+         * IMPORTANT:
+         * Order matters → most specific first
+         */
+        const domainConfigs = [
+          {
+            match: (h) => h === 'web.salary4sure.com',
+            gtm: 'GTM-MSQTQW5F',
+          },
+          {
+            match: (h) => h === 'web1.salary4sure.com',
+            gtm: 'GTM-MP75XDD3',
+          },
+          {
+            match: (h) => h === 'web2.salary4sure.com',
+            gtm: 'GTM-KPSC3VLF',
+            gtag:"AW-17937650468"
+          },
+          {
+            match: (h) => h === 'web.paisapop.com',
+            gtm: 'GTM-567KPXTZ',
+          },
+          {
+            match: (h) => h.endsWith('qualoan.com'),
+            gtm: 'GTM-5ZDLXW7R',
+            gtag: 'AW-17788451372', 
+          },
+          {
+            match: (h) => h.endsWith('fastsalary.com'),
+            gtag: 'AW-17892393989', 
+          },
+        ];
+
+        const trackingConfig =
+          domainConfigs.find((c) => c.match(hostname)) || null;
+
+        // Expose globally (optional but useful)
+        window.__TRACKING__ = {
+          hostname,
+          trackingConfig,
+        };
+
+        if (!trackingConfig) return;
+
+        /* =======================
+           Google Tag Manager
+           ======================= */
+        if (trackingConfig.gtm) {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            'gtm.start': new Date().getTime(),
+            event: 'gtm.js',
+          });
+
+          const gtmScript = document.createElement('script');
+          gtmScript.async = true;
+          gtmScript.src =
+            'https://www.googletagmanager.com/gtm.js?id=' +
+            trackingConfig.gtm;
+          document.head.appendChild(gtmScript);
+        }
+
+        /* =======================
+           Google Ads / gtag (ONLY if needed)
+           ======================= */
+        if (trackingConfig.gtag) {
+          const gtagScript = document.createElement('script');
+          gtagScript.async = true;
+          gtagScript.src =
+            'https://www.googletagmanager.com/gtag/js?id=' +
+            trackingConfig.gtag;
+          document.head.appendChild(gtagScript);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          window.gtag = gtag;
+
+          gtag('js', new Date());
+          gtag('config', trackingConfig.gtag);
+        }
+      })();
+    </script>
+
+    <!-- Vite Entry -->
+    <script type="module" src="/src/main.tsx"></script>
+  </head>
+
+  <body>
+    <!-- =========================================================
+         Google Tag Manager (noscript – SAFE injection)
+         ========================================================= -->
+    <script>
+      (function () {
+        const config = window.__TRACKING__?.trackingConfig;
+        if (!config?.gtm) return;
+
+        const noscript = document.createElement('noscript');
+        noscript.innerHTML = `
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=${config.gtm}"
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+          ></iframe>
+        `;
+        document.body.prepend(noscript);
+      })();
+    </script>
+
+    <div id="root"></div>
+  </body>
+</html>

@@ -1,0 +1,1033 @@
+{
+  "brands": [
+    {
+      "brandId": "1ef804d8-6d25-463a-81c2-6b34e0bc3571",
+      "brandName": "ZeptoFinance",
+      "description": "ZeptoFinance — ",
+      "isActive": true,
+      "rules": {
+        "1_profession": {
+          "paramNo": 1,
+          "paramName": "Profession",
+          "enabled": true,
+          "allowedValues": ["SALARIED"],
+          "failValues": ["SELF_EMPLOYED"],
+          "description": "Only salaried applicants accepted",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "2_salaryThreshold": {
+          "paramNo": 2,
+          "paramName": "Monthly Salary / Turnover",
+          "enabled": true,
+          "threshold": 35000,
+          "currency": "INR",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "description": "Minimum monthly salary ₹35,000",
+          "rejectionReasonId": "811b4ebc-fd37-4088-aad4-ef1acde395fe"
+        },
+        "3_phoneNumber": {
+          "paramNo": 3,
+          "paramName": "Phone Number",
+          "enabled": true,
+          "exactLength": 10,
+          "pattern": "^(\\+91)?[6-9][0-9]{9}$",
+          "description": "Valid 10-digit Indian mobile number",
+          "rejectionReasonId": "f72ab07f-7081-4ac6-919a-794e15babcd7"
+        },
+        "4_panCard": {
+          "paramNo": 4,
+          "paramName": "PAN Card",
+          "enabled": true,
+          "fourthCharMustBe": "P",
+          "pattern": "^[A-Z]{3}P[A-Z][0-9]{4}[A-Z]$",
+          "fraudDbCheck": true,
+          "description": "Valid PAN format with fraud DB check",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "5_panAadharLink": {
+          "paramNo": 5,
+          "paramName": "PAN & Aadhar Link",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "PAN must be linked to Aadhar",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "6_aadharLast4": {
+          "paramNo": 6,
+          "paramName": "Aadhar Last 4 Digits Received",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "Last 4 digits of Aadhar must be received",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "7_age": {
+          "paramNo": 7,
+          "paramName": "Age",
+          "enabled": true,
+          "min": 21,
+          "max": 55,
+          "unit": "years",
+          "description": "Applicant age must be between 21 and 55",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "8_pinCode": {
+          "paramNo": 8,
+          "paramName": "Pin Code",
+          "enabled": true,
+          "mustComplyWith": "BLOCK_LIST_MODULE",
+          "description": "Pin code must pass block list module check",
+          "rejectionReasonId": "e63faa63-651c-4f37-99e7-794f13b57bce"
+        },
+        "9_ifsc": {
+          "paramNo": 9,
+          "paramName": "IFSC Code",
+          "enabled": true,
+          "mustBeIn": "APPROVED_BANK_LIST",
+          "description": "IFSC must exist in approved bank list",
+          "rejectionReasonId": "f72ab07f-7081-4ac6-919a-794e15babcd7"
+        },
+        "10_nameMatchPanBank": {
+          "paramNo": 10,
+          "paramName": "Name Match: PAN vs Bank Account",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and bank account must exceed 75%",
+          "rejectionReasonId": "a9b5329a-9d8c-4509-8443-a8599e6a0c07"
+        },
+        "11_bankStatement": {
+          "paramNo": 11,
+          "paramName": "Bank Statement Upload",
+          "enabled": true,
+          "mustBe": "ORIGINAL",
+          "description": "Bank statement must not be modified",
+          "rejectionReasonId": "f72ab07f-7081-4ac6-919a-794e15babcd7"
+        },
+        "12_videoUpload": {
+          "paramNo": 12,
+          "paramName": "Video Upload",
+          "enabled": true,
+          "mustBe": "NORMAL",
+          "description": "Video must not contain inappropriate content",
+          "rejectionReasonId": "f95cc66c-94c0-45b0-be62-5285db75010f"
+        },
+        "13_aadharPanDigitMatch": {
+          "paramNo": 13,
+          "paramName": "Aadhar–PAN Last 4 Digit Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Last 4 digits of Aadhar must match across PAN and Aadhar",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "14_genderMatch": {
+          "paramNo": 14,
+          "paramName": "Gender Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Gender on PAN must match applicant records",
+          "rejectionReasonId": "a1738206-26bc-4838-b071-05280293a44c"
+        },
+        "15_nameMatchPanAadhar": {
+          "paramNo": 15,
+          "paramName": "Name Match: PAN vs Aadhar",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and Aadhar must exceed 75%",
+          "rejectionReasonId": "a9b5329a-9d8c-4509-8443-a8599e6a0c07"
+        },
+        "16_nbfc": {
+          "paramNo": 16,
+          "paramName": "NBFC Check",
+          "enabled": true,
+          "mustBe": "DIFFERENT",
+          "description": "NBFC must be different",
+          "rejectionReasonId": "071ea0f3-b394-4438-9bc9-fcc3397071e4"
+        },
+        "17_crifScore": {
+          "paramNo": 17,
+          "paramName": "CRIF Score",
+          "enabled": true,
+          "minScore": 500,
+          "operator": "GREATER_THAN",
+          "description": "CRIF score must exceed 500",
+          "rejectionReasonId": "9bce5254-ab35-4c65-b4e8-87df232691c7"
+        },
+        "18_crifReport": {
+          "paramNo": 18,
+          "paramName": "CRIF Report",
+          "enabled": true,
+          "mustBe": "NON_DELINQUENT",
+          "description": "CRIF report must show no delinquency",
+          "rejectionReasonId": "780b1cc5-cfe6-43ed-968a-353b1f40920f"
+        },
+        "19_brandLoan": {
+          "paramNo": 19,
+          "paramName": "Different Brand Loan Status",
+          "enabled": true,
+          "mustBe": "NON_DEFAULT",
+          "description": "No default or settled loan with other brands",
+          "rejectionReasonId": "9bce5254-ab35-4c65-b4e8-87df232691c7"
+        }
+      }
+    },
+    {
+      "brandId": "165a2d32-d1bd-4287-b2db-104a7feee308",
+      "brandName": "PaisaPop",
+      "description": "PaisaPop — ",
+      "isActive": true,
+      "rules": {
+        "1_profession": {
+          "paramNo": 1,
+          "paramName": "Profession",
+          "enabled": true,
+          "allowedValues": ["SALARIED"],
+          "failValues": ["SELF_EMPLOYED"],
+          "description": "Only salaried applicants accepted",
+          "rejectionReasonId": "232a6b19-f09b-4af3-8de2-3b2b3fdb55d8"
+        },
+        "2_salaryThreshold": {
+          "paramNo": 2,
+          "paramName": "Monthly Salary / Turnover",
+          "enabled": true,
+          "threshold": 40000,
+          "currency": "INR",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "description": "Minimum monthly salary ₹40,000",
+          "rejectionReasonId": "fed53e2c-7b3b-41db-b203-5c5c59146b7f"
+        },
+        "3_phoneNumber": {
+          "paramNo": 3,
+          "paramName": "Phone Number",
+          "enabled": true,
+          "exactLength": 10,
+          "pattern": "^(\\+91)?[6-9][0-9]{9}$",
+          "description": "Valid 10-digit Indian mobile number",
+          "rejectionReasonId": "232a6b19-f09b-4af3-8de2-3b2b3fdb55d8"
+        },
+        "4_panCard": {
+          "paramNo": 4,
+          "paramName": "PAN Card",
+          "enabled": true,
+          "fourthCharMustBe": "P",
+          "pattern": "^[A-Z]{3}P[A-Z][0-9]{4}[A-Z]$",
+          "fraudDbCheck": true,
+          "description": "Valid PAN format with fraud DB check",
+          "rejectionReasonId": "127723d5-ea8e-4914-a157-c14150d73b76"
+        },
+        "5_panAadharLink": {
+          "paramNo": 5,
+          "paramName": "PAN & Aadhar Link",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "PAN must be linked to Aadhar",
+          "rejectionReasonId": "30694372-fc1d-4ddc-a18c-c12b123cbcc4"
+        },
+        "6_aadharLast4": {
+          "paramNo": 6,
+          "paramName": "Aadhar Last 4 Digits Received",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "Last 4 digits of Aadhar must be received",
+          "rejectionReasonId": "30694372-fc1d-4ddc-a18c-c12b123cbcc4"
+        },
+        "7_age": {
+          "paramNo": 7,
+          "paramName": "Age",
+          "enabled": true,
+          "min": 21,
+          "max": 55,
+          "unit": "years",
+          "description": "Applicant age must be between 21 and 55",
+          "rejectionReasonId": "232a6b19-f09b-4af3-8de2-3b2b3fdb55d8"
+        },
+        "8_pinCode": {
+          "paramNo": 8,
+          "paramName": "Pin Code",
+          "enabled": true,
+          "mustComplyWith": "BLOCK_LIST_MODULE",
+          "description": "Pin code must pass block list module check",
+          "rejectionReasonId": "0a65f571-d7a0-41de-a271-bbc4c3fbe366"
+        },
+        "9_ifsc": {
+          "paramNo": 9,
+          "paramName": "IFSC Code",
+          "enabled": true,
+          "mustBeIn": "APPROVED_BANK_LIST",
+          "description": "IFSC must exist in approved bank list",
+          "rejectionReasonId": "232a6b19-f09b-4af3-8de2-3b2b3fdb55d8"
+        },
+        "10_nameMatchPanBank": {
+          "paramNo": 10,
+          "paramName": "Name Match: PAN vs Bank Account",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and bank account must exceed 75%",
+          "rejectionReasonId": "c504fa4c-a257-4640-a70c-f53377784ad2"
+        },
+        "11_bankStatement": {
+          "paramNo": 11,
+          "paramName": "Bank Statement Upload",
+          "enabled": true,
+          "mustBe": "ORIGINAL",
+          "description": "Bank statement must not be modified",
+          "rejectionReasonId": "232a6b19-f09b-4af3-8de2-3b2b3fdb55d8"
+        },
+        "12_videoUpload": {
+          "paramNo": 12,
+          "paramName": "Video Upload",
+          "enabled": true,
+          "mustBe": "NORMAL",
+          "description": "Video must not contain inappropriate content",
+          "rejectionReasonId": "07a32d9a-80f4-4e27-a976-cdb36a3c4a74"
+        },
+        "13_aadharPanDigitMatch": {
+          "paramNo": 13,
+          "paramName": "Aadhar–PAN Last 4 Digit Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Last 4 digits of Aadhar must match across PAN and Aadhar",
+          "rejectionReasonId": "c504fa4c-a257-4640-a70c-f53377784ad2"
+        },
+        "14_genderMatch": {
+          "paramNo": 14,
+          "paramName": "Gender Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Gender on PAN must match applicant records",
+          "rejectionReasonId": "c504fa4c-a257-4640-a70c-f53377784ad2"
+        },
+        "15_nameMatchPanAadhar": {
+          "paramNo": 15,
+          "paramName": "Name Match: PAN vs Aadhar",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and Aadhar must exceed 75%",
+          "rejectionReasonId": "c504fa4c-a257-4640-a70c-f53377784ad2"
+        },
+        "16_nbfc": {
+          "paramNo": 16,
+          "paramName": "NBFC Check",
+          "enabled": true,
+          "mustBe": "DIFFERENT",
+          "description": "NBFC must be different",
+          "rejectionReasonId": "add78dc5-5c72-4ccb-a3df-4f268448d44e"
+        },
+        "17_crifScore": {
+          "paramNo": 17,
+          "paramName": "CRIF Score",
+          "enabled": true,
+          "minScore": 500,
+          "operator": "GREATER_THAN",
+          "description": "CRIF score must exceed 500",
+          "rejectionReasonId": "f0adf8cd-1021-4c32-a5c0-3b512c3a25a7"
+        },
+        "18_crifReport": {
+          "paramNo": 18,
+          "paramName": "CRIF Report",
+          "enabled": true,
+          "mustBe": "NON_DELINQUENT",
+          "description": "CRIF report must show no delinquency",
+          "rejectionReasonId": "f0adf8cd-1021-4c32-a5c0-3b512c3a25a7"
+        },
+        "19_brandLoan": {
+          "paramNo": 19,
+          "paramName": "Different Brand Loan Status",
+          "enabled": true,
+          "mustBe": "NON_DEFAULT",
+          "description": "No default or settled loan with other brands",
+          "rejectionReasonId": "add78dc5-5c72-4ccb-a3df-4f268448d44e"
+        }
+      }
+    },
+    {
+      "brandId": "4b2f828d-e7d4-45d2-be7d-f2a0ee6a70ae",
+      "brandName": "QuaLoan",
+      "description": "QuaLoan — ",
+      "isActive": true,
+      "rules": {
+        "1_profession": {
+          "paramNo": 1,
+          "paramName": "Profession",
+          "enabled": true,
+          "allowedValues": ["SALARIED"],
+          "failValues": ["SELF_EMPLOYED"],
+          "description": "Only salaried applicants accepted",
+          "rejectionReasonId": "0cfe0b7b-ce7a-4b97-8213-cf444563e083"
+        },
+        "2_salaryThreshold": {
+          "paramNo": 2,
+          "paramName": "Monthly Salary / Turnover",
+          "enabled": true,
+          "threshold": 40000,
+          "currency": "INR",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "description": "Minimum monthly salary ₹40,000",
+          "rejectionReasonId": "34acdf01-15c8-4659-bc4e-58a34b73ae71"
+        },
+        "3_phoneNumber": {
+          "paramNo": 3,
+          "paramName": "Phone Number",
+          "enabled": true,
+          "exactLength": 10,
+          "pattern": "^(\\+91)?[6-9][0-9]{9}$",
+          "description": "Valid 10-digit Indian mobile number",
+          "rejectionReasonId": "a2385b27-0610-4654-a403-f5795af1c12c"
+        },
+        "4_panCard": {
+          "paramNo": 4,
+          "paramName": "PAN Card",
+          "enabled": true,
+          "fourthCharMustBe": "P",
+          "pattern": "^[A-Z]{3}P[A-Z][0-9]{4}[A-Z]$",
+          "fraudDbCheck": true,
+          "description": "Valid PAN format with fraud DB check",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "5_panAadharLink": {
+          "paramNo": 5,
+          "paramName": "PAN & Aadhar Link",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "PAN must be linked to Aadhar",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "6_aadharLast4": {
+          "paramNo": 6,
+          "paramName": "Aadhar Last 4 Digits Received",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "Last 4 digits of Aadhar must be received",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "7_age": {
+          "paramNo": 7,
+          "paramName": "Age",
+          "enabled": true,
+          "min": 21,
+          "max": 55,
+          "unit": "years",
+          "description": "Applicant age must be between 21 and 55",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "8_pinCode": {
+          "paramNo": 8,
+          "paramName": "Pin Code",
+          "enabled": true,
+          "mustComplyWith": "BLOCK_LIST_MODULE",
+          "description": "Pin code must pass block list module check",
+          "rejectionReasonId": "6bbed1d5-a7d8-40b6-9601-8466ecb06456"
+        },
+        "9_ifsc": {
+          "paramNo": 9,
+          "paramName": "IFSC Code",
+          "enabled": true,
+          "mustBeIn": "APPROVED_BANK_LIST",
+          "description": "IFSC must exist in approved bank list",
+          "rejectionReasonId": "a5844e49-e69b-49fc-878a-f5ba0fe151bc"
+        },
+        "10_nameMatchPanBank": {
+          "paramNo": 10,
+          "paramName": "Name Match: PAN vs Bank Account",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and bank account must exceed 75%",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "11_bankStatement": {
+          "paramNo": 11,
+          "paramName": "Bank Statement Upload",
+          "enabled": true,
+          "mustBe": "ORIGINAL",
+          "description": "Bank statement must not be modified",
+          "rejectionReasonId": "a5844e49-e69b-49fc-878a-f5ba0fe151bc"
+        },
+        "12_videoUpload": {
+          "paramNo": 12,
+          "paramName": "Video Upload",
+          "enabled": true,
+          "mustBe": "NORMAL",
+          "description": "Video must not contain inappropriate content",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "13_aadharPanDigitMatch": {
+          "paramNo": 13,
+          "paramName": "Aadhar–PAN Last 4 Digit Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Last 4 digits of Aadhar must match across PAN and Aadhar",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "14_genderMatch": {
+          "paramNo": 14,
+          "paramName": "Gender Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Gender on PAN must match applicant records",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "15_nameMatchPanAadhar": {
+          "paramNo": 15,
+          "paramName": "Name Match: PAN vs Aadhar",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and Aadhar must exceed 75%",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        },
+        "16_nbfc": {
+          "paramNo": 16,
+          "paramName": "NBFC Check",
+          "enabled": true,
+          "mustBe": "DIFFERENT",
+          "description": "NBFC must be different",
+          "rejectionReasonId": "4633d92d-cd50-4fab-8771-a0405f35b834"
+        },
+        "17_crifScore": {
+          "paramNo": 17,
+          "paramName": "CRIF Score",
+          "enabled": true,
+          "minScore": 500,
+          "operator": "GREATER_THAN",
+          "description": "CRIF score must exceed 500",
+          "rejectionReasonId": "4633d92d-cd50-4fab-8771-a0405f35b834"
+        },
+        "18_crifReport": {
+          "paramNo": 18,
+          "paramName": "CRIF Report",
+          "enabled": true,
+          "mustBe": "NON_DELINQUENT",
+          "description": "CRIF report must show no delinquency",
+          "rejectionReasonId": "4633d92d-cd50-4fab-8771-a0405f35b834"
+        },
+        "19_brandLoan": {
+          "paramNo": 19,
+          "paramName": "Different Brand Loan Status",
+          "enabled": true,
+          "mustBe": "NON_DEFAULT",
+          "description": "No default or settled loan with other brands",
+          "rejectionReasonId": "5b2d881f-22ee-4246-8244-87a12dc6ae92"
+        }
+      }
+    },
+
+    {
+      "brandId": "676027d3-a43c-4716-9663-7272f5df1ac7",
+      "brandName": "FastSalary",
+      "description": "FastSalary — ",
+      "isActive": true,
+      "rules": {
+        "1_profession": {
+          "paramNo": 1,
+          "paramName": "Profession",
+          "enabled": true,
+          "allowedValues": ["SALARIED"],
+          "failValues": ["SELF_EMPLOYED"],
+          "description": "Only salaried applicants accepted",
+          "rejectionReasonId": "d4927296-cbe8-475d-b2b7-ef6e7b4d8de4"
+        },
+        "2_salaryThreshold": {
+          "paramNo": 2,
+          "paramName": "Monthly Salary / Turnover",
+          "enabled": true,
+          "threshold": 40000,
+          "currency": "INR",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "description": "Minimum monthly salary ₹40,000",
+          "rejectionReasonId": "faf6f280-7caa-4ca5-b3f2-3996ad07563e"
+        },
+        "3_phoneNumber": {
+          "paramNo": 3,
+          "paramName": "Phone Number",
+          "enabled": true,
+          "exactLength": 10,
+          "pattern": "^(\\+91)?[6-9][0-9]{9}$",
+          "description": "Valid 10-digit Indian mobile number",
+          "rejectionReasonId": "4e02055a-707a-40d4-b766-90604ecece25"
+        },
+        "4_panCard": {
+          "paramNo": 4,
+          "paramName": "PAN Card",
+          "enabled": true,
+          "fourthCharMustBe": "P",
+          "pattern": "^[A-Z]{3}P[A-Z][0-9]{4}[A-Z]$",
+          "fraudDbCheck": true,
+          "description": "Valid PAN format with fraud DB check",
+          "rejectionReasonId": "8d37469f-42a3-410c-9f4f-fdbe74918567"
+        },
+        "5_panAadharLink": {
+          "paramNo": 5,
+          "paramName": "PAN & Aadhar Link",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "PAN must be linked to Aadhar",
+          "rejectionReasonId": "be39bf42-2bf2-4d1e-afa5-f03cc5ffb5e4"
+        },
+        "6_aadharLast4": {
+          "paramNo": 6,
+          "paramName": "Aadhar Last 4 Digits Received",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "Last 4 digits of Aadhar must be received",
+          "rejectionReasonId": "be39bf42-2bf2-4d1e-afa5-f03cc5ffb5e4"
+        },
+        "7_age": {
+          "paramNo": 7,
+          "paramName": "Age",
+          "enabled": true,
+          "min": 21,
+          "max": 55,
+          "unit": "years",
+          "description": "Applicant age must be between 21 and 55",
+          "rejectionReasonId": "be39bf42-2bf2-4d1e-afa5-f03cc5ffb5e4"
+        },
+        "8_pinCode": {
+          "paramNo": 8,
+          "paramName": "Pin Code",
+          "enabled": true,
+          "mustComplyWith": "BLOCK_LIST_MODULE",
+          "description": "Pin code must pass block list module check",
+          "rejectionReasonId": "a7601a4f-5fa4-451b-bdc2-0997eef60be5"
+        },
+        "9_ifsc": {
+          "paramNo": 9,
+          "paramName": "IFSC Code",
+          "enabled": true,
+          "mustBeIn": "APPROVED_BANK_LIST",
+          "description": "IFSC must exist in approved bank list",
+          "rejectionReasonId": "561fbf29-2162-4119-a7af-5a5524823aed"
+        },
+        "10_nameMatchPanBank": {
+          "paramNo": 10,
+          "paramName": "Name Match: PAN vs Bank Account",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and bank account must exceed 75%",
+          "rejectionReasonId": "f3b1edc3-bcfa-46d5-bdc1-24dbe48366cc"
+        },
+        "11_bankStatement": {
+          "paramNo": 11,
+          "paramName": "Bank Statement Upload",
+          "enabled": true,
+          "mustBe": "ORIGINAL",
+          "description": "Bank statement must not be modified",
+          "rejectionReasonId": "faf6f280-7caa-4ca5-b3f2-3996ad07563e"
+        },
+        "12_videoUpload": {
+          "paramNo": 12,
+          "paramName": "Video Upload",
+          "enabled": true,
+          "mustBe": "NORMAL",
+          "description": "Video must not contain inappropriate content",
+          "rejectionReasonId": "d4927296-cbe8-475d-b2b7-ef6e7b4d8de4"
+        },
+        "13_aadharPanDigitMatch": {
+          "paramNo": 13,
+          "paramName": "Aadhar–PAN Last 4 Digit Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Last 4 digits of Aadhar must match across PAN and Aadhar",
+          "rejectionReasonId": "f3b1edc3-bcfa-46d5-bdc1-24dbe48366cc"
+        },
+        "14_genderMatch": {
+          "paramNo": 14,
+          "paramName": "Gender Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Gender on PAN must match applicant records",
+          "rejectionReasonId": "f3b1edc3-bcfa-46d5-bdc1-24dbe48366cc"
+        },
+        "15_nameMatchPanAadhar": {
+          "paramNo": 15,
+          "paramName": "Name Match: PAN vs Aadhar",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and Aadhar must exceed 75%",
+          "rejectionReasonId": "f3b1edc3-bcfa-46d5-bdc1-24dbe48366cc"
+        },
+        "16_nbfc": {
+          "paramNo": 16,
+          "paramName": "NBFC Check",
+          "enabled": true,
+          "mustBe": "DIFFERENT",
+          "description": "NBFC must be different",
+          "rejectionReasonId": "961640d9-57ce-4945-b899-271bd3e5b583"
+        },
+        "17_crifScore": {
+          "paramNo": 17,
+          "paramName": "CRIF Score",
+          "enabled": true,
+          "minScore": 500,
+          "operator": "GREATER_THAN",
+          "description": "CRIF score must exceed 500",
+          "rejectionReasonId": "d99e0c1a-b10b-440b-9063-61c639a53985"
+        },
+        "18_crifReport": {
+          "paramNo": 18,
+          "paramName": "CRIF Report",
+          "enabled": true,
+          "mustBe": "NON_DELINQUENT",
+          "description": "CRIF report must show no delinquency",
+          "rejectionReasonId": "d99e0c1a-b10b-440b-9063-61c639a53985"
+        },
+        "19_brandLoan": {
+          "paramNo": 19,
+          "paramName": "Different Brand Loan Status",
+          "enabled": true,
+          "mustBe": "NON_DEFAULT",
+          "description": "No default or settled loan with other brands",
+          "rejectionReasonId": "ddc8c20b-6b44-4dd8-9da4-475e9d303c41"
+        }
+      }
+    },
+
+    {
+      "brandId": "0dbae4da-461a-4959-aa82-6a788de61593",
+      "brandName": "MinutesLoan",
+      "description": "MinutesLoan — ",
+      "isActive": true,
+      "rules": {
+        "1_profession": {
+          "paramNo": 1,
+          "paramName": "Profession",
+          "enabled": true,
+          "allowedValues": ["SALARIED"],
+          "failValues": ["SELF_EMPLOYED"],
+          "description": "Only salaried applicants accepted",
+          "rejectionReasonId": "018b8d38-c37c-4df4-81a4-ecb8b705baa8"
+        },
+        "2_salaryThreshold": {
+          "paramNo": 2,
+          "paramName": "Monthly Salary / Turnover",
+          "enabled": true,
+          "threshold": 40000,
+          "currency": "INR",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "description": "Minimum monthly salary ₹40,000",
+          "rejectionReasonId": "4b859563-ac14-4fc6-890b-4727bc54f349"
+        },
+        "3_phoneNumber": {
+          "paramNo": 3,
+          "paramName": "Phone Number",
+          "enabled": true,
+          "exactLength": 10,
+          "pattern": "^(\\+91)?[6-9][0-9]{9}$",
+          "description": "Valid 10-digit Indian mobile number",
+          "rejectionReasonId": "ee40080f-f345-41a5-9977-3988b7bdea28"
+        },
+        "4_panCard": {
+          "paramNo": 4,
+          "paramName": "PAN Card",
+          "enabled": true,
+          "fourthCharMustBe": "P",
+          "pattern": "^[A-Z]{3}P[A-Z][0-9]{4}[A-Z]$",
+          "fraudDbCheck": true,
+          "description": "Valid PAN format with fraud DB check",
+          "rejectionReasonId": "eb84ba1d-69a5-4141-b7be-902599b30876"
+        },
+        "5_panAadharLink": {
+          "paramNo": 5,
+          "paramName": "PAN & Aadhar Link",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "PAN must be linked to Aadhar",
+          "rejectionReasonId": "24ad8289-c6fa-486c-8874-d6f7dfc174dc"
+        },
+        "6_aadharLast4": {
+          "paramNo": 6,
+          "paramName": "Aadhar Last 4 Digits Received",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "Last 4 digits of Aadhar must be received",
+          "rejectionReasonId": "24ad8289-c6fa-486c-8874-d6f7dfc174dc"
+        },
+        "7_age": {
+          "paramNo": 7,
+          "paramName": "Age",
+          "enabled": true,
+          "min": 21,
+          "max": 55,
+          "unit": "years",
+          "description": "Applicant age must be between 21 and 55",
+          "rejectionReasonId": "24ad8289-c6fa-486c-8874-d6f7dfc174dc"
+        },
+        "8_pinCode": {
+          "paramNo": 8,
+          "paramName": "Pin Code",
+          "enabled": true,
+          "mustComplyWith": "BLOCK_LIST_MODULE",
+          "description": "Pin code must pass block list module check",
+          "rejectionReasonId": "b5841ae2-9913-46ee-8837-c806dda89894"
+        },
+        "9_ifsc": {
+          "paramNo": 9,
+          "paramName": "IFSC Code",
+          "enabled": true,
+          "mustBeIn": "APPROVED_BANK_LIST",
+          "description": "IFSC must exist in approved bank list",
+          "rejectionReasonId": "d984f3d3-8f4c-49ae-ba4f-21ade1114553"
+        },
+        "10_nameMatchPanBank": {
+          "paramNo": 10,
+          "paramName": "Name Match: PAN vs Bank Account",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and bank account must exceed 75%",
+          "rejectionReasonId": "c3769051-04d4-4147-a168-31f1f2bbffb5"
+        },
+        "11_bankStatement": {
+          "paramNo": 11,
+          "paramName": "Bank Statement Upload",
+          "enabled": true,
+          "mustBe": "ORIGINAL",
+          "description": "Bank statement must not be modified",
+          "rejectionReasonId": "4b859563-ac14-4fc6-890b-4727bc54f349"
+        },
+        "12_videoUpload": {
+          "paramNo": 12,
+          "paramName": "Video Upload",
+          "enabled": true,
+          "mustBe": "NORMAL",
+          "description": "Video must not contain inappropriate content",
+          "rejectionReasonId": "018b8d38-c37c-4df4-81a4-ecb8b705baa8"
+        },
+        "13_aadharPanDigitMatch": {
+          "paramNo": 13,
+          "paramName": "Aadhar–PAN Last 4 Digit Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Last 4 digits of Aadhar must match across PAN and Aadhar",
+          "rejectionReasonId": "c3769051-04d4-4147-a168-31f1f2bbffb5"
+        },
+        "14_genderMatch": {
+          "paramNo": 14,
+          "paramName": "Gender Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Gender on PAN must match applicant records",
+          "rejectionReasonId": "c3769051-04d4-4147-a168-31f1f2bbffb5"
+        },
+        "15_nameMatchPanAadhar": {
+          "paramNo": 15,
+          "paramName": "Name Match: PAN vs Aadhar",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and Aadhar must exceed 75%",
+          "rejectionReasonId": "c3769051-04d4-4147-a168-31f1f2bbffb5"
+        },
+        "16_nbfc": {
+          "paramNo": 16,
+          "paramName": "NBFC Check",
+          "enabled": true,
+          "mustBe": "DIFFERENT",
+          "description": "NBFC must be different",
+          "rejectionReasonId": "f111d463-bd50-4862-996b-5b19ddd32e96"
+        },
+        "17_crifScore": {
+          "paramNo": 17,
+          "paramName": "CRIF Score",
+          "enabled": true,
+          "minScore": 500,
+          "operator": "GREATER_THAN",
+          "description": "CRIF score must exceed 500",
+          "rejectionReasonId": "46b41d6c-fe49-4903-bc76-e9fc133f21b2"
+        },
+        "18_crifReport": {
+          "paramNo": 18,
+          "paramName": "CRIF Report",
+          "enabled": true,
+          "mustBe": "NON_DELINQUENT",
+          "description": "CRIF report must show no delinquency",
+          "rejectionReasonId": "46b41d6c-fe49-4903-bc76-e9fc133f21b2"
+        },
+        "19_brandLoan": {
+          "paramNo": 19,
+          "paramName": "Different Brand Loan Status",
+          "enabled": true,
+          "mustBe": "NON_DEFAULT",
+          "description": "No default or settled loan with other brands",
+          "rejectionReasonId": "3da22e3a-2d10-409f-9d77-70101682ebb2"
+        }
+      }
+    },
+
+    {
+      "brandId": "adcc6c01-62c9-47ab-8f45-19c463124b76",
+      "brandName": "Salary4Sure",
+      "description": "Salary4Sure — ",
+      "isActive": true,
+      "rules": {
+        "1_profession": {
+          "paramNo": 1,
+          "paramName": "Profession",
+          "enabled": true,
+          "allowedValues": ["SALARIED"],
+          "failValues": ["SELF_EMPLOYED"],
+          "description": "Only salaried applicants accepted",
+          "rejectionReasonId": "81fb9d6b-7e91-4e6e-8f31-e08b53e18bc2"
+        },
+        "2_salaryThreshold": {
+          "paramNo": 2,
+          "paramName": "Monthly Salary / Turnover",
+          "enabled": true,
+          "threshold": 40000,
+          "currency": "INR",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "description": "Minimum monthly salary ₹40,000",
+          "rejectionReasonId": "b313be14-e010-4ee8-bdc7-fa899673614f"
+        },
+        "3_phoneNumber": {
+          "paramNo": 3,
+          "paramName": "Phone Number",
+          "enabled": true,
+          "exactLength": 10,
+          "pattern": "^(\\+91)?[6-9][0-9]{9}$",
+          "description": "Valid 10-digit Indian mobile number",
+          "rejectionReasonId": "4aea78bc-27f0-4471-8504-033acf1ed9e3"
+        },
+        "4_panCard": {
+          "paramNo": 4,
+          "paramName": "PAN Card",
+          "enabled": true,
+          "fourthCharMustBe": "P",
+          "pattern": "^[A-Z]{3}P[A-Z][0-9]{4}[A-Z]$",
+          "fraudDbCheck": true,
+          "description": "Valid PAN format with fraud DB check",
+          "rejectionReasonId": "2786c398-9fc0-4d75-a031-dd79a01dd1d3"
+        },
+        "5_panAadharLink": {
+          "paramNo": 5,
+          "paramName": "PAN & Aadhar Link",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "PAN must be linked to Aadhar",
+          "rejectionReasonId": "756f17c0-022c-4173-9a83-af70c720e7be"
+        },
+        "6_aadharLast4": {
+          "paramNo": 6,
+          "paramName": "Aadhar Last 4 Digits Received",
+          "enabled": true,
+          "mustBe": "YES",
+          "description": "Last 4 digits of Aadhar must be received",
+          "rejectionReasonId": "756f17c0-022c-4173-9a83-af70c720e7be"
+        },
+        "7_age": {
+          "paramNo": 7,
+          "paramName": "Age",
+          "enabled": true,
+          "min": 21,
+          "max": 55,
+          "unit": "years",
+          "description": "Applicant age must be between 21 and 55",
+          "rejectionReasonId": "756f17c0-022c-4173-9a83-af70c720e7be"
+        },
+        "8_pinCode": {
+          "paramNo": 8,
+          "paramName": "Pin Code",
+          "enabled": true,
+          "mustComplyWith": "BLOCK_LIST_MODULE",
+          "description": "Pin code must pass block list module check",
+          "rejectionReasonId": "784e0510-7a5a-4afb-bf60-7796ab6a64d9"
+        },
+        "9_ifsc": {
+          "paramNo": 9,
+          "paramName": "IFSC Code",
+          "enabled": true,
+          "mustBeIn": "APPROVED_BANK_LIST",
+          "description": "IFSC must exist in approved bank list",
+          "rejectionReasonId": "955d0fcb-1002-45f6-a1a5-056e19c8a849"
+        },
+        "10_nameMatchPanBank": {
+          "paramNo": 10,
+          "paramName": "Name Match: PAN vs Bank Account",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and bank account must exceed 75%",
+          "rejectionReasonId": "7b957a69-efce-47b5-905a-f87b2f696ba9"
+        },
+        "11_bankStatement": {
+          "paramNo": 11,
+          "paramName": "Bank Statement Upload",
+          "enabled": true,
+          "mustBe": "ORIGINAL",
+          "description": "Bank statement must not be modified",
+          "rejectionReasonId": "b2e38f2e-d4ef-4fcd-aa03-4e61a32913aa"
+        },
+        "12_videoUpload": {
+          "paramNo": 12,
+          "paramName": "Video Upload",
+          "enabled": true,
+          "mustBe": "NORMAL",
+          "description": "Video must not contain inappropriate content",
+          "rejectionReasonId": "81fb9d6b-7e91-4e6e-8f31-e08b53e18bc2"
+        },
+        "13_aadharPanDigitMatch": {
+          "paramNo": 13,
+          "paramName": "Aadhar–PAN Last 4 Digit Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Last 4 digits of Aadhar must match across PAN and Aadhar",
+          "rejectionReasonId": "7b957a69-efce-47b5-905a-f87b2f696ba9"
+        },
+        "14_genderMatch": {
+          "paramNo": 14,
+          "paramName": "Gender Match",
+          "enabled": true,
+          "mustBe": "MATCH",
+          "description": "Gender on PAN must match applicant records",
+          "rejectionReasonId": "7b957a69-efce-47b5-905a-f87b2f696ba9"
+        },
+        "15_nameMatchPanAadhar": {
+          "paramNo": 15,
+          "paramName": "Name Match: PAN vs Aadhar",
+          "enabled": true,
+          "minMatchPercent": 75,
+          "operator": "GREATER_THAN",
+          "description": "Name match between PAN and Aadhar must exceed 75%",
+          "rejectionReasonId": "7b957a69-efce-47b5-905a-f87b2f696ba9"
+        },
+        "16_nbfc": {
+          "paramNo": 16,
+          "paramName": "NBFC Check",
+          "enabled": true,
+          "mustBe": "DIFFERENT",
+          "description": "NBFC must be different",
+          "rejectionReasonId": "154df161-74c9-4653-86c6-e088c0a0788d"
+        },
+        "17_crifScore": {
+          "paramNo": 17,
+          "paramName": "CRIF Score",
+          "enabled": true,
+          "minScore": 500,
+          "operator": "GREATER_THAN",
+          "description": "CRIF score must exceed 500",
+          "rejectionReasonId": "4d6f0ced-61b2-4ba5-93fc-041dddcfc333"
+        },
+        "18_crifReport": {
+          "paramNo": 18,
+          "paramName": "CRIF Report",
+          "enabled": true,
+          "mustBe": "NON_DELINQUENT",
+          "description": "CRIF report must show no delinquency",
+          "rejectionReasonId": "4d6f0ced-61b2-4ba5-93fc-041dddcfc333"
+        },
+        "19_brandLoan": {
+          "paramNo": 19,
+          "paramName": "Different Brand Loan Status",
+          "enabled": true,
+          "mustBe": "NON_DEFAULT",
+          "description": "No default or settled loan with other brands",
+          "rejectionReasonId": "d8dfefd2-6913-48e7-b754-f0f3324d10fb"
+        }
+      }
+    }
+  ]
+}

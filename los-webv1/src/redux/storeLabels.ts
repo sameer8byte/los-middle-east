@@ -1,0 +1,12 @@
+export const USER_SLICE_LABEL = "user";
+export const INDEX_SLICE_LABEL = "index";
+export const USER_DEVICES_SLICE_LABEL ='user_devices'
+export const USER_EMPLOYMENT_SLICE_LABEL ='user_employment'
+export const USER_BANK_ACCOUNT_LABEL = "user_bank_account";
+export const USER_DETAILS_SLICE_LABEL = "user_details";
+export const USER_DOCUMENTS_SLICE_LABEL = "user_documents";
+export const USER_LOAN_RULES_SLICE_LABEL = "user_loan_rules";
+export const META_DATA_SLICE_LABEL = "metaData";
+export const ALTERNATE_PHONE_NUMBER_SLICE_LABEL = "alternate_phone_number";
+export const USER_GEO_LOCATION_SLICE_LABEL = "user_geo_location";
+export const AA_CONSENT_REQUESTS_SLICE_LABEL = "aa_consent_requests";

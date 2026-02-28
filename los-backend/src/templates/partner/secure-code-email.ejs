@@ -1,0 +1,38 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center; color: white; border-radius: 8px 8px 0 0;">
+    <h1 style="margin: 0; font-size: 24px;">Secure Partner Code Generated</h1>
+  </div>
+  
+  <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+    <p style="color: #333; font-size: 16px;">Hello <strong><%= userName %></strong>,</p>
+    
+    <p style="color: #666; font-size: 14px; line-height: 1.6;">
+      Your secure partner code has been generated successfully. Please use this code for authentication purposes. 
+      This code is valid for 1 year from the date of generation.
+    </p>
+    
+    <div style="background-color: #fff; border: 2px solid #667eea; border-radius: 6px; padding: 20px; margin: 20px 0; text-align: center;">
+      <p style="margin: 0; color: #999; font-size: 12px;">Your Secure Code:</p>
+      <h2 style="margin: 10px 0; color: #667eea; font-size: 28px; letter-spacing: 2px; font-family: 'Courier New', monospace;">
+        <%= secureCode %>
+      </h2>
+    </div>
+    
+    <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+      <p style="margin: 0; color: #856404; font-size: 13px;">
+        <strong>⚠️ Important:</strong> Please keep this code confidential and never share it with anyone. 
+        Store it securely for future reference.
+      </p>
+    </div>
+    
+    <p style="color: #666; font-size: 13px; margin-top: 20px;">
+      Generated at: <%= generatedAt %>
+    </p>
+    
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+    
+    <p style="color: #999; font-size: 12px; text-align: center;">
+      If you did not request this code, please contact your administrator immediately.
+    </p>
+  </div>
+</div>

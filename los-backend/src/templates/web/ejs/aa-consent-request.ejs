@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= brandName %> - Account Aggregator Consent
+  </title>
+</head>
+
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f7fa;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f7fa; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background: linear-gradient(135deg, <%= brandPrimaryColor %> 0%, <%= brandSecondaryColor %> 100%); padding: 30px 20px;">
+              <% if (brandLogo) { %>
+              <img src="<%= brandLogo %>" alt="<%= brandName %>" style="max-width: 180px; margin-bottom: 10px;">
+              <% } else { %>
+              <h1 style="margin: 0; font-size: 28px; color: #fff;">
+                <%= brandName %>
+              </h1>
+              <% } %>
+              <p style="color: #fff; font-size: 18px; margin-top: 5px;">Account
+                Aggregator
+                Consent</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 30px;">
+              <p style="font-size: 16px; color: #333;">Hi
+                <strong>
+                  <%= userName %>
+                </strong>,
+              </p>
+              <p style="font-size: 14px; color: #555; line-height: 1.6;">
+                We request access to your financial data via
+                the RBI-regulated Account Aggregator (AA)
+                framework. This helps us offer faster
+                approvals, better rates, and personalized
+                services.
+              </p>
+
+              <!-- Info Box -->
+              <div style="background: #edf2f7; border-left: 4px solid <%= brandPrimaryColor %>; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 14px; color: #333;"><strong>What
+                    is Account
+                    Aggregator?</strong><br>
+                  A secure system that lets you share
+                  financial data between institutions with
+                  your
+                  explicit consent.</p>
+              </div>
+
+              <!-- Benefits -->
+              <p style="font-size: 14px; font-weight: bold; margin: 20px 0 10px;">Why
+                consent?</p>
+              <ul style="padding-left: 18px; font-size: 14px; color: #555; line-height: 1.6;">
+                <li>Instant loan approvals</li>
+                <li>Better interest rates</li>
+                <li>No paperwork</li>
+                <li>Personalized offers</li>
+                <li>Secure and RBI-compliant</li>
+              </ul>
+
+              <!-- CTA Button -->
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="<%= consentUrl %>" style="background-color: <%= brandPrimaryColor %>; color: #fff; text-decoration: none; padding: 14px 30px; border-radius: 6px; font-weight: bold; font-size: 15px;">
+                  Grant Consent & Continue →
+                </a>
+              </div>
+
+              <!-- Fallback Link -->
+              <p style="font-size: 12px; color: #777; background: #f9f9f9; padding: 10px; border-radius: 6px;">
+                Or copy and paste this link in your
+                browser:<br>
+                <span style="word-break: break-word;">
+                  <%= consentUrl %>
+                </span>
+              </p>
+
+              <!-- Expiry Note -->
+              <p style="font-size: 13px; color: #991b1b; background: #fef2f2; padding: 12px; border-left: 3px solid #ef4444; border-radius: 6px;">
+                <strong>Note:</strong> This link will expire
+                in 24 hours for your security.
+              </p>
+
+              <!-- Closing -->
+              <p style="font-size: 14px; color: #333; margin-top: 25px;">
+                Thank you for choosing <strong>
+                  <%= brandName %>
+                </strong>.<br>
+                – The <%= brandName %> Team
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f7fafc; padding: 20px; text-align: center; font-size: 12px; color: #888;">
+              <% if (supportEmail) { %>
+              📧 <a href="mailto:<%= supportEmail %>" style="color: <%= brandPrimaryColor %>;">
+                <%= supportEmail %>
+              </a><br>
+              <% } %>
+              <% if (supportPhone) { %>
+              📞 <a href="tel:<%= supportPhone %>" style="color: <%= brandPrimaryColor %>;">
+                <%= supportPhone %>
+              </a><br>
+              <% } %>
+              <% if (brandWebsite) { %>
+              🌐 <a href="<%= brandWebsite %>" style="color: <%= brandPrimaryColor %>;">
+                <%= brandWebsite %>
+              </a><br>
+              <% } %>
+              <hr style="margin: 15px 0; border: none; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0; font-size: 11px; color: #aaa;">
+                This is an automated email. Please do not
+                reply.<br>
+                © <%= currentYear %>
+                <%= brandName %>. All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+
+</html>

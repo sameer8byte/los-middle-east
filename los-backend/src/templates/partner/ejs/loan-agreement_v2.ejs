@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= documentTitle %></title>
+ <style>
+    /* * ================================================
+     * DOCUMENT CUSTOMIZATION VARIABLES
+     * ================================================
+     */
+    :root {
+      --font-family: Arial, sans-serif;
+      --primary-color: #1a237e; /* Dark blue for headings and strong text */
+      --text-color: #333;
+      --page-bg-color: #f5f5f5;
+      --document-bg-color: #fff; /* This will now be used by the body */
+      --border-color: #ddd;
+      --table-header-bg: #f5f5f5;
+      --table-border-color: #333;
+
+      --page-margin-top-bottom: 15mm;
+      --page-margin-left: 10mm;
+      --page-margin-right: 20mm;
+    }
+
+    /* * ================================================
+     * GENERAL & RESET STYLES
+     * ================================================
+     */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text-color);
+      /* The body now controls the visible page background color */
+      background: var(--document-bg-color);
+    }
+
+    /* * ================================================
+     * MAIN LAYOUT & CONTAINER
+     * ================================================
+     */
+    .document-container {
+      width: 210mm; /* A4 Width */
+      min-height: 297mm; /* A4 Height */
+      margin: 0 auto;
+      padding: var(--page-margin-top-bottom) var(--page-margin-right) var(--page-margin-top-bottom) var(--page-margin-left);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      
+      /* === FIX 1: ESTABLISH STACKING CONTEXT === */
+      /* Make the container's background transparent to see the watermark behind it. */
+      background: transparent;
+      /* position: relative is needed for z-index to work. */
+      position: relative;
+      /* Place the content on a layer above the watermark. */
+      z-index: 2;
+    }
+    
+    .header {
+      width: 100%;
+      height: 25mm;
+      margin-bottom: 15mm;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .footer {
+      width: 100%;
+      height: 20mm;
+      margin-top: 15mm;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .header img, .footer img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* * ================================================
+     * WATERMARK (ALL PAGES)
+     * ================================================
+     */
+    .watermark-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      
+      /* === FIX 2: ADJUST WATERMARK LAYER === */
+      /* Change z-index from -1 to a positive value below the content's z-index. */
+      z-index: 1;
+      
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .watermark-container::before {
+      content: '';
+      display: block;
+      width: 80%;
+      height: 80%;
+      background-image: url('<%= brandHeaderLogo %>');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0.2;
+    }
+
+
+    /* * ================================================
+     * TYPOGRAPHY & CONTENT STYLES
+     * ================================================
+     */
+    .title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    h2, h3, h4 {
+      color: var(--primary-color);
+      font-weight: bold;
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 15px;
+      margin: 25px 0 12px 0;
+      padding-bottom: 5px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    h3 { font-size: 13px; margin: 20px 0 10px 0; }
+    h4 { font-size: 12px; margin: 15px 0 8px 0; }
+
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+      orphans: 3;
+      widows: 3;
+    }
+
+    strong { font-weight: bold; color: var(--primary-color); }
+    a { color: var(--primary-color); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .section {
+      margin: 25px 0;
+      /* === FIX 3: REMOVE OBSOLETE RULE === */
+      /* This background is no longer needed and would hide the watermark. */
+      /* background-color: var(--document-bg-color); */
+    }
+
+    /* * ================================================
+     * TABLE STYLES
+     * ================================================
+     */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      page-break-inside: auto;
+    }
+
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+
+    th, td {
+      border: 1px solid var(--table-border-color);
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    th {
+      background-color: var(--table-header-bg);
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    /* * ================================================
+     * LIST STYLES
+     * ================================================
+     */
+    ol, ul { margin: 10px 0 10px 20px; padding-left: 15px; }
+    li { margin-bottom: 8px; text-align: justify; }
+    .terms-list { list-style-type: decimal; }
+    .terms-list > li { margin-bottom: 12px; }
+    .terms-list ol { list-style-type: lower-alpha; margin-top: 8px; }
+    .terms-list ol ol { list-style-type: lower-roman; }
+
+    /* * ================================================
+     * PRINT-SPECIFIC STYLES
+     * ================================================
+     */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      html, body {
+        width: 210mm;
+        margin: 0;
+        padding: 0;
+        background: var(--document-bg-color) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .document-container {
+        width: 100%;
+        min-height: 0;
+        margin: 0;
+        padding: var(--page-margin-top-bottom) var(--page-margin-right) var(--page-margin-top-bottom) var(--page-margin-left);
+        box-shadow: none;
+      }
+      
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+    }
+</style>
+</head>
+
+<body>
+  <div class="watermark-container"></div>
+
+  <div class="document-container">
+
+    <div class="header">
+        <img src="<%= headerImageUrl %>" alt="Company Header">
+    </div>
+
+    <section class="section">
+      <div class="title"><%= sanctionLetter.title %></div>
+      <div class="letter-body">
+        <p><%= sanctionLetter.greeting %></p>
+        <p><strong><%= sanctionLetter.subject %></strong></p>
+        <p><%= sanctionLetter.introParagraph %></p>
+        
+        <ol>
+          <% sanctionLetter.loanDetails.forEach(detail => { %>
+          <li><%= detail.label %>: <%= detail.value %></li>
+          <% }); %>
+        </ol>
+        
+        <p><%= sanctionLetter.chargesIntro %></p>
+        
+        <table>
+          <thead>
+            <tr>
+              <th><%= sanctionLetter.chargesTable.headers.component %></th>
+              <th><%= sanctionLetter.chargesTable.headers.details %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sanctionLetter.chargesTable.rows.forEach(row => { %>
+            <tr>
+              <td><%= row.component %></td>
+              <td><%- row.details %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        
+        <p><%= sanctionLetter.waiverClause %></p>
+        <p><%- sanctionLetter.contactInfo %></p>
+        
+        <% sanctionLetter.closing.forEach(line => { %>
+        <p><%= line %></p>
+        <% }); %>
+      </div>
+    </section>
+
+    <section class="section">
+      <h3 style="text-align: center;"><%= kfs.title %></h3>
+      
+      <table>
+        <thead>
+          <tr>
+            <th colspan="3"><strong><%= kfs.tableTitle %></strong></th>
+          </tr>
+          <tr>
+            <th style="width: 10%;"><%= kfs.headers.sno %></th>
+            <th style="width: 45%;"><%= kfs.headers.parameter %></th>
+            <th style="width: 45%;"><%= kfs.headers.details %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% kfs.details.forEach(detail => { %>
+          <tr>
+            <td><%= detail.sno %></td>
+            <td><%= detail.parameter %></td>
+            <td><%- detail.details %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <table>
+        <tbody>
+          <% kfs.contingentCharges.forEach(charge => { %>
+          <tr>
+            <td style="width: 10%;"><%= charge.sno %></td>
+            <td style="width: 45%;"><%- charge.parameter %></td>
+            <td style="width: 45%;"><%- charge.details %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      
+      <p><strong><%= coolingOffPeriod.title %></strong> <%= coolingOffPeriod.description %></p>
+    </section>
+
+    <section class="section">
+      <% grievance.cancellationRequest.paragraphs.forEach(para => { %>
+      <p><%- para %></p>
+      <% }); %>
+
+      <h3 style="text-align: center;"><%= grievance.title %></h3>
+
+      <% grievance.levels.forEach(level => { %>
+      <table>
+        <tbody>
+          <tr>
+            <td rowspan="2" style="width: 15%;"><strong><%= level.level %></strong></td>
+            <td>
+              <strong><%= level.officer.title %></strong><br />
+              <%- level.officer.policyInfo %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong><%= level.officer.details.title %></strong><br />
+              <%= level.officer.details.name %><br />
+              <strong>Address:</strong> <%= level.officer.details.address %><br />
+              <%= level.officer.details.cityStateZip %><br />
+              <strong><%= level.officer.details.contactLabel %>:</strong> <%= level.officer.details.contactNo %><br />
+              <strong><%= level.officer.details.emailLabel %>:</strong> <%- level.officer.details.email %>
+            </td>
+          </tr>
+          <!-- Add conditional Nodal Officer section -->
+          <% if (level.nodalOfficer && level.nodalOfficer.details && 
+              level.nodalOfficer.details.name && level.nodalOfficer.details.name.trim() &&
+              level.nodalOfficer.details.address && level.nodalOfficer.details.address.trim() &&
+              level.nodalOfficer.details.contactNo && level.nodalOfficer.details.contactNo.trim() &&
+              level.nodalOfficer.details.email && level.nodalOfficer.details.email.trim()) { %>
+          <tr>
+            <td></td>
+            <td>
+              <strong><%= level.nodalOfficer.details.title %></strong><br />
+              <%= level.nodalOfficer.details.name %><br />
+              <strong>Address:</strong> <%= level.nodalOfficer.details.address %><br />
+              <%= level.nodalOfficer.details.cityStateZip %><br />
+              <strong><%= level.nodalOfficer.details.contactLabel %>:</strong> <%= level.nodalOfficer.details.contactNo %><br />
+              <strong><%= level.nodalOfficer.details.emailLabel %>:</strong> <%- level.nodalOfficer.details.email %>
+            </td>
+          </tr>
+          <% } %>
+          <tr>
+            <td><strong><%= level.lsp.title %></strong></td>
+            <td><%- level.lsp.description %></td>
+          </tr>
+        </tbody>
+      </table>
+      <% }); %>
+    </section>
+
+    <section class="section">
+      <h3 style="text-align: center;"><%= recoveryMechanism.title %></h3>
+      
+      <% if (recoveryMechanism.intro) { %>
+      <p><%= recoveryMechanism.intro %></p>
+      <% } %>
+
+      <% if (recoveryMechanism.methods && recoveryMechanism.methods.length > 0) { %>
+      <ul>
+        <% recoveryMechanism.methods.forEach(method => { %>
+        <li><%= method %></li>
+        <% }); %>
+      </ul>
+      <% } %>
+
+      <% if (recoveryMechanism.paragraphs) { %>
+      <% recoveryMechanism.paragraphs.forEach(para => { %>
+      <p><%= para %></p>
+      <% }); %>
+      <% } %>
+    </section>
+
+    <section class="section">
+      <h3 style="text-align: center;"><%= repaymentSchedule.title %></h3>
+
+      <table>
+        <thead>
+          <tr>
+            <% repaymentSchedule.headers.forEach(header => { %>
+            <th><%= header %></th>
+            <% }); %>
+          </tr>
+        </thead>
+        <tbody>
+          <% repaymentSchedule.rows.forEach(row => { %>
+          <tr>
+            <td><%= row.sno %></td>
+            <td><%= row.principal %></td>
+            <td><%= row.interest %></td>
+            <td><%= row.fees %></td>
+            <td><%= row.dueDate %></td>
+            <td><%= row.repayable %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <% if (repaymentSchedule.contactInfo) { %>
+      <p><%- repaymentSchedule.contactInfo %></p>
+      <% } %>
+
+      <% if (repaymentSchedule.closing) { %>
+      <% repaymentSchedule.closing.forEach(line => { %>
+      <p><%= line %></p>
+      <% }); %>
+      <% } %>
+    </section>
+
+    <% legalSections.forEach(section => { %>
+    <section class="section">
+      <h3 style="text-align: center;"><%= section.title %></h3>
+      
+      <% if (section.introParagraphs) { %>
+      <% section.introParagraphs.forEach(para => { %>
+      <p><%= para %></p>
+      <% }); %>
+      <% } %>
+
+      <% section.clauses.forEach(clause => { %>
+      <div style="margin: 20px 0;">
+        <% if (clause.title) { %>
+        <p><strong><%= clause.title %></strong></p>
+        <% } %>
+
+        <% if (clause.term && Array.isArray(clause.term)) { %>
+          <% clause.term.forEach(t => { %>
+            <p><%= t %></p>
+          <% }); %>
+        <% } %>
+
+        <% if (clause.paragraphs) { %>
+        <% clause.paragraphs.forEach(para => { %>
+        <p><%= typeof para === 'string' ? para : JSON.stringify(para) %></p>
+        <% }); %>
+        <% } %>
+
+        <% if (clause.list && clause.list.length > 0) { %>
+        <ol class="terms-list">
+          <% clause.list.forEach(item => { %>
+          <li>
+            <% if (typeof item === 'string') { %>
+            <%= item %>
+            <% } else if (item.term) { %>
+            <strong><%= item.term %></strong><% if (item.definition) { %>: <%= item.definition %><% } %>
+            
+            <% if (item.sublist && item.sublist.length > 0) { %>
+            <ol>
+              <% item.sublist.forEach(subItem => { %>
+              <li>
+                <% if (typeof subItem === 'string') { %>
+                <%= subItem %>
+                <% } else if (subItem.term) { %>
+                <strong><%= subItem.term %></strong><% if (subItem.definition) { %>: <%= subItem.definition %><% } %>
+                
+                <% if (subItem.sublist && subItem.sublist.length > 0) { %>
+                <ol>
+                  <% subItem.sublist.forEach(subSubItem => { %>
+                  <li><%= typeof subSubItem === 'string' ? subSubItem : (subSubItem.term || '') + (subSubItem.definition ? ': ' + subSubItem.definition : '') %></li>
+                  <% }); %>
+                </ol>
+                <% } %>
+                
+                <% if (subItem.paragraphs) { %>
+                <% subItem.paragraphs.forEach(p => { %>
+                <p><%- p %></p>
+                <% }); %>
+                <% } %>
+                <% } %>
+              </li>
+              <% }); %>
+            </ol>
+            <% } %>
+            
+            <% if (item.paragraphs) { %>
+            <% item.paragraphs.forEach(p => { %>
+            <p><%- p %></p>
+            <% }); %>
+            <% } %>
+            <% } %>
+          </li>
+          <% }); %>
+        </ol>
+        <% } %>
+      </div>
+      <% }); %>
+    </section>
+    <% }); %>
+
+    <section class="section">
+      <h3 style="text-align: center;"><%= scheduleA.title %></h3>
+      <h4 style="text-align: center;"><%= scheduleA.subtitle %></h4>
+      
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 10%;"><%= scheduleA.headers.sno %></th>
+            <th style="width: 40%;"><%= scheduleA.headers.particular %></th>
+            <th style="width: 50%;"><%= scheduleA.headers.details %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% scheduleA.rows.forEach(row => { %>
+          <tr>
+            <td><%= row.sno %></td>
+            <td><%= row.particular %></td>
+            <td><%= row.details %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <table>
+        <tbody>
+          <% finalCharges.rows.forEach(row => { %>
+          <tr>
+            <td style="width: 10%;"><%= row.sno %></td>
+            <td style="width: 40%;"><%= row.particular %></td>
+            <td style="width: 50%;"><%- row.details %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 30px;">
+        <p><%= finalAcceptance.waiverClause %></p>
+        <p><strong><%= finalAcceptance.acceptanceStatementTitle %></strong></p>
+        <p><%- finalAcceptance.acceptanceStatementBody %></p>
+
+        <p style="margin-top: 40px; font-size: 13px;">
+          <%= finalAcceptance.signatureLine %>
+          <span style="font-size: 18px;"><%= finalAcceptance.signatureSymbol %></span>
+        </p>
+
+        <p style="font-weight: bold; margin-top: 10px;"><%= finalAcceptance.signedByText %></p>
+      </div>
+    </section>
+
+    <div class="footer">
+        <img src="<%= footerImageUrl %>" alt="Company Footer">
+    </div>
+
+  </div>
+</body>
+</html>

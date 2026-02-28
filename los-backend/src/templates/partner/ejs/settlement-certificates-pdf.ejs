@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loan Settlement Letter</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+      body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #2c3e50;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .certificate-container {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .header-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        z-index: 1;
+        height: 80px;
+        overflow: hidden;
+      }
+
+      .header-image img {
+        height: 80px;
+        width: auto;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .footer-image {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-top: 20px;
+      }
+
+      .footer-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+      }
+
+      .content-container {
+        padding: 110px 25px 20px 25px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .header h1 {
+        font-size: 18px;
+        margin: 0;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .content p {
+        margin-bottom: 8px;
+      }
+
+      .certification-text {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 15px 0;
+        border-left: 4px solid #27ae60;
+      }
+
+      .details {
+        margin: 20px 0;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .details td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .details td.label {
+        font-weight: 600;
+        width: 30%;
+        background-color: #f8f9fa;
+      }
+
+      .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 11px;
+        color: #666;
+      }
+
+      .certificate-id {
+        font-size: 11px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+        padding: 8px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+      }
+
+      .note {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 10px;
+        color: #999;
+        font-style: italic;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="certificate-container">
+
+      <% if (headerImageUrl) { %>
+      <div class="header-image">
+        <img src="<%= headerImageUrl %>" alt="Header" />
+      </div>
+      <% } %>
+
+      <div class="content-container">
+        <div class="header">
+          <h1>LOAN SETTLEMENT LETTER</h1>
+        </div>
+
+        <div class="content">
+          <p><strong>To:</strong></p>
+          <p><strong><%= customerName %></strong></p>
+          <p><%= customerAddress %></p>
+
+          <div class="certification-text">
+            <p>
+              This is to confirm that the loan account bearing
+              <strong>Loan ID: <%= loanId %></strong> availed from
+              <strong><%= lenderName %></strong> has been
+              <strong>settled</strong> as per the mutually agreed settlement terms.
+            </p>
+            <p style="margin-bottom: 0;">
+              Upon receipt of the settlement amount, the loan account stands
+              closed with effect from <strong><%= closureDate %></strong>.
+            </p>
+          </div>
+
+          <table class="details">
+            <tr>
+              <td class="label">Loan ID</td>
+              <td><%= loanId %></td>
+            </tr>
+            <tr>
+              <td class="label">Original Loan Amount</td>
+              <td>₹<%= loanAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Settlement Amount Paid</td>
+              <td>₹<%= paidAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Loan Start Date</td>
+              <td><%= startDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Settlement Date</td>
+              <td><%= closureDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Loan Status</td>
+              <td><strong>Settled</strong></td>
+            </tr>
+          </table>
+
+          <p>
+            Please note that settlement of the loan may be reported to credit
+            bureaus as <strong>“Settled”</strong> in accordance with applicable
+            reporting guidelines.
+          </p>
+        </div>
+
+        <div class="footer">
+          <p>
+            For any assistance, contact us at
+            <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>
+            or call <%= supportPhone %>.
+          </p>
+        </div>
+
+        <div class="certificate-id">
+          Settlement Reference ID: <%= certificateId %>
+        </div>
+
+        <div class="note">
+          This is a system-generated letter and does not require a physical signature.
+        </div>
+      </div>
+
+      <% if (footerImageUrl) { %>
+      <div class="footer-image">
+        <img src="<%= footerImageUrl %>" alt="Footer" />
+      </div>
+      <% } %>
+
+    </div>
+  </body>
+</html>

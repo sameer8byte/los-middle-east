@@ -1,0 +1,190 @@
+{
+	"fipList": [
+		{
+			"fipId": "CGGBFIP0001",
+			"fipName": "Chaitanya Godavari Grameena Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "fiplive@indusind",
+			"fipName": "IndusInd Bank Ltd.",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "TERM-DEPOSIT", "RECURRING_DEPOSIT"]
+		},
+		{
+			"fipId": "PNB-FIP",
+			"fipName": "Punjab National Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "AUBank-FIP",
+			"fipName": "AU Small Finance Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "ICICI-FIP",
+			"fipName": "ICICI Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "Hutatma_FIPLIVE",
+			"fipName": "Hutatma Sahakari Bank Ltd",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "IBFIP",
+			"fipName": "Indian Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "RECURRING_DEPOSIT", "TERM-DEPOSIT", "TERM_DEPOSIT"]
+		},
+		{
+			"fipId": "IOB-FIP",
+			"fipName": "Indian Overseas Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "OGB-FIP",
+			"fipName": "Odisha Gramya Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "CUBFIP",
+			"fipName": "City Union Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "UCOB-FIP",
+			"fipName": "UCO Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "FDRLFIPPROD",
+			"fipName": "FEDERAL BANK",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "PSFIP",
+			"fipName": "Punjab and Sind Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "RECURRING_DEPOSIT", "TERM-DEPOSIT", "TERM_DEPOSIT"]
+		},
+		{
+			"fipId": "YESB-FIP",
+			"fipName": "Yes Bank Ltd",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "HDFC-FIP",
+			"fipName": "HDFC Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "CENTRALFIP",
+			"fipName": "Central Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "RECURRING_DEPOSIT", "TERM-DEPOSIT", "TERM_DEPOSIT"]
+		},
+		{
+			"fipId": "IDFCFirstBank-FIP",
+			"fipName": "IDFC FIRST BANK",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "BARBFIP",
+			"fipName": "BANK OF BARODA",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "TERM-DEPOSIT", "RECURRING_DEPOSIT"]
+		},
+		{
+			"fipId": "KotakMahindraBank-FIP",
+			"fipName": "Kotak Mahindra Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "MVAFL_live",
+			"fipName": "MUTHOOT VEHICLE & ASSET FINANCE LTD",
+			"assetClassID": "BANK",
+			"fiType": ["TERM_DEPOSIT", "RECURRING_DEPOSIT", "TERM-DEPOSIT"]
+		},
+		{
+			"fipId": "UBI-FIP",
+			"fipName": "Union Bank Of India",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "KBL-FIP",
+			"fipName": "Karnataka Bank Ltd",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "BOM_FIP",
+			"fipName": "Bank of Maharashtra",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "RECURRING_DEPOSIT", "TERM-DEPOSIT", "TERM_DEPOSIT"]
+		},
+		{
+			"fipId": "KarurVysyaBank-FIP",
+			"fipName": "Karur Vysya Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "idbibank-fip",
+			"fipName": "IDBI Bank Ltd.",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "RECURRING_DEPOSIT", "TERM_DEPOSIT"]
+		},
+		{
+			"fipId": "sbi-fip",
+			"fipName": "STATE BANK OF INDIA",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "TERM_DEPOSIT", "RECURRING_DEPOSIT"]
+		},
+		{
+			"fipId": "fiplive@canarabank",
+			"fipName": "Canara Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "fiplive@fincarebank",
+			"fipName": "Fincare Small Finance Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "MGBFIP",
+			"fipName": "Maharashtra Gramin Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT", "RECURRING_DEPOSIT", "TERM-DEPOSIT"]
+		},
+		{
+			"fipId": "AXIS001",
+			"fipName": "Axis Bank",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		},
+		{
+			"fipId": "BOI-FIP",
+			"fipName": "Bank Of India",
+			"assetClassID": "BANK",
+			"fiType": ["DEPOSIT"]
+		}
+	]
+}

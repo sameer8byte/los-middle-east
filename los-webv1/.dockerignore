@@ -1,0 +1,19 @@
+# node stuff
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-store
+
+# local env files (optional: keep if needed in image)
+.env*
+!.env.production
+
+# build artifacts
+dist
+
+# system junk
+.DS_Store
+Thumbs.db
+.vscode
+.idea

@@ -1,0 +1,619 @@
+{
+  "info": {
+    "name": "DigiLocker 2.0 API",
+    "description": "API endpoints for DigiLocker 2.0 integration with Signzy and Digitap providers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345678"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "brand_id",
+      "value": "your-brand-id-here",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "user-123",
+      "type": "string"
+    },
+    {
+      "key": "aadhaar_number",
+      "value": "123456789012",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "URL Generation",
+      "item": [
+        {
+          "name": "Create URL with Signzy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"brandId\": \"{{brand_id}}\",\n  \"aadhaarNumber\": \"{{aadhaar_number}}\",\n  \"redirectionUrl\": \"https://yourapp.com/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/signzy/create-url",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "signzy",
+                "create-url"
+              ]
+            },
+            "description": "Create a DigiLocker URL using Signzy provider"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"DigiLocker URL created successfully with Signzy\",\n  \"url\": \"https://digilocker.signzy.app/verify/...\",\n  \"digiLockerId\": \"signzy-id-123\",\n  \"provider\": \"SIGNZY\",\n  \"raw\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Generate URL with Digitap",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"brandId\": \"{{brand_id}}\",\n  \"aadhaarNumber\": \"{{aadhaar_number}}\",\n  \"redirectionUrl\": \"https://yourapp.com/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/digitap/generate-url",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "digitap",
+                "generate-url"
+              ]
+            },
+            "description": "Generate a DigiLocker URL using Digitap KYC Unified provider"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"KYC Unified URL generated successfully with Digitap\",\n  \"url\": \"https://kyc.digitap.ai/verify/...\",\n  \"provider\": \"DIGITAP\",\n  \"raw\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Generate URL with Fallback (Digitap -> Signzy)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"brandId\": \"{{brand_id}}\",\n  \"aadhaarNumber\": \"{{aadhaar_number}}\",\n  \"redirectionUrl\": \"https://yourapp.com/callback\",\n  \"primaryProvider\": \"digitap\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/with-fallback",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "with-fallback"
+              ]
+            },
+            "description": "Generate DigiLocker URL with automatic fallback. Tries Digitap first, falls back to Signzy if it fails."
+          },
+          "response": [
+            {
+              "name": "Success Response (Primary)",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"KYC Unified URL generated successfully with Digitap\",\n  \"url\": \"https://kyc.digitap.ai/verify/...\",\n  \"provider\": \"DIGITAP\",\n  \"raw\": {}\n}"
+            },
+            {
+              "name": "Success Response (Fallback)",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"DigiLocker URL created successfully with Signzy (Fallback from digitap)\",\n  \"url\": \"https://digilocker.signzy.app/verify/...\",\n  \"digiLockerId\": \"signzy-id-123\",\n  \"provider\": \"SIGNZY\",\n  \"raw\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Generate URL with Fallback (Signzy -> Digitap)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"brandId\": \"{{brand_id}}\",\n  \"aadhaarNumber\": \"{{aadhaar_number}}\",\n  \"redirectionUrl\": \"https://yourapp.com/callback\",\n  \"primaryProvider\": \"signzy\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/with-fallback",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "with-fallback"
+              ]
+            },
+            "description": "Generate DigiLocker URL with automatic fallback. Tries Signzy first, falls back to Digitap if it fails."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Callbacks",
+      "item": [
+        {
+          "name": "Handle Signzy Callback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"digilocker-id-from-signzy\",\n  \"status\": \"success\",\n  \"internalId\": \"user-123\",\n  \"documents\": [\n    {\n      \"type\": \"PANCR\",\n      \"data\": {\n        \"name\": \"John Doe\",\n        \"panNumber\": \"ABCDE1234F\",\n        \"dateOfBirth\": \"1990-01-01\"\n      }\n    },\n    {\n      \"type\": \"ADHAR\",\n      \"data\": {\n        \"name\": \"John Doe\",\n        \"aadhaarNumber\": \"XXXX XXXX 1234\",\n        \"address\": \"123 Main St, City, State - 123456\",\n        \"dateOfBirth\": \"1990-01-01\",\n        \"gender\": \"M\"\n      }\n    }\n  ],\n  \"message\": \"Documents fetched successfully\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/signzy/callback",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "signzy",
+                "callback"
+              ]
+            },
+            "description": "Callback endpoint for Signzy DigiLocker (public - no auth required). Signzy will call this endpoint with verification results."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Signzy DigiLocker callback processed successfully\",\n  \"documents\": [\n    {\n      \"type\": \"PANCR\",\n      \"data\": {\n        \"name\": \"John Doe\",\n        \"panNumber\": \"ABCDE1234F\"\n      }\n    }\n  ],\n  \"provider\": \"SIGNZY\",\n  \"raw\": {}\n}"
+            },
+            {
+              "name": "Failure Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Signzy DigiLocker callback received with failure: User cancelled verification\",\n  \"documents\": [],\n  \"provider\": \"SIGNZY\",\n  \"raw\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Handle Digitap Callback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uniqueId\": \"user-123\",\n  \"status\": \"success\",\n  \"requestId\": \"digitap-request-id-123\",\n  \"data\": {\n    \"aadhaar\": {\n      \"name\": \"John Doe\",\n      \"dob\": \"1990-01-01\",\n      \"gender\": \"M\",\n      \"address\": \"123 Main St, City, State - 123456\",\n      \"aadhaarNumber\": \"XXXX XXXX 1234\",\n      \"photo\": \"base64_encoded_photo_data\"\n    },\n    \"pan\": {\n      \"name\": \"John Doe\",\n      \"panNumber\": \"ABCDE1234F\",\n      \"dateOfBirth\": \"1990-01-01\"\n    },\n    \"digilocker\": {\n      \"consent\": true,\n      \"timestamp\": \"2024-01-01T12:00:00Z\"\n    }\n  },\n  \"message\": \"KYC verification completed successfully\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/digitap/callback",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "digitap",
+                "callback"
+              ]
+            },
+            "description": "Callback endpoint for Digitap KYC Unified (public - no auth required). Digitap will call this endpoint with KYC verification results."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Digitap KYC callback processed successfully\",\n  \"provider\": \"DIGITAP\",\n  \"raw\": {\n    \"uniqueId\": \"user-123\",\n    \"status\": \"success\",\n    \"requestId\": \"digitap-request-id-123\",\n    \"data\": {},\n    \"message\": \"KYC verification completed successfully\"\n  }\n}"
+            },
+            {
+              "name": "Failure Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Digitap KYC callback received with failure: OTP verification failed\",\n  \"provider\": \"DIGITAP\",\n  \"raw\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Handle Generic Callback (Auto-detect)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"some-id\",\n  \"status\": \"success\",\n  \"internalId\": \"user-123\",\n  \"error\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/callback",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "callback"
+              ]
+            },
+            "description": "Generic callback endpoint that auto-detects provider based on payload structure (public - no auth required). Use provider-specific endpoints for better reliability."
+          },
+          "response": [
+            {
+              "name": "Auto-detected as Signzy",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Signzy DigiLocker callback processed successfully\",\n  \"provider\": \"SIGNZY\",\n  \"raw\": {}\n}"
+            },
+            {
+              "name": "Auto-detected as Digitap",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Digitap KYC callback processed successfully\",\n  \"provider\": \"DIGITAP\",\n  \"raw\": {}\n}"
+            },
+            {
+              "name": "Unknown Provider",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Generic callback processed (provider unknown)\",\n  \"provider\": \"SIGNZY\",\n  \"raw\": {}\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Logs & Monitoring",
+      "item": [
+        {
+          "name": "Get All Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/logs?skip=0&take=20",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0",
+                  "description": "Number of records to skip (pagination)"
+                },
+                {
+                  "key": "take",
+                  "value": "20",
+                  "description": "Number of records to return (max 100)"
+                }
+              ]
+            },
+            "description": "Get all DigiLocker logs for a brand with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs (Filter by Provider)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/logs?provider=DIGITAP&skip=0&take=20",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "provider",
+                  "value": "DIGITAP",
+                  "description": "Filter by provider: DIGITAP, SIGNZY, or UNKNOWN"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get DigiLocker logs filtered by provider (DIGITAP, SIGNZY, or UNKNOWN)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs (Filter by Status)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/logs?status=SUCCESS&skip=0&take=20",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SUCCESS",
+                  "description": "Filter by status: SUCCESS or FAILED"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get DigiLocker logs filtered by status (SUCCESS or FAILED)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs (Filter by User)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/logs?userId={{user_id}}&skip=0&take=20",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{user_id}}",
+                  "description": "Filter by user ID"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get DigiLocker logs for a specific user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs (Multiple Filters)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/logs?userId={{user_id}}&provider=SIGNZY&status=SUCCESS&skip=0&take=10",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{user_id}}",
+                  "description": "Filter by user ID"
+                },
+                {
+                  "key": "provider",
+                  "value": "SIGNZY",
+                  "description": "Filter by provider"
+                },
+                {
+                  "key": "status",
+                  "value": "SUCCESS",
+                  "description": "Filter by status"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get DigiLocker logs with multiple filters applied"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Log by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/partner/brand/{{brand_id}}/digilocker/digilocker-log-id-123",
+              "host": ["{{base_url}}"],
+              "path": [
+                "partner",
+                "brand",
+                "{{brand_id}}",
+                "digilocker",
+                "digilocker-log-id-123"
+              ]
+            },
+            "description": "Get a single DigiLocker log by its ID"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"digilocker-log-id-123\",\n  \"userId\": \"user-123\",\n  \"brandId\": \"brand-456\",\n  \"provider\": \"DIGITAP\",\n  \"requestType\": \"CREATE_URL\",\n  \"status\": \"SUCCESS\",\n  \"request\": {},\n  \"response\": {},\n  \"digiLockerId\": \"digitap-request-id\",\n  \"errorMessage\": null,\n  \"createdAt\": \"2024-01-01T12:00:00Z\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

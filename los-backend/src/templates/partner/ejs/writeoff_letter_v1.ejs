@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loan Write-Off Letter</title>
+    <style>
+      body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #2c3e50;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+      }
+
+      .certificate-container {
+        max-width: 800px;
+        margin: 40px auto;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header-image img,
+      .footer-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .content-container {
+        padding: 40px 30px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin: 0;
+        color: #1a1a1a;
+      }
+
+      .content {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .content p {
+        margin-bottom: 16px;
+      }
+
+      .details {
+        margin: 30px 0;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+      }
+
+      .details td {
+        padding: 10px 8px;
+        vertical-align: top;
+      }
+
+      .details td.label {
+        font-weight: 600;
+        width: 35%;
+        color: #444;
+      }
+
+      .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .note {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 13px;
+        color: #999;
+      }
+
+      .certificate-id {
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 40px;
+        color: #444;
+      }
+
+      a {
+        color: #2e86de;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="certificate-container">
+
+      <!-- Header Image -->
+      <div class="header-image">
+        <% if (headerImageUrl) { %>
+          <img src="<%= headerImageUrl %>" alt="Header" />
+        <% } %>
+      </div>
+
+      <div class="content-container">
+        <div class="header">
+          <h1>LOAN WRITE-OFF LETTER</h1>
+        </div>
+
+        <div class="content">
+          <p>To,</p>
+          <p><strong><%= customerName %></strong></p>
+          <p><strong><%= customerAddress %></strong></p>
+
+          <p>
+            This is to inform you that the loan account bearing number
+            <strong><%= loanId %></strong>, availed from
+            <strong><%= lenderName %></strong>, has been classified as
+            <strong>Written Off</strong> with effect from
+            <strong><%= closureDate %></strong>, in accordance with the lender’s
+            internal credit and accounting policies.
+          </p>
+
+          <p>
+            Please note that a write-off is an internal accounting classification
+            and <strong>does not imply waiver, settlement, or closure</strong> of
+            the outstanding dues. The outstanding amount remains payable, and the
+            lender reserves the right to recover the same through lawful means.
+          </p>
+
+          <table class="details">
+            <tr>
+              <td class="label">Loan ID:</td>
+              <td><%= loanId %></td>
+            </tr>
+            <tr>
+              <td class="label">Original Loan Amount:</td>
+              <td>₹<%= loanAmount %></td>
+            </tr>
+            <tr>
+              <td class="label">Amount Paid Till Date:</td>
+              <td>₹<%= paidAmount %></td>
+            </tr>
+
+            <tr>
+              <td class="label">Write-Off Date:</td>
+              <td><%= closureDate %></td>
+            </tr>
+            <tr>
+              <td class="label">Loan Status:</td>
+              <td>Written Off</td>
+            </tr>
+          </table>
+
+          <p>
+            This status may be reported to credit bureaus as
+            <strong>“Written Off”</strong> in accordance with applicable
+            reporting guidelines, which may impact your credit score.
+          </p>
+        </div>
+
+        <div class="footer">
+          <p>
+            For any assistance, contact us at
+            <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>
+            or call <%= supportPhone %>.
+          </p>
+        </div>
+
+        <div class="note">
+          This is a system-generated letter and does not require a physical signature.
+        </div>
+
+        <div class="certificate-id">
+          Write-Off Reference ID: <%= certificateId %>
+        </div>
+      </div>
+
+      <!-- Footer Image -->
+      <div class="footer-image">
+        <% if (footerImageUrl) { %>
+          <img src="<%= footerImageUrl %>" alt="Footer" />
+        <% } %>
+      </div>
+
+    </div>
+  </body>
+</html>

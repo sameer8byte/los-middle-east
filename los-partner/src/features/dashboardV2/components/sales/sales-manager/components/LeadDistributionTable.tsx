@@ -1,0 +1,271 @@
+import { useState, useEffect, useMemo, useRef } from "react";
+import { FiChevronDown } from "react-icons/fi";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+
+interface Lead {
+  id: string;
+  dateOfAssign: string;
+  leadId: string;
+  customerName: string;
+  phNo: string;
+  email: string;
+  leadType: string;
+  loanAmount: number;
+  assignedTo: string;
+  lastUpdated: string;
+  status: "Followups" | "Sanctioned" | "Rejected" | "Disbursed" | "Pending Disbursal";
+}
+
+const mockLeads: Lead[] = Array.from({ length: 10 }, (_, i) => ({
+  id: `${i + 1}`,
+  dateOfAssign: ["Jan 20 2025", "Jan 22 2025", "Jan 24 2025", "Jan 26 2025", "Jan 28 2025", "Jan 30 2025", "Feb 01 2025", "Feb 03 2025", "Feb 05 2025", "Feb 07 2025"][i],
+  leadId: `L${123 + i}`,
+  customerName: ["Jinosh D", "Ayesha R", "Samir T", "Nisha P", "Karan S", "Riya M", "Anil K", "Sonia L", "Vijay R", "Ravi H"][i],
+  phNo: ["9987462735", "9876543210", "9765432109", "9654321098", "9543210987", "9432109876", "9321098765", "9210987654", "9109876543", "9098765432"][i],
+  email: ["jinosh@gmail.com", "ayesha@gmail.com", "samir@gmail.com", "nisha@gmail.com", "karan@gmail.com", "riya@gmail.com", "anil@gmail.com", "sonia@gmail.com", "vijay@gmail.com", "ravi@gmail.com"][i],
+  leadType: ["Fresh", "In Progress", "Pending", "Completed", "Fresh", "In Progress", "Pending", "Completed", "Fresh", "In Progress"][i],
+  loanAmount: [8_00_000, 6_00_000, 5_50_000, 7_20_000, 8_50_000, 9_00_000, 4_80_000, 10_00_000, 7_10_000, 6_70_000][i],
+  assignedTo: ["Harshad S", "Rohit K", "Priya M", "Vikas J", "Deepa A", "Suresh N", "Meera B", "Ajay T", "Nisha D", "Kiran M"][i],
+  lastUpdated: ["Jan 21 2025", "Jan 23 2025", "Jan 25 2025", "Jan 27 2025", "Jan 29 2025", "Jan 31 2025", "Feb 02 2025", "Feb 04 2025", "Feb 06 2025", "Feb 08 2025"][i],
+  status: ["Followups", "Rejected", "Disbursed", "Pending Disbursal", "Sanctioned", "Disbursed", "Followups", "Followups", "Rejected", "Followups"][i] as Lead["status"],
+}));
+
+const tabs = ["All", "Current Followup", "Disbursed", "Pending Disbursal", "Rejected"];
+
+const getStatusBadge = (status?: Lead["status"]) => {
+  if (!status) return <span className="px-2 py-1 rounded text-xs font-medium bg-gray-50 text-gray-600">-</span>;
+  
+  const styles = {
+    Followups: "bg-blue-50 text-blue-600 border border-blue-200",
+    Sanctioned: "bg-purple-50 text-purple-600 border border-purple-200",
+    Rejected: "bg-red-50 text-red-600 border border-red-200",
+    Disbursed: "bg-green-50 text-green-600 border border-green-200",
+    "Pending Disbursal": "bg-yellow-50 text-yellow-600 border border-yellow-200",
+  };
+  return (
+    <span className={`px-2 py-1 rounded text-xs font-medium ${styles[status] ?? 'bg-gray-50 text-gray-600'}`}>
+      {status}
+    </span>
+  );
+};
+
+interface LeadDistributionTableProps {
+  data?: Lead[];
+  loading?: boolean;
+  error?: string | null;
+}
+
+const LeadDistributionTable = ({ data, loading, error }: LeadDistributionTableProps = {}) => {
+  const [activeTab, setActiveTab] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const dateFilterRef = useRef<HTMLDivElement>(null);
+  const pageSize = 10;
+  const leads = data ?? mockLeads;
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dateFilterRef.current && !dateFilterRef.current.contains(event.target as Node)) {
+        setShowDateFilter(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  
+  const filteredLeads = useMemo(() => {
+    if (activeTab === "All") return leads;
+    return leads.filter(lead => {
+      if (activeTab === "Current Followup") return lead.status === "Followups";
+      if (activeTab === "Disbursed") return lead.status === "Disbursed";
+      if (activeTab === "Pending Disbursal") return lead.status === "Pending Disbursal";
+      if (activeTab === "Rejected") return lead.status === "Rejected";
+      return true;
+    });
+  }, [activeTab, leads]);
+  
+  const totalCount = filteredLeads.length;
+  const totalPages = Math.ceil(totalCount / pageSize);
+  
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredLeads.slice(start, start + pageSize);
+  }, [filteredLeads, currentPage, pageSize]);
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 mb-4">
+      {error && (
+        <div className="p-4 bg-red-50 border-b border-red-200">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">Lead Distribution Table</h2>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50">
+            Sort
+            <FiChevronDown className="w-4 h-4" />
+          </button>
+          <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50">
+            Filter
+            <FiChevronDown className="w-4 h-4" />
+          </button>
+          <div className="relative" ref={dateFilterRef}>
+            <button 
+              onClick={() => setShowDateFilter(!showDateFilter)}
+              className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
+            >
+              Date Filter
+              <FiChevronDown className="w-4 h-4" />
+            </button>
+            
+            {showDateFilter && (
+              <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-4">
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => {
+                        setStartDate("");
+                        setEndDate("");
+                      }}
+                      className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      onClick={() => setShowDateFilter(false)}
+                      className="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 px-4 pt-4 pb-2 border-b border-gray-200">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === tab
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Sr No</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date Of Assign</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Lead Id</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Customer Name</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ph.No</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Lead Type</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Loan Amount</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Assigned To</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Last Updated</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loading ? (
+              <tr>
+                <td colSpan={12} className="px-4 py-8">
+                  <div className="animate-pulse space-y-2">
+                    {[1,2,3].map(i => <div key={i} className="h-8 bg-gray-200 rounded" />)}
+                  </div>
+                </td>
+              </tr>
+            ) : paginatedLeads.map((lead, index) => (
+              <tr key={lead.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 text-sm text-gray-900">{(currentPage - 1) * pageSize + index + 1}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.dateOfAssign}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.leadId}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.customerName}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.phNo}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.email}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.leadType}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{(lead.loanAmount ?? 0).toLocaleString()}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {lead.assignedTo} <span className="text-purple-600 font-medium">• EXEC</span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">{lead.lastUpdated}</td>
+                <td className="px-4 py-3 text-sm">{getStatusBadge(lead.status)}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <HiOutlineDotsVertical className="w-4 h-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+        <div className="text-sm text-gray-600">
+          {currentPage * pageSize - pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)} of {totalCount}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            &lt;
+          </button>
+          <button
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={currentPage >= totalPages}
+            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            &gt;
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LeadDistributionTable;
