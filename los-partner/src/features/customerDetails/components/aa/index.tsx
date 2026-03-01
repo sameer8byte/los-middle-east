@@ -574,7 +574,7 @@ export const CustomerDetailsTabs = () => {
                     summary.currentODLimit !== "0.00" && (
                       <div className="bg-white rounded-lg p-4 shadow-sm">
                         <span className="text-sm font-medium text-[var(--color-on-surface)] opacity-70">
-                          Overdraft Limit
+                          Tawarruq Limit
                         </span>
                         <p className="text-base font-semibold text-[var(--color-on-background)]">
                           {formatCurrency(

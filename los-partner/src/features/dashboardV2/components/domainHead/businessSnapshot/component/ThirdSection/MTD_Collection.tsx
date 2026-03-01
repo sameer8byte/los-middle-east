@@ -123,7 +123,8 @@ const MTD_Collection: React.FC<MTDCollectionProps> = ({
                                 y: cy + ((labelRadius) * Math.sin(labelInRadians))
                             };
 
-                            let textAnchor: "inherit" | "end" | "start" | "middle" | undefined = "middle";
+                             let textAnchor: "inherit" | "end" | "start" | "middle" | undefined = "middle";
+
                             let dx = 0;
                             let dy = 0;
 

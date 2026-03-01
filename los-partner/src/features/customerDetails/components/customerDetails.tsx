@@ -379,7 +379,7 @@ ${alternatePhoneLoans.loansViaAlternateNumbers
 👤 Full Name: ${fullName}
 ${
   customerDetails.aAdharName
-    ? `📄 Aadhaar Name: ${customerDetails.aAdharName}\n`
+    ? `📄 CPR Card Name: ${customerDetails.aAdharName}\n`
     : ""
 }━━━━━━━━━━━━━━━━━━━━━━
 ${alternateLoansText}
@@ -390,7 +390,7 @@ ${ipCheckText}
    Date of Birth: ${formatDate(customerDetails.dateOfBirth)}
    ${
      customerDetails.aAdharDOB
-       ? `Aadhaar DOB: ${formatDate(customerDetails.aAdharDOB)}\n   `
+       ? `CPR Card DOB: ${formatDate(customerDetails.aAdharDOB)}\n   `
        : ""
    }Marital Status: ${customerDetails.maritalStatus || "N/A"}
    ${
@@ -1060,7 +1060,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
 
           {customerDetails?.aAdharName && (
             <DetailItem
-              label="Aadhaar Name"
+              label="CPR Card Name"
               value={customerDetails.aAdharName}
             />
           )}
@@ -1164,7 +1164,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
 
           {customerDetails.aAdharDOB && (
             <DetailItem
-              label="Aadhaar DOB"
+              label="CPR Card DOB"
               value={formatDate(customerDetails.aAdharDOB)}
             />
           )}

@@ -574,7 +574,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           {/* Interest/Fees */}
           <tr className="bg-[var(--color-surface)] bg-opacity-20 hover:bg-[var(--color-muted)] hover:bg-opacity-5">
             <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
-              Interest
+              Murabaha margin
             </td>
             <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
               {Number(transaction.totalFees || 0).toLocaleString("en-IN")}
@@ -622,7 +622,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
             <tr className="bg-gradient-to-r from-purple-50 to-pink-50">
               <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)]">
                 <div className="font-medium text-purple-900">Round Off Discount</div>
-                <div className="text-[10px] text-purple-700 italic">(on Interest + Principal)</div>
+                <div className="text-[10px] text-purple-700 italic">(on Murabaha margin + Principal)</div>
               </td>
               <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-purple-700 font-bold">
                 -{Number(transaction.roundOffDiscount || 0).toLocaleString("en-IN")}

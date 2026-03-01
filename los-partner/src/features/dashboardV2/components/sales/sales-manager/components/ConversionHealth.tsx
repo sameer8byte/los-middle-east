@@ -33,7 +33,7 @@ const ConversionHealth = ({ data, loading, error }: ConversionHealthProps = {}) 
   const dropOffTotal = data?.dropOffTotal ?? 1500;
 
   const donutData = data?.donutData ?? [
-    { name: "Low Cibil", value: 82, percentage: 26, color: "#93C5FD" },
+    { name: "Low Credit Score", value: 82, percentage: 26, color: "#93C5FD" },
     { name: "No Response", value: 64, percentage: 20, color: "#3B82F6" },
     { name: "High For", value: 52, percentage: 16, color: "#60A5FA" },
     { name: "Customer Declined", value: 48, percentage: 15, color: "#BFDBFE" },

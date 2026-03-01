@@ -116,7 +116,7 @@ const decisionSummaryData = {
         { label: "Documents Approved", count: 9 },
         { label: "Bank Statement Pending", count: 5 },
         { label: "Needs Field Verification", count: 4 },
-        { label: "CIBIL Clarification", count: 3 },
+        { label: "BENEFIT Credit Bureau Clarification", count: 3 },
       ]
     },
     {
@@ -131,7 +131,7 @@ const decisionSummaryData = {
         { label: "Documents Rejected", count: 3 },
         { label: "Bank Statement Pending", count: 5 },
         { label: "Needs Field Verification", count: 4 },
-        { label: "CIBIL Clarification", count: 3 },
+        { label: "BENEFIT Credit Bureau Clarification", count: 3 },
       ]
     }
   ]

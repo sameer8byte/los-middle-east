@@ -1073,9 +1073,9 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[var(--color-on-surface)] opacity-80">
               <div>00 - Account Review</div>
-              <div>05 - Personal Finance</div>
+              <div>05 - Tawarruq</div>
               <div>10 - Credit Card</div>
-              <div>06 - Housing Finance</div>
+              <div>06 - Musharakah Mutanaqisah </div>
             </div>
           </div>
 

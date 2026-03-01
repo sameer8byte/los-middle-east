@@ -292,11 +292,11 @@ export const generateLoanStatement = async (
       ["Current instalment", data.loanSummary.currentInstallmentAmount.toLocaleString(), "Sanction loan tenure", `${data.loanSummary.sanctionLoanTenureDays} Days`],
       ["Total Deductions", data.loanSummary.totalDeductions.toLocaleString(), "Loan status", data.loanSummary.loanStatus],
       ["Processing Fee", data.loanSummary.processingFee.toLocaleString(), "Principal Due", Number(data.loanSummary.principalDue || 0).toFixed(2)],
-      ["Total Interest Charges", data.loanSummary.totalInterestCharges.toLocaleString(), "Interest Due", Number(data.loanSummary.interestDue || 0).toFixed(2)],
+      ["Total Murabaha Charges", data.loanSummary.totalInterestCharges.toLocaleString(), "Murabaha Due", Number(data.loanSummary.interestDue || 0).toFixed(2)],
       ["Total Taxes", Number(data.loanSummary.totalTaxes || 0).toFixed(2), "Penalty Due", Number(data.loanSummary.penaltyDue || 0).toFixed(2)],
       ["Annual Percentage Rate", Number(data.loanSummary.annualPercentageRate || 0).toFixed(2) + "%", "Total Due", Number(data.loanSummary.totalDue || 0).toFixed(2)],
       ["Total Principal Paid", data.loanSummary.totalPrincipalPaid.toLocaleString(), "Excess Amount", Number(data.loanSummary.excessAmount || 0).toFixed(2)],
-      ["Repayment Mode", "Payment Gateway/Bank Transfer", "Total Interest Paid", data.loanSummary.totalInterestPaid.toLocaleString()],
+      ["Repayment Mode", "Payment Gateway/Bank Transfer", "Total Murabaha Paid", data.loanSummary.totalInterestPaid.toLocaleString()],
     ];
 
     const rowH = 20;
