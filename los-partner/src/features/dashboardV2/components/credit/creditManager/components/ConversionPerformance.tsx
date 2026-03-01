@@ -466,9 +466,7 @@ const ConversionPerformance: React.FC<Props> = ({ data }) => {
                 )}
               </div>
               
-              <p className="text-[10px] text-gray-400 text-center mt-2">
-                Showing {displayMetrics.length} of {visibleMetrics >= 10 ? 10 : visibleMetrics} rejection reasons
-              </p>
+           
             </div>
           </div>
         </div>

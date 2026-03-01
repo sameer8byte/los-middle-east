@@ -78,17 +78,15 @@ const SummaryCard: React.FC<SummaryItem> = ({
       </div>
 
       <div
-        className={`text-xl font-extrabold tracking-tight ${
-          isPrimary ? "text-white" : "text-gray-900"
-        }`}
+        className={`text-xl font-extrabold tracking-tight ${isPrimary ? "text-white" : "text-gray-900"
+          }`}
       >
         {number}
       </div>
 
       <div
-        className={`text-xs mt-1 font-medium leading-snug whitespace-normal ${
-          isPrimary ? "text-white/90" : "text-gray-500"
-        }`}
+        className={`text-xs mt-1 font-medium leading-snug whitespace-normal ${isPrimary ? "text-white/90" : "text-gray-500"
+          }`}
       >
         {label}
       </div>
@@ -114,7 +112,7 @@ const CreditSummary: React.FC<CreditSummaryProps> = ({
       </div>
 
       {/* Grid */}
-      <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+      <div className="p-4 flex gap-3 overflow-x-auto">
         {data.map((item, index) => (
           <SummaryCard key={index} {...item} />
         ))}

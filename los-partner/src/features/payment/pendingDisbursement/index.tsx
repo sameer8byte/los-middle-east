@@ -526,50 +526,50 @@ export function PendingDisbursementComponent() {
 
       {/* Table */}
       <div className="flex-1 min-h-0 overflow-auto px-5 py-4">
-        <div className="bg-[var(--surface)] rounded-xl border border-[var(--muted)]/15 shadow-sm overflow-hidden">
-          <table className="w-full min-w-[700px] text-sm border-collapse">
+        <div className="bg-[var(--surface)] rounded-xl border border-[var(--muted)]/15 overflow-hidden shadow-sm">
+          <table className="w-full text-sm border-collapse">
             <thead className="sticky top-0 z-10 bg-[var(--background)]">
               <tr className="text-[var(--on-surface)]/60 border-b border-[var(--muted)]/15">
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider w-10">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider w-12">
                   #
                 </th>
                 <th
-                  className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer hover:text-[var(--on-surface)] select-none"
+                  className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer hover:text-[var(--on-surface)] select-none"
                   onClick={() => handleSort("name")}
                 >
                   Customer
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider hidden md:table-cell">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider">
                   Status
                 </th>
                 <th
-                  className="px-3 py-3 text-right font-semibold text-xs uppercase tracking-wider cursor-pointer hover:text-[var(--on-surface)] select-none hidden lg:table-cell"
+                  className="px-4 py-3 text-right font-semibold text-xs uppercase tracking-wider cursor-pointer hover:text-[var(--on-surface)] select-none hidden md:table-cell"
                   onClick={() => handleSort("amount")}
                 >
                   Amount
                 </th>
-                <th className="px-3 py-3 text-right font-semibold text-xs uppercase tracking-wider hidden lg:table-cell">
+                <th className="px-4 py-3 text-right font-semibold text-xs uppercase tracking-wider hidden md:table-cell">
                   Net Amount
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider hidden xl:table-cell">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider hidden lg:table-cell">
                   Agreement
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider hidden xl:table-cell">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider hidden lg:table-cell">
                   Signed At
                 </th>
                 <th
-                  className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer hover:text-[var(--on-surface)] select-none hidden md:table-cell"
+                  className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer hover:text-[var(--on-surface)] select-none"
                   onClick={() => handleSort("createdAt")}
                 >
                   Created
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider hidden 2xl:table-cell">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider">
                   Warning
                 </th>
-                <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider">
+                <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider w-56">
                   Actions
                 </th>
               </tr>
@@ -630,75 +630,78 @@ export function PendingDisbursementComponent() {
                           : 'hover:bg-[var(--primary)]/[0.03]'
                       }`}
                     >
-                      <td className="px-3 py-3 text-[var(--on-surface)]/30 tabular-nums font-medium text-xs w-10">
+                      <td className="px-4 py-3.5 text-[var(--on-surface)]/30 tabular-nums font-medium text-xs">
                         {(page - 1) * limit + idx + 1}
                       </td>
-                      <td className="px-3 py-3">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-semibold text-[var(--on-surface)] group-hover:text-[var(--primary)] transition-colors leading-tight">
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-[var(--on-surface)] group-hover:text-[var(--primary)] transition-colors">
                             {name}
                           </span>
-                          <span className="text-[11px] text-[var(--on-surface)]/40 font-mono">
+                          <span className="text-xs text-[var(--on-surface)]/40 font-mono mt-0.5">
                             {tx.formattedLoanId}
                           </span>
                         </div>
                       </td>
-                      <td className="px-3 py-3 hidden md:table-cell">
-                        <div className="flex flex-col gap-0.5">
-                          {tx.id && (
-                            <AcefoneClickToDialButton userId={tx.user?.id!} loanId={tx.id} />
-                          )}
-                          <span className="text-[var(--on-surface)]/70 font-mono text-xs leading-tight">
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-col">
+                            {tx.id && (
+                                                                                               <AcefoneClickToDialButton userId={tx.user?.id!}
+                                                                                               loanId={tx.id}  
+                                                                                               />
+                                                                                             )}{" "}      
+                          <span className="text-[var(--on-surface)]/70 font-mono text-sm">
                             {tx.user?.phoneNumber || "—"}
                           </span>
-                          <span className="text-[11px] text-[var(--on-surface)]/40 truncate max-w-[140px]">
+                          <span className="text-xs text-[var(--on-surface)]/40 truncate max-w-[180px] mt-0.5">
                             {tx.user?.email || ""}
                           </span>
                         </div>
                       </td>
-                      <td className="px-3 py-3">
-                        <div className="flex flex-col gap-1">
-                          <LoanStatusBadge status={tx.status || "PENDING_DISBURSEMENT"} />
-                          <div className="flex flex-wrap gap-1">
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-col gap-2">
+                          <LoanStatusBadge
+                            status={tx.status || "PENDING_DISBURSEMENT"}
+                          />
+                          <div className="flex flex-wrap gap-1.5">
                             {tx?.is_repeat_loan && (
-                              <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700 border border-blue-100">
-                                Repeat
+                              <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                                Repeat Loan
                               </span>
                             )}
                             {tx?.is_workflow_automated && (
-                              <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-purple-50 text-purple-700 border border-purple-100">
-                                Auto
+                              <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                                Auto Workflow
                               </span>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-right hidden lg:table-cell">
+
+                      <td className="px-4 py-3.5 text-right hidden md:table-cell">
                         <span className="font-bold text-emerald-600 tabular-nums text-sm">
                           {formatCurrency(tx.amount)}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-right hidden lg:table-cell">
+                      <td className="px-4 py-3.5 text-right hidden md:table-cell">
                         <span className="font-bold text-blue-600 tabular-nums text-sm">
                           {formatCurrency(tx.disbursement?.netAmount || 0)}
                         </span>
                       </td>
-                      <td className="px-3 py-3 hidden xl:table-cell">
+                      <td className="px-4 py-3.5 hidden lg:table-cell">
                         <AgreementBadge agreement={tx.agreement} />
                       </td>
-                      <td className="px-3 py-3 hidden xl:table-cell text-[var(--on-surface)]/50 text-xs">
+                      <td className="px-4 py-3.5 hidden lg:table-cell text-[var(--on-surface)]/50 text-sm">
                         {tx.agreement?.signed}
                       </td>
-                      <td className="px-3 py-3 hidden md:table-cell">
-                        <span className="text-[var(--on-surface)]/50 text-xs">
-                          {formatDate(tx.createdAt)}
-                        </span>
+                      <td className="px-4 py-3.5 text-[var(--on-surface)]/50 text-sm">
+                        {formatDate(tx.createdAt)}
                       </td>
-                      <td className="px-3 py-3 hidden 2xl:table-cell">
+                      <td className="px-4 py-3.5">
                         {hasExistingDisbursement && (
-                          <div className="flex items-start gap-1.5">
-                            <HiXCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0 mt-0.5" />
-                            <div className="text-[11px]">
+                          <div className="flex items-start gap-2">
+                            <HiXCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                            <div className="text-xs">
                               <div className="font-semibold text-red-700">Already Disbursed</div>
                               <div className="text-red-600 mt-0.5">
                                 {new Date(tx.existingDisbursement?.completedAt!).toLocaleString('en-IN', {
@@ -718,8 +721,8 @@ export function PendingDisbursementComponent() {
                           </div>
                         )}
                       </td>
-                      <td className="px-3 py-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Button
                             onClick={() => setSelectedLoanForDisburse(tx.id)}
                             variant="primary"

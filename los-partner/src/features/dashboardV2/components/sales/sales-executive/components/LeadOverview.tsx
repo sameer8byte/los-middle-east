@@ -41,8 +41,8 @@ const LeadOverview = ({ data, loading, error }: LeadOverviewProps = {}) => {
                     icon={<LuUsers className="w-6 h-6" />}
                     leadNumber={data?.totalAllocated ?? 150}
                     title="Total Allocated Loans"
-                    color="#E3F2FD"
-                    borderColor="#2196F3"
+                    color="#2563EB"
+                    borderColor="#2563EB"
                     statusObj={[
                         { label: "Pending", count: 80, percentage: 53 },
                         { label: "Approved", count: 70, percentage: 47 }
@@ -58,6 +58,8 @@ const LeadOverview = ({ data, loading, error }: LeadOverviewProps = {}) => {
                         { label: "Hot", count: 45, percentage: 53 },
                         { label: "Warm", count: 40, percentage: 47 }
                     ]}
+                    isLeadPercentage={true}
+                    leadPercentage={55}
                 />
                 <ColouredBox 
                     icon={<LuUsers className="w-6 h-6" />}
@@ -82,6 +84,8 @@ const LeadOverview = ({ data, loading, error }: LeadOverviewProps = {}) => {
                         { label: "Credit", count: 12, percentage: 60 },
                         { label: "Other", count: 8, percentage: 40 }
                     ]}
+                    isLeadPercentage={true}
+                    leadPercentage={22}
                 />
             </div>
         </BoxContainer>

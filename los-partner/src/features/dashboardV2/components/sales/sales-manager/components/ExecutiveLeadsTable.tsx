@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FiChevronDown } from "react-icons/fi";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 
@@ -36,9 +36,11 @@ interface ExecutiveLeadsTableProps {
   data?: ExecutiveLead[];
   loading?: boolean;
   error?: string | null;
+  onToggle?: (isOpen: boolean) => void;
 }
 
-const ExecutiveLeadsTable = ({ data, loading, error }: ExecutiveLeadsTableProps = {}) => {
+const ExecutiveLeadsTable = ({ data, loading, error, onToggle }: ExecutiveLeadsTableProps = {}) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const leads = data ?? mockData;
@@ -51,6 +53,13 @@ const ExecutiveLeadsTable = ({ data, loading, error }: ExecutiveLeadsTableProps 
     return leads.slice(start, start + pageSize);
   }, [currentPage, pageSize, leads]);
 
+  // Trigger API call when table is opened
+  useEffect(() => {
+    if (isOpen && onToggle) {
+      onToggle(true);
+    }
+  }, [isOpen]);
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 mb-4">
       {error && (
@@ -59,24 +68,45 @@ const ExecutiveLeadsTable = ({ data, loading, error }: ExecutiveLeadsTableProps 
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Executive's Leads Summary</h2>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between p-4 border-b border-gray-200 cursor-pointer transition-colors ${
+          isOpen ? 'bg-gray-50 hover:bg-gray-100' : 'bg-blue-50 hover:bg-blue-100'
+        }`}
+      >
+        <h2 className={`font-semibold text-gray-900 ${isOpen ? 'text-base' : 'text-base'}`}>Executive's Leads Summary</h2>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50">
-            Sort
-            <FiChevronDown className="w-4 h-4" />
-          </button>
-          <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50">
-            Filter
-            <FiChevronDown className="w-4 h-4" />
-          </button>
-          <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50">
-            Date Filter
-            <FiChevronDown className="w-4 h-4" />
-          </button>
+          {isOpen && (
+            <>
+              <button 
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
+              >
+                Sort
+                <FiChevronDown className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
+              >
+                Filter
+                <FiChevronDown className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
+              >
+                Date Filter
+                <FiChevronDown className="w-4 h-4" />
+              </button>
+            </>
+          )}
+          <FiChevronDown className={`w-5 h-5 transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
         </div>
       </div>
 
+      {isOpen && (
+        <>
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -159,6 +189,8 @@ const ExecutiveLeadsTable = ({ data, loading, error }: ExecutiveLeadsTableProps 
           </button>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

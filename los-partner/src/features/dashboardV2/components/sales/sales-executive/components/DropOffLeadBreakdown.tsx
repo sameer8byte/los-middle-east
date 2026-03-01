@@ -1,5 +1,8 @@
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import BoxContainer from "../ui/BoxContainer";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface FactorData {
   name: string;
@@ -20,7 +23,11 @@ interface DropOffLeadBreakdownProps {
   error?: string | null;
 }
 
-const DropOffLeadBreakdown = ({ data, loading, error }: DropOffLeadBreakdownProps = {}) => {
+const DropOffLeadBreakdown = ({
+  data,
+  loading,
+  error,
+}: DropOffLeadBreakdownProps = {}) => {
   const percentage = data?.percentage ?? 21;
   const count = data?.count ?? 320;
   const total = data?.total ?? 1500;
@@ -34,10 +41,42 @@ const DropOffLeadBreakdown = ({ data, loading, error }: DropOffLeadBreakdownProp
     { name: "Factor F", value: 10, color: "#DBEAFE" },
   ];
 
+  const donutChartData = {
+    labels: factors.map((factor) => factor.name),
+    datasets: [
+      {
+        data: factors.map((factor) => factor.value),
+        backgroundColor: factors.map((factor) => factor.color),
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const donutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "65%",
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const factor = factors[context.dataIndex];
+            const totalValue = factors.reduce((sum, f) => sum + f.value, 0);
+            const percentage = Math.round((factor.value / totalValue) * 100);
+            return `${factor.name}: ${factor.value} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
   if (error) {
     return (
       <BoxContainer title="Drop off Lead Breakdown" className="w-full h-full">
-        <div className="flex items-center justify-center h-40 text-red-500 text-sm">{error}</div>
+        <div className="flex items-center justify-center h-40 text-red-500 text-sm">
+          {error}
+        </div>
       </BoxContainer>
     );
   }
@@ -56,43 +95,19 @@ const DropOffLeadBreakdown = ({ data, loading, error }: DropOffLeadBreakdownProp
   if (!factors || factors.length === 0) {
     return (
       <BoxContainer title="Drop off Lead Breakdown" className="w-full h-full">
-        <div className="flex items-center justify-center h-40 text-gray-500">No data available</div>
+        <div className="flex items-center justify-center h-40 text-gray-500">
+          No data available
+        </div>
       </BoxContainer>
     );
   }
 
   return (
-
     <BoxContainer title="Drop off Lead Breakdown" className="w-full h-full">
       <div className="flex flex-col items-center w-full">
         {/* Donut Chart */}
-        <div className="relative w-full h-48 mb-6">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={factors}
-                cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={70}
-                dataKey="value"
-              >
-                {factors.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "0.5rem",
-                  fontSize: "12px",
-                  zIndex: 1000,
-                }}
-                wrapperStyle={{ zIndex: 1000 }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+        <div className="relative w-full h-54 mb-6 bg-[#f8faff] rounded-lg p-4">
+          <Doughnut data={donutChartData} options={donutOptions} />
           {/* Center text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <div className="text-2xl font-bold text-gray-900">
@@ -108,20 +123,26 @@ const DropOffLeadBreakdown = ({ data, loading, error }: DropOffLeadBreakdownProp
         <div className="border-t border-gray-300 border-dashed w-full mb-6"></div>
 
         {/* Legend */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm w-full">
-          {factors.map((factor, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full "
-                style={{ backgroundColor: factor.color }}
-              />
-              <div className="flex items-center">
-                <span className="text-gray-700">{factor.name}</span>
-                <span className="text-gray-500">: X % | Count</span>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-y-2 justify-between text-sm w-full">
+  {factors.map((factor, index) => (
+    <div
+      key={index}
+      className="flex items-center gap-2 pr-4"
+    >
+      <div className="flex items-center gap-2 min-w-0">
+        <div
+          className="w-3 h-3 rounded-full"
+          style={{ backgroundColor: factor.color }}
+        />
+        <span className="text-gray-700 truncate">{factor.name}</span>
+      </div>
+
+      <span className="text-gray-500 whitespace-nowrap">
+        {factor.value}% | Count
+      </span>
+    </div>
+  ))}
+</div>
       </div>
     </BoxContainer>
   );

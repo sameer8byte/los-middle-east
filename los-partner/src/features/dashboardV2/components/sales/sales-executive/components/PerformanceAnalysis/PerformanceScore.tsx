@@ -1,5 +1,6 @@
 import { FaTrophy, FaStar } from "react-icons/fa";
 import BoxContainer from "../../ui/BoxContainer";
+import { LuFlame } from "react-icons/lu";
 
 interface PerformanceScoreData {
     overallScore?: number;
@@ -23,7 +24,7 @@ const PerformanceScore = ({ data, loading, error }: PerformanceScoreProps = {}) 
     const totalRanks = data?.totalRanks ?? 24;
 
     const factors = data?.factors ?? [
-        { name: "Factor 1", score: 8, color: "#86EFAC", icon: "+" },
+        { name: "Factor 1", score: 8, color: "#86EFAC", icon: "★" },
         { name: "Factor 2", score: 7.5, color: "#FEF08A", icon: "★" },
         { name: "Factor 3", score: 6, color: "#FDE047", icon: "★" },
         { name: "Factor 4", score: 5, color: "#FCA5A5", icon: "★" },
@@ -58,9 +59,9 @@ const PerformanceScore = ({ data, loading, error }: PerformanceScoreProps = {}) 
             {/* Overall Rating */}
             <div className="bg-gradient-to-l from-[#2388FF] to-[#155299] rounded-xl p-4 mb-6 flex items-center justify-between w-full">
                 <div className="flex items-center justify-between gap-2">
-                    <span className="text-4xl font-bold text-white">{overallScore}</span>
-                    <span className="text-white text-sm">/ {maxScore}</span>
-                    <span className="text-white text-sm ml-2">Overall Rating</span>
+                    <span className="text-4xl font-semibold text-white">{overallScore}</span>
+                    <span className="text-white text-base">/ {maxScore}</span>
+                    <span className="text-white text-base ml-2">Overall Rating</span>
                 </div>
                 <div className="bg-white rounded-lg px-3 py-2 flex items-center gap-2">
                     <FaTrophy className="text-yellow-500" />
@@ -72,7 +73,7 @@ const PerformanceScore = ({ data, loading, error }: PerformanceScoreProps = {}) 
             <div className="grid grid-cols-2 gap-6 mb-6">
                 {factors.map((factor, index) => (
                     <div key={index} className="flex items-center gap-2">
-                        <span className="text-blue-600 text-lg">🔥</span>
+                        <LuFlame className="w-5 h-5 text-blue-600" />
                         <span className="text-sm text-gray-700">{factor.name ?? ""}</span>
                         <div 
                             className="ml-auto px-3 py-1 rounded-md flex items-center gap-1 font-semibold text-sm"

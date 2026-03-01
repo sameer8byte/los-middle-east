@@ -60,8 +60,8 @@ export const PerformanceSummary = () => {
   if (!isOpen) {
     return (
       <div 
-        className="bg-white border border-[#F5F5F5] cursor-pointer"
-        style={{ width: '1396px', borderRadius: '20px' }}
+        className="bg-white border border-[#F5F5F5] cursor-pointer w-full max-w-[1396px]"
+        style={{ borderRadius: '20px' }}
         onClick={() => setIsOpen(true)}
       >
         <div 
@@ -85,8 +85,8 @@ export const PerformanceSummary = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '1396px', height: '650px', borderRadius: '20px', gap: '10px' }}
+      className="bg-white border border-[#F5F5F5] w-full max-w-[1396px]"
+      style={{ borderRadius: '20px', gap: '10px' }}
     >
       {/* Header */}
       <div 
@@ -128,9 +128,9 @@ export const PerformanceSummary = () => {
       </div>
       
       {/* Content */}
-      <div style={{ width: '1396px', height: '602px', padding: '20px 15px', gap: '28px' }}>
+      <div className="p-4">
         {/* Table */}
-        <div style={{ width: '1366px', height: '513px', overflowY: 'auto' }}>
+        <div className="w-full h-[513px] overflow-x-auto overflow-y-auto">
           <table className="w-full">
             <thead className="bg-gray-50 sticky top-0">
               <tr style={{ height: '47px', fontFamily: 'Inter', fontSize: '12px', fontWeight: 500, lineHeight: '18px' }}>

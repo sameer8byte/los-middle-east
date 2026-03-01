@@ -18,7 +18,7 @@ export class AAWebhookController {
 
   constructor(
     private readonly aaService: AccountAggregatorService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   // Single endpoint for both ConsentStatusNotification and Push_Data
@@ -26,7 +26,7 @@ export class AAWebhookController {
   @HttpCode(HttpStatus.OK)
   async handleWebhook(
     @Headers() headers: Record<string, string>,
-    @Body() payload: any
+    @Body() payload: any,
   ): Promise<any> {
     try {
       // try {
@@ -36,6 +36,11 @@ export class AAWebhookController {
       // } catch (e) {
       //   this.logger.error("Failed to log webhook payload to database:", e);
       // }
+      console.log(
+        "Received AA Webhook:",
+        payload?.purpose,
+        !!payload?.dataDetail?.reportData,
+      );
 
       if (payload && (payload as any).purpose === "ConsentStatusNotification") {
         const csn = payload as any;
@@ -114,7 +119,7 @@ export class AAWebhookController {
         message: "success",
       };
     } catch (error) {
-      this.logger.error("Error processing AA webhook:");
+      this.logger.error("Error processing AA webhook:", error, payload);
       return {
         clienttxnid: (payload as any)?.clienttxnid ?? null,
         result: "false",

@@ -10,6 +10,8 @@ interface BoxContainerProps {
   childrenClassName?: string;
   titleBgColor?: string;
   autoWidth?: boolean;
+  isIcon?: boolean;
+  icon?: React.ReactNode;
 }
 
 const BoxContainer = ({
@@ -22,6 +24,9 @@ const BoxContainer = ({
   childrenClassName = "",
   titleBgColor = "bg-[#f5f5f5]",
   autoWidth = false,
+  isIcon = false,
+  icon,
+
 }: BoxContainerProps) => {
   const childCount = Children.count(children);
   const widthClass = autoWidth && childCount > 0 ? `w-fit` : "";
@@ -35,12 +40,17 @@ const BoxContainer = ({
           className={`flex justify-between items-center py-3 px-4 ${titleBgColor} rounded-t-xl border-b border-gray-100 ${titleClassName}`}
         >
           <div className="flex items-center gap-2">
+            {isIcon && icon && (
+              <div className="text-gray-700">
+                {icon}
+              </div>
+            )}
             {title && (
               <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
             )}
-            {dropdown}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {dropdown}
             {button}
           </div>
         </div>

@@ -116,8 +116,8 @@ export const CollectionContribution = () => {
 
   return (
     <div 
-      className="bg-white border border-[#E5E7EB]"
-      style={{ width: '544px', height: '384px', borderRadius: '20px', overflow: 'hidden' }}
+      className="bg-white border border-[#E5E7EB] w-full lg:w-[544px]"
+      style={{ height: '384px', borderRadius: '20px', overflow: 'hidden' }}
     >
       <div className="bg-[#F5F5F5] px-4 py-3">
         <h3 className="text-sm font-semibold text-gray-900">Collection (%) Contribution (Across Executive)</h3>

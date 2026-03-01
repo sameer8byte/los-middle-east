@@ -2,6 +2,7 @@
 // import { useState, useEffect } from "react";
 import { useState } from "react";
 import { FaChartPie } from "react-icons/fa";
+import { AddRatingModal } from "./AddRatingModal";
 // import { getTeamPerformance } from "../services/dashboardApi";
 
 // 🔴 API INTEGRATION: Type definition (currently inline, move to ../types/dashboard.types.ts)
@@ -67,7 +68,7 @@ const TeamMemberCard = ({ initials, name, role, rank, score, isExpanded, onToggl
       </div>
 
       {isExpanded && metrics && (
-        <div className="bg-[#FBFCFF] border-t border-[#E3EFFF]" style={{ width: '514px', borderRadius: '8px', padding: '15px', gap: '24px' }}>
+        <div className="bg-[#FBFCFF] border-t border-[#E3EFFF] rounded-lg p-4 w-full">
           {/* Metrics */}
           <div className="flex flex-col gap-2 mb-4">
             {[
@@ -94,8 +95,8 @@ const TeamMemberCard = ({ initials, name, role, rank, score, isExpanded, onToggl
           </div>
 
           {/* Qualitative Feedback Section */}
-          <div style={{ width: '484px', height: '247px', borderRadius: '12px', border: '1px solid #F4F5FB', marginBottom: '16px' }}>
-            <div style={{ width: '484px', height: '48px', padding: '15px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', background: '#EAF2FF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
+          <div className="w-full max-w-[484px] h-[247px] rounded-xl border border-gray-100 mb-4">
+            <div className="w-full h-12 px-4 rounded-t-xl bg-blue-50 flex justify-between items-center">
               <h3 className="text-sm font-semibold text-gray-900">Qualitative Feedback</h3>
               <select 
                 value={feedbackFilter}
@@ -110,7 +111,7 @@ const TeamMemberCard = ({ initials, name, role, rank, score, isExpanded, onToggl
               </select>
             </div>
 
-            <div style={{ padding: '15px', background: '#FFFFFF', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
+            <div className="p-4 bg-white rounded-b-xl">
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-1">Lead Conversion</h4>
                 <p className="text-xs text-gray-600 mb-2">Good follow-ups today. Improve hot lead conversion with faster response and clarity.</p>
@@ -145,6 +146,7 @@ const TeamMemberCard = ({ initials, name, role, rank, score, isExpanded, onToggl
 
 export const TeamPerformance = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
   // 🔴 API INTEGRATION: Uncomment state management when backend is ready
   // const [data, setData] = useState<TeamMemberProps[]>([]);
@@ -182,20 +184,23 @@ export const TeamPerformance = () => {
   // 🔴 API INTEGRATION: Replace above with: const allMembers = data;
 
   return (
-    <div style={{ width: '544px', height: '1007px', borderRadius: '16px', border: '1px solid #F3F4F6', background: '#FFFFFF', display: 'flex', flexDirection: 'column' }}>
+    <div className="w-full h-[1007px] rounded-2xl border border-gray-200 bg-white flex flex-col">
       {/* Header */}
-      <div style={{ width: '544px', height: '60px', padding: '10px 15px', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="w-full h-[60px] px-4 py-2.5 rounded-t-2xl bg-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FaChartPie className="text-blue-600" size={20} />
           <h2 className="text-lg font-semibold text-gray-900">Team Performance</h2>
         </div>
-        <button className="bg-white border border-gray-300 rounded px-3 py-1 text-sm hover:bg-gray-50">
+        <button 
+          onClick={() => setIsRatingModalOpen(true)}
+          className="bg-white border border-gray-300 rounded px-3 py-1 text-sm hover:bg-gray-50"
+        >
           Add Rating +
         </button>
       </div>
 
       {/* Reporting Manager */}
-      <div style={{ width: '544px', height: '62px', padding: '15px', borderBottom: '1px solid #F0F0F7', display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="w-full h-[62px] px-4 border-b border-gray-200 flex items-center gap-3">
         <span className="text-sm text-gray-600">Reporting Manager:</span>
         <div className="flex items-center gap-2">
           <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'linear-gradient(135deg, #FFE3F0 0%, #FFC3DD 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -206,7 +211,7 @@ export const TeamPerformance = () => {
       </div>
 
       {/* Search Bar */}
-      <div style={{ padding: '15px' }}>
+      <div className="px-4 py-4">
         <div className="relative">
           <input
             type="text"
@@ -221,7 +226,7 @@ export const TeamPerformance = () => {
       </div>
 
       {/* Team Members List - Scrollable */}
-      <div style={{ padding: '0 15px 15px', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="px-4 pb-4 flex-1 overflow-y-auto flex flex-col gap-3">
         {allMembers.map((member, index) => (
           <TeamMemberCard 
             key={index} 
@@ -231,6 +236,12 @@ export const TeamPerformance = () => {
           />
         ))}
       </div>
+
+      {/* Add Rating Modal */}
+      <AddRatingModal 
+        isOpen={isRatingModalOpen} 
+        onClose={() => setIsRatingModalOpen(false)} 
+      />
     </div>
   );
 };

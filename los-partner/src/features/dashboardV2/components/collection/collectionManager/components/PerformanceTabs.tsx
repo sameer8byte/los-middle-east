@@ -9,12 +9,12 @@ export const PerformanceTabs = () => {
   if (!isOpen) {
     return (
       <div 
-        className="bg-white border border-[#F5F5F5] cursor-pointer"
-        style={{ width: '1396px', borderRadius: '20px', marginTop: '24px' }}
+        className="bg-white border border-[#F5F5F5] cursor-pointer w-full max-w-[1396px]"
+        style={{ borderRadius: '20px', marginTop: '24px' }}
         onClick={() => setIsOpen(true)}
       >
         <div 
-          className="bg-[#F5F5F5] px-4 flex items-center justify-between"
+          className="bg-[#F5F5F5] px-4 flex items-center justify-between cursor-pointer"
           style={{ 
             height: '48px',
             paddingTop: '8px',
@@ -22,6 +22,7 @@ export const PerformanceTabs = () => {
             borderTopLeftRadius: '12px',
             borderTopRightRadius: '12px'
           }}
+          onClick={() => setIsOpen(true)}
         >
           <h2 className="text-base font-semibold text-gray-900">Performance</h2>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -33,15 +34,15 @@ export const PerformanceTabs = () => {
   }
 
   return (
-    <div style={{ width: '1396px', marginTop: '24px' }}>
+    <div style={{ width: '100%', maxWidth: '1396px', marginTop: '24px' }}>
       {/* Header */}
       <div 
-        className="bg-white border border-[#F5F5F5] cursor-pointer mb-4"
-        style={{ width: '1396px', borderRadius: '20px' }}
+        className="bg-white border border-[#F5F5F5] cursor-pointer mb-4 w-full"
+        style={{ borderRadius: '20px' }}
         onClick={() => setIsOpen(false)}
       >
         <div 
-          className="bg-[#F5F5F5] px-4 flex items-center justify-between"
+          className="bg-[#F5F5F5] px-4 flex items-center justify-between cursor-pointer"
           style={{ 
             height: '48px',
             paddingTop: '8px',
@@ -49,6 +50,7 @@ export const PerformanceTabs = () => {
             borderTopLeftRadius: '12px',
             borderTopRightRadius: '12px'
           }}
+          onClick={() => setIsOpen(false)}
         >
           <h2 className="text-base font-semibold text-gray-900">Performance</h2>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -58,7 +60,7 @@ export const PerformanceTabs = () => {
       </div>
 
       {/* Three Cards Side by Side */}
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         <CollectionContribution />
         <CollectionPerformance />
         <ConversionPerformance />

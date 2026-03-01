@@ -72,8 +72,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
                     <div className="pl-7 pr-2 py-1 text-[11px] font-medium text-gray-600 flex items-center min-w-[100px] h-full pointer-events-none justify-between">
-                        <span>{startDate || "Start Date"}</span>
-                        <HiChevronDown className="text-gray-400 text-sm ml-1" />
+                        <span>{endDate || "End Date"}</span>                        <HiChevronDown className="text-gray-400 text-sm ml-1" />
                     </div>
                 </div>
             </div>

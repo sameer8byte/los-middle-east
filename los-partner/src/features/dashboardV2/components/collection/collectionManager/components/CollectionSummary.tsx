@@ -13,7 +13,7 @@ interface SummaryCardProps {
 const SummaryCard = ({ amount, title, percentage, borderColor }: SummaryCardProps) => (
   <div 
     className="bg-white flex flex-col justify-between relative overflow-hidden"
-    style={{ width: '260px', height: '100px', padding: '16px', borderRadius: '8px', border: '1px solid #E5E7EB' }}
+    style={{ height: '110px', padding: '16px', borderRadius: '8px', border: '1px solid #E5E7EB', flex: 1, minWidth: '180px' }}
   >
     <div 
       style={{ 
@@ -74,8 +74,8 @@ export const CollectionSummary = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '834px', height: '167px', borderRadius: '20px' }}
+      className="bg-white border border-[#F5F5F5] w-full"
+      style={{ borderRadius: '20px' }}
     >
       <div 
         className="bg-[#F5F5F5] px-4"
@@ -96,9 +96,9 @@ export const CollectionSummary = () => {
         className="flex"
         style={{ 
           width: '100%',
-          padding: '20px 15px',
-          gap: '20px',
-          justifyContent: 'space-between'
+          padding: '18px 15px',
+          gap: '15px',
+          flexWrap: 'wrap'
         }}
       >
         {summaryData.map((item, index) => (

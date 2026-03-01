@@ -70,13 +70,13 @@ const MetricCard: React.FC<PortfolioMetric> = ({
       
       {/* Accent Bar */}
       <div
-        className="w-1 h-10 rounded-full mr-3 shrink-0"
+        className="w-1 h-12 rounded-full mr-3 shrink-0"
         style={{ backgroundColor: accentColor }}
       />
 
       {/* Content */}
       <div className="flex flex-col justify-center min-w-0 flex-1">
-        <div className="text-base font-extrabold text-gray-800">
+        <div className="font-extrabold text-gray-800">
           ₹{amount}
         </div>
 
@@ -109,20 +109,15 @@ const LoanPortfolio: React.FC<LoanPortfolioProps> = ({
       
       {/* Header */}
       <div className="bg-[#F8F9FA] px-4 py-3 border-b border-gray-100">
-        <h2 className="text-sm sm:text-base font-bold text-gray-700">
+        <h2 className="text-sm font-bold text-gray-700 tracking-tight">
           {title}
         </h2>
       </div>
 
       <div className="p-4 space-y-6">
         
-        {/* ✅ FIXED Status Grid */}
-        {/* Mobile → 1 column */}
-        {/* ≥640px (sm) → 2 columns */}
-        {/* ≥768px (md) → 2 columns */}
-        {/* ≥1024px (lg) → 3 columns */}
-        {/* ≥1280px (xl) → 4 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3">
           {statuses.map((item, index) => (
             <StatusBadge key={index} {...item} />
           ))}

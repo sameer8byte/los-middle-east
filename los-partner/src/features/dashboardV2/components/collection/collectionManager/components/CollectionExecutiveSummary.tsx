@@ -12,12 +12,12 @@ interface VariableCardProps {
 
 const VariableCard = ({ label, value }: VariableCardProps) => (
   <div 
-    className="bg-[#F8FAFF] border border-[#F1F3F7] flex items-center gap-2"
-    style={{ width: '250px', height: '50px', borderRadius: '12px', padding: '12px 15px' }}
+    className="bg-[#F8FAFF] border border-[#F1F3F7] flex items-center gap-2 flex-1"
+    style={{ minWidth: '160px', height: '55px', borderRadius: '12px', padding: '12px 15px' }}
   >
     <HiOutlineFire className="text-blue-600" size={20} />
     <span className="text-sm text-gray-700">{label}</span>
-    <div className="ml-auto bg-blue-600 text-white px-3 py-1 rounded text-sm font-semibold">
+    <div className="ml-auto bg-blue-600 text-white px-2.5 py-1 rounded text-sm font-semibold">
       {value}
     </div>
   </div>
@@ -56,14 +56,13 @@ export const CollectionExecutiveSummary = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '834px', height: '125px', borderRadius: '20px', gap: '10px' }}
+      className="bg-white border border-[#F5F5F5] w-full"
+      style={{ borderRadius: '20px', gap: '10px' }}
     >
       {/* Header */}
       <div 
         className="bg-[#F5F5F5] px-4"
         style={{ 
-          width: '834px',
           height: '48px',
           paddingTop: '8px',
           paddingBottom: '8px',
@@ -78,7 +77,7 @@ export const CollectionExecutiveSummary = () => {
       </div>
       
       {/* Content */}
-      <div style={{ padding: '15px', display: 'flex', gap: '8px' }}>
+      <div style={{ padding: '15px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {variables.map((variable, index) => (
           <VariableCard key={index} {...variable} />
         ))}

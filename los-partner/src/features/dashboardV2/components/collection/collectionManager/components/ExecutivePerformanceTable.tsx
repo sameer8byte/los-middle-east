@@ -66,12 +66,12 @@ export const ExecutivePerformanceTable = () => {
   if (!isOpen) {
     return (
       <div 
-        className="bg-white border border-[#F5F5F5] cursor-pointer"
-        style={{ width: '1396px', borderRadius: '20px', marginTop: '24px' }}
+        className="bg-white border border-[#F5F5F5] cursor-pointer w-full max-w-[1396px]"
+        style={{ borderRadius: '20px', marginTop: '24px' }}
         onClick={() => setIsOpen(true)}
       >
         <div 
-          className="bg-[#F5F5F5] px-4 flex items-center justify-between"
+          className="bg-[#F5F5F5] px-4 flex items-center justify-between cursor-pointer"
           style={{ 
             height: '48px',
             paddingTop: '8px',
@@ -79,6 +79,7 @@ export const ExecutivePerformanceTable = () => {
             borderTopLeftRadius: '12px',
             borderTopRightRadius: '12px'
           }}
+          onClick={() => setIsOpen(true)}
         >
           <h2 className="text-base font-semibold text-gray-900">Executives Performance Table</h2>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -91,12 +92,12 @@ export const ExecutivePerformanceTable = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '1396px', borderRadius: '20px', marginTop: '24px' }}
+      className="bg-white border border-[#F5F5F5] w-full max-w-[1396px]"
+      style={{ borderRadius: '20px', marginTop: '24px' }}
     >
       {/* Header */}
       <div 
-        className="bg-[#F5F5F5] px-4 flex items-center justify-between"
+        className="bg-[#F5F5F5] px-4 flex items-center justify-between cursor-pointer"
         style={{ 
           height: '48px',
           paddingTop: '8px',
@@ -104,32 +105,31 @@ export const ExecutivePerformanceTable = () => {
           borderTopLeftRadius: '12px',
           borderTopRightRadius: '12px'
         }}
+        onClick={() => setIsOpen(false)}
       >
-        <div className="flex items-center gap-2">
-          <h2 className="text-base font-semibold text-gray-900">Executives Performance Table</h2>
-          <button onClick={() => setIsOpen(false)}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M15 12.5L10 7.5L5 12.5" stroke="#374151" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+        <h2 className="text-base font-semibold text-gray-900">Executives Performance Table</h2>
+        <div className="flex items-center gap-3">
+          <select 
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none"
+          >
+            <option>Today</option>
+            <option>Yesterday</option>
+            <option>Last 7 Days</option>
+            <option>Last 30 Days</option>
+            <option>Last Month</option>
+            <option>Last Year</option>
+          </select>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M15 12.5L10 7.5L5 12.5" stroke="#374151" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
-        
-        <select 
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none"
-        >
-          <option>Today</option>
-          <option>Yesterday</option>
-          <option>Last 7 Days</option>
-          <option>Last 30 Days</option>
-          <option>Last Month</option>
-          <option>Last Year</option>
-        </select>
       </div>
       
       {/* Table */}
-      <div style={{ width: '1396px', height: '550px', overflowY: 'auto', padding: '15px' }}>
+      <div className="w-full h-[550px] overflow-x-auto overflow-y-auto p-4">
         <table className="w-full">
           <thead className="bg-gray-50 sticky top-0">
             <tr style={{ height: '47px', fontFamily: 'Inter', fontSize: '12px', fontWeight: 500, lineHeight: '18px' }}>

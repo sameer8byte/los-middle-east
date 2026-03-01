@@ -38,3 +38,6 @@ coverage/
 .nest-cli.json
 
 .trigger
+
+# Secrets
+client_secret.json

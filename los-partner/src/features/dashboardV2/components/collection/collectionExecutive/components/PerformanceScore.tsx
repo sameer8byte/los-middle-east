@@ -34,9 +34,9 @@ export const PerformanceScore = () => {
   };
 
   return (
-    <div style={{ width: '544px', minHeight: '975px', borderRadius: '16px', border: '1px solid #E5E7EB', background: '#FFFFFF' }}>
+    <div className="w-full max-w-[420px] rounded-2xl border border-gray-200 bg-white">
       {/* Header */}
-      <div style={{ width: '544px', height: '60px', padding: '10px 15px', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="w-full h-[60px] px-4 py-2.5 rounded-t-2xl bg-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M12 12L22 12A10 10 0 1 1 7 3.34L12 12Z" fill="#8B4513" />
@@ -48,7 +48,7 @@ export const PerformanceScore = () => {
       </div>
 
       {/* Reporting Manager */}
-      <div style={{ width: '544px', height: '62px', padding: '15px', borderBottom: '1px solid #F0F0F7', display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="w-full h-[62px] px-4 border-b border-gray-200 flex items-center gap-3">
         <span className="text-sm text-gray-600">Reporting Manager:</span>
         <div className="flex items-center gap-2">
           <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'linear-gradient(135deg, #FFE3F0 0%, #FFC3DD 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -59,14 +59,14 @@ export const PerformanceScore = () => {
       </div>
 
       {/* Performance Score Section */}
-      <div style={{ width: '514px', margin: '24px 15px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="w-full px-4 mt-6 flex flex-col gap-4">
         {/* Performance Heading */}
-        <div style={{ width: '514px', height: '48px', padding: '15px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', background: '#EAF2FF' }}>
-          <h3 className="text-sm font-semibold text-gray-900">Performance Score</h3>
+        <div className="w-full h-12 px-4 rounded-t-xl bg-blue-50">
+          <h3 className="text-sm font-semibold text-gray-900 leading-[48px]">Performance Score</h3>
         </div>
 
         {/* Rating Card */}
-        <div style={{ width: '484px', height: '76px', padding: '20px', borderRadius: '8px', background: 'linear-gradient(270deg, #2388FF 0%, #155299 100%)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 15px' }}>
+        <div className="w-full h-[76px] px-5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 flex justify-between items-center">
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold text-white">{data.score}</span>
             <span className="text-white/80">/ {data.maxScore}</span>
@@ -78,7 +78,7 @@ export const PerformanceScore = () => {
         </div>
 
         {/* Factors */}
-        <div className="grid grid-cols-2 gap-3" style={{ padding: '0 15px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {data.factors.map((factor, i) => {
             const getScoreColor = (score: number) => {
               if (score >= 8) return { bg: 'bg-green-100', text: 'text-green-700' };
@@ -89,7 +89,7 @@ export const PerformanceScore = () => {
             const colors = getScoreColor(factor.score);
             
             return (
-              <div key={i} style={{ width: '235px', height: '56px', padding: '15px', borderRadius: '12px', border: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div key={i} className="w-full h-14 px-4 rounded-xl border border-gray-200 flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <HiOutlineFire className="text-blue-600" size={18} />
                   <span className="text-sm text-gray-700">{factor.name}</span>
@@ -106,10 +106,10 @@ export const PerformanceScore = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-dashed border-gray-300" style={{ margin: '8px 15px' }}></div>
+        <div className="border-t border-dashed border-gray-300 my-2"></div>
 
         {/* Employee Performance */}
-        <div style={{ width: '484px', margin: '0 15px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="w-full flex flex-col gap-3.5">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900">Employees</h3>
             <span className="text-sm text-gray-500">Performance Position</span>
@@ -118,23 +118,14 @@ export const PerformanceScore = () => {
             const barWidth = (emp.score / 10) * 100;
             
             return (
-              <div key={i} style={{ width: '484px', height: '38px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div key={i} className="w-full h-[38px] flex items-center gap-2.5">
                 {/* Progress Bar Container */}
-                <div style={{ flex: 1, height: '38px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: '#F9FAFB' }}>
+                <div className="flex-1 h-[38px] relative rounded overflow-hidden bg-gray-50">
                   {/* Filled Bar */}
-                  <div style={{ 
-                    width: `${barWidth}%`, 
-                    height: '100%', 
-                    background: 'linear-gradient(135deg, #E3EFFF 0%, #C3DDFF 100%)',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    borderTopRightRadius: '4px',
-                    borderBottomRightRadius: '4px'
-                  }} />
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-100 to-blue-200 rounded-r" style={{ width: `${barWidth}%` }} />
                   
                   {/* Content */}
-                  <div style={{ position: 'relative', height: '100%', padding: '0 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div className="relative h-full px-3.5 flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-900">{emp.name} | {emp.score}</span>
                     <span className="text-sm font-semibold text-gray-600">#{emp.rank}</span>
                   </div>
@@ -146,9 +137,9 @@ export const PerformanceScore = () => {
       </div>
 
       {/* Qualitative Feedback */}
-      <div style={{ width: '514px', margin: '24px 15px 15px', borderRadius: '12px', border: '1px solid #F4F5FB' }}>
+      <div className="w-full px-4 mt-6 mb-4 rounded-xl border border-gray-100">
         {/* Feedback Heading */}
-        <div style={{ width: '514px', height: '48px', padding: '15px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', background: '#EAF2FF', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="w-full h-12 px-4 rounded-t-xl bg-blue-50 flex justify-between items-center">
           <h3 className="text-sm font-semibold text-gray-900">Qualitative Feedback</h3>
           <select 
             value={dateFilter}
@@ -163,8 +154,8 @@ export const PerformanceScore = () => {
         </div>
 
         {/* Feedback Content */}
-        <div style={{ width: '514px', padding: '20px 15px', background: '#FFFFFF', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
-          <div style={{ width: '484px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="w-full p-5 bg-white rounded-b-xl">
+          <div className="w-full flex flex-col gap-4">
             {data.feedback.map((fb, i) => (
               <div key={i}>
                 <h4 className="text-sm font-medium text-gray-900 mb-1">{fb.title}</h4>

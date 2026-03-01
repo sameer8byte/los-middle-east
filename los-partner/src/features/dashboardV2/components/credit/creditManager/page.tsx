@@ -3,12 +3,12 @@ import DashboardHeader from './components/Header';
 import CreditExecutivesSummary from './components/CreditExecutivesSummary';
 import TeamPerformance from './components/TeamPerformance';
 import {
-    HiOutlineDocumentText,
-    HiOutlineDocumentCheck,
-    HiOutlineListBullet,
-    HiOutlineExclamationTriangle,
-    HiOutlineCheckCircle,
-    HiOutlineDocumentMinus
+  HiOutlineDocumentText,
+  HiOutlineDocumentCheck,
+  HiOutlineListBullet,
+  HiOutlineExclamationTriangle,
+  HiOutlineCheckCircle,
+  HiOutlineDocumentMinus
 } from "react-icons/hi2";
 import CreditSummary, { SummaryItem } from '../creditExecutive/components/CreditSummary';
 import CreditFunnel, { FunnelMetric, AmountMetric } from '../creditExecutive/components/CreditFunnel';
@@ -20,10 +20,10 @@ import CreditApplicationTable, { CreditApplicationData } from './components/Cred
 import ApprovedLoanTable, { ApprovedLoanData } from './components/ApprovedLoanTable';
 import CreditIntakeOverview, { EmployeeCreditData } from './components/CreditIntakeOverview';
 const portfolioStatuses: PortfolioStatus[] = [
-    { label: "T.Active Loans", count: 300, icon: HiOutlineBookOpen },
-    { label: "Ongoing Loans", count: 224, icon: HiOutlineBookOpen },
-    { label: "Overdue Loans", count: 44, icon: HiOutlineBookOpen },
-    { label: "Closed Loans", count: 76, icon: HiOutlineBookOpen },
+  { label: "T.Active Loans", count: 300, icon: HiOutlineBookOpen },
+  { label: "Ongoing Loans", count: 224, icon: HiOutlineBookOpen },
+  { label: "Overdue Loans", count: 44, icon: HiOutlineBookOpen },
+  { label: "Closed Loans", count: 76, icon: HiOutlineBookOpen },
 ];
 
 const approvalData: ContributionData[] = [
@@ -178,20 +178,20 @@ const conversionData: ConversionPerformanceData = {
   }
 };
 const portfolioMetrics: PortfolioMetric[] = [
-    { amount: "6.8 Cr", label: "Total Loan Amount", accentColor: "#3B66F5" },
-    { amount: "1.85 Cr", label: "Total Repayment Amount", accentColor: "#A855F7" },
-    { amount: "1.32 Cr", label: "Total Amount Collected", accentColor: "#22C55E", percentage: "85%" },
-    { amount: "53 L", label: "Outstanding Amount", accentColor: "#EAB308" },
-    { amount: "18L", label: "Overdue Amount", accentColor: "#EF4444" },
-    { amount: "72 L", label: "Closed Loan Amount", accentColor: "#EC4899" },
+  { amount: "6.8 Cr", label: "Total Loan Amount", accentColor: "#3B66F5" },
+  { amount: "1.85 Cr", label: "Total Repayment Amount", accentColor: "#A855F7" },
+  { amount: "1.32 Cr", label: "Total Amount Collected", accentColor: "#22C55E", percentage: "85%" },
+  { amount: "53 L", label: "Outstanding Amount", accentColor: "#EAB308" },
+  { amount: "18L", label: "Overdue Amount", accentColor: "#EF4444" },
+  { amount: "72 L", label: "Closed Loan Amount", accentColor: "#EC4899" },
 ];
 /* --- Funnel Metrics (Top Row) --- */
 const funnelMetrics: FunnelMetric[] = [
-    { count: 120, label: "Total Applications", variant: "blue" },
-    { count: 85, label: "Sanctioned", variant: "yellow" },
-    { count: 64, label: "Disbursed", variant: "green" },
-    { count: 42, label: "Pending Disbursal", variant: "orange" },
-    { count: 12, label: "Rejected", variant: "red" },
+  { count: 120, label: "Total Applications", variant: "blue" },
+  { count: 85, label: "Sanctioned", variant: "yellow" },
+  { count: 64, label: "Disbursed", variant: "green" },
+  { count: 42, label: "Pending Disbursal", variant: "orange" },
+  { count: 12, label: "Rejected", variant: "red" },
 ];
 const approvedLoanMockData: ApprovedLoanData[] = [
   { srNo: 1, loanId: 'L1234', name: 'Lokesh S', loanType: 'Repeat', loanAmount: '21,00,000', amountDisbursed: '21,00,000', pendingDisbursal: '0', totalRepayment: '21,00,000', amountCollected: '11,00,000', outstanding: '10,00,000', loanStatus: 'Ongoing' },
@@ -201,53 +201,53 @@ const approvedLoanMockData: ApprovedLoanData[] = [
 ];
 /* --- Financial Amounts (Bottom Row) --- */
 const financialAmounts: AmountMetric[] = [
-    { amount: "45,00,000", label: "Total Amount Sanctioned", accentColor: "#3B66F5" },
-    { amount: "32,50,000", label: "Amount Disbursed", accentColor: "#22C55E" },
-    { amount: "28,00,000", label: "Pending For Disbursal ", accentColor: "#F97316" },
-    { amount: "4,50,000", label: "Avg Loan Ticket Size", accentColor: "#EAB308" },
+  { amount: "45,00,000", label: "Total Amount Sanctioned", accentColor: "#3B66F5" },
+  { amount: "32,50,000", label: "Amount Disbursed", accentColor: "#22C55E" },
+  { amount: "28,00,000", label: "Pending For Disbursal ", accentColor: "#F97316" },
+  { amount: "4,50,000", label: "Avg Loan Ticket Size", accentColor: "#EAB308" },
 ];
 const summaryData: SummaryItem[] = [
-    {
-        label: "Total Application",
-        number: 420,
-        icon: HiOutlineDocumentText,
-        variant: "blue",
-    },
-    {
-        label: "Application Assessed",
-        number: 360,
-        percentage: 86,
-        icon: HiOutlineDocumentCheck,
-        variant: "indigo",
-    },
-    {
-        label: "Application In Queue",
-        number: 52,
-        percentage: 12,
-        icon: HiOutlineListBullet,
-        variant: "yellow",
-    },
-    {
-        label: "Application On Hold",
-        number: 8,
-        percentage: 2,
-        icon: HiOutlineExclamationTriangle,
-        variant: "orange",
-    },
-    {
-        label: "Approved Application",
-        number: 248,
-        percentage: 69,
-        icon: HiOutlineCheckCircle,
-        variant: "green",
-    },
-    {
-        label: "Rejected Application",
-        number: 112,
-        percentage: 31,
-        icon: HiOutlineDocumentMinus,
-        variant: "red",
-    },
+  {
+    label: "Total Application",
+    number: 420,
+    icon: HiOutlineDocumentText,
+    variant: "blue",
+  },
+  {
+    label: "Application Assessed",
+    number: 360,
+    percentage: 86,
+    icon: HiOutlineDocumentCheck,
+    variant: "indigo",
+  },
+  {
+    label: "Application In Queue",
+    number: 52,
+    percentage: 12,
+    icon: HiOutlineListBullet,
+    variant: "yellow",
+  },
+  {
+    label: "Application On Hold",
+    number: 8,
+    percentage: 2,
+    icon: HiOutlineExclamationTriangle,
+    variant: "orange",
+  },
+  {
+    label: "Approved Application",
+    number: 248,
+    percentage: 69,
+    icon: HiOutlineCheckCircle,
+    variant: "green",
+  },
+  {
+    label: "Rejected Application",
+    number: 112,
+    percentage: 31,
+    icon: HiOutlineDocumentMinus,
+    variant: "red",
+  },
 ];
 const mockData: CreditApplicationData[] = [
   { srNo: 1, dateOfAssign: 'Jan 20 2025', leadId: 'L123', customerName: 'Jinosh D', phNo: '9987462735', email: 'jinosh@gmail.com', leadType: 'Fresh', loanAmount: '8,00,000', assignedTo: 'Harshad S', lastUpdated: 'Jan 21 2025', status: 'Followups' },
@@ -270,96 +270,97 @@ const employeeIntakeData: EmployeeCreditData[] = [
 ];
 
 const CreditManager = () => {
-    const [startDate, setStartDate] = useState<string>("");
-    const [endDate, setEndDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
-    const executiveMetrics = [
-        { label: "Variable A", count: 30 },
-        { label: "Variable B", count: 30 },
-        { label: "Variable C", count: 30 },
-    ];
+  const executiveMetrics = [
+    { label: "Variable A", count: 30 },
+    { label: "Variable B", count: 30 },
+    { label: "Variable C", count: 30 },
+  ];
 
-    return (
-        /* 1. Main Root: Use min-h-screen to ensure background coverage */
-        <div className="min-h-screen w-full bg-[#F8F9FB] flex flex-col font-sans">
+  return (
+    /* 1. Main Root: Use min-h-screen to ensure background coverage */
+    <div className="min-h-screen w-full bg-[#F8F9FB] flex flex-col font-sans">
 
-            {/* ================= TOP ROW ================= */}
-            {/* items-stretch ensures the sidebar matches the left column height */}
-            <div className="flex flex-col lg:flex-row gap-6 p-5 lg:p-6 items-stretch">
+      {/* ================= TOP ROW ================= */}
+      {/* items-stretch ensures the sidebar matches the left column height */}
+      <div className="flex flex-col lg:flex-row gap-6 p-5 lg:p-6 items-stretch">
 
-                {/* ---------- LEFT COLUMN (Main Content) ---------- */}
-                <div className="flex-1 flex flex-col gap-6 min-w-0">
+        {/* ---------- LEFT COLUMN (Main Content) ---------- */}
+        <div className="flex-1 flex flex-col gap-6 min-w-0">
 
-                    {/* Header Section: Aligned to the top left of the content area */}
-                    <div className="z-10 flex-shrink-0">
-                        <DashboardHeader
-                            startDate={startDate}
-                            setStartDate={setStartDate}
-                            endDate={endDate}
-                            setEndDate={setEndDate}
-                        />
-                    </div>
+          {/* Header Section: Aligned to the top left of the content area */}
+          <div className="z-10 flex-shrink-0">
+            <DashboardHeader
+              startDate={startDate}
+              setStartDate={setStartDate}
+              endDate={endDate}
+              setEndDate={setEndDate}
+            />
+          </div>
 
-                    {/* Credit Executives Summary: Placed immediately below the header */}
-                    <CreditExecutivesSummary metrics={executiveMetrics} />
-                    <CreditSummary
-                        title="Credit Intake Summary (Across Executives)"
-                        data={summaryData}
-                    />
-                    <CreditFunnel
-                        title="Loan Application Funnel"
-                        metrics={funnelMetrics}
-                        amounts={financialAmounts}
-                    />
-                    <LoanPortfolio
-                        title="Loan Portfolio & Repayment Overview (Across Executive)"
-                        statuses={portfolioStatuses}
-                        metrics={portfolioMetrics}
-                    />
+          {/* Credit Executives Summary: Placed immediately below the header */}
+          <CreditExecutivesSummary metrics={executiveMetrics} />
+          <CreditSummary
+            title="Credit Intake Summary (Across Executives)"
+            data={summaryData}
+          />
+          <CreditFunnel
+            title="Loan Application Funnel"
+            metrics={funnelMetrics}
+            amounts={financialAmounts}
+          />
+          <LoanPortfolio
+            title="Loan Portfolio & Repayment Overview (Across Executive)"
+            statuses={portfolioStatuses}
+            metrics={portfolioMetrics}
+          />
 
-                </div>
-
-                {/* ---------- RIGHT SIDEBAR (Team Performance) ---------- */}
-                {/* Fixed width column aligned alongside the top cards */}
-                <div className="hidden xl:block w-full lg:w-[400px] flex-shrink-0">
-                    <TeamPerformance />
-                </div>
-            </div>
-
-{/* ================= BOTTOM SECTION ================= */}
-<div className="px-5 lg:px-6 pb-10 space-y-8">
-    
-    {/* Side-by-side Flex Row for Performance and Contribution */}
-{/* Updated Bottom Section Wrapper */}
-<div className="flex flex-col xl:flex-row gap-6 items-start w-full overflow-hidden">
-    
-    {/* 1. Approval (%) Contribution - Removed w-[500px] on mobile */}
-    <div className="w-full xl:w-[450px] shrink-0">
-        <ApprovalContribution 
-            title="Approval (%) Contribution (By Executive)" 
-            data={approvalData} 
-        />
-    </div>
-
-    {/* 2. Conversion Approval Performance - min-w-0 prevents flex items from pushing outward */}
-    <div className="flex-1 w-full min-w-0">
-        <ConversionPerformance data={conversionData} />
-    </div>
-</div>
-    {/* ---------- INTEGRATED TABLE SECTION ---------- */}
-    {/* This will span the full width of the dashboard */}
-    <div className="w-full">
-        <CreditApplicationTable data={mockData} />
-    </div>
-
-    <div className="w-full">
-        <ApprovedLoanTable data={approvedLoanMockData} />
-    </div>
-
-    <CreditIntakeOverview data={employeeIntakeData} />
-</div>
         </div>
-    );
+
+        {/* ---------- RIGHT SIDEBAR (Team Performance) ---------- */}
+        {/* Fixed width column aligned alongside the top cards */}
+        {/* min-h-0 lets its child flex container shrink so scrolling works */}
+        <div className=" w-full lg:w-[400px] h-full flex-shrink-0 min-h-0">
+          <TeamPerformance />
+        </div>
+      </div>
+
+      {/* ================= BOTTOM SECTION ================= */}
+      <div className="px-5 lg:px-6 pb-10 space-y-8">
+
+        {/* Side-by-side Flex Row for Performance and Contribution */}
+        {/* Updated Bottom Section Wrapper */}
+        <div className="flex flex-col xl:flex-row gap-6 items-start w-full overflow-hidden">
+
+          {/* 1. Approval (%) Contribution - Removed w-[500px] on mobile */}
+          <div className="w-full xl:w-[450px] shrink-0">
+            <ApprovalContribution
+              title="Approval (%) Contribution (By Executive)"
+              data={approvalData}
+            />
+          </div>
+
+          {/* 2. Conversion Approval Performance - min-w-0 prevents flex items from pushing outward */}
+          <div className="flex-1 w-full min-w-0">
+            <ConversionPerformance data={conversionData} />
+          </div>
+        </div>
+        {/* ---------- INTEGRATED TABLE SECTION ---------- */}
+        {/* This will span the full width of the dashboard */}
+        <div className="w-full">
+          <CreditApplicationTable data={mockData} />
+        </div>
+
+        <div className="w-full">
+          <ApprovedLoanTable data={approvedLoanMockData} />
+        </div>
+
+        <CreditIntakeOverview data={employeeIntakeData} />
+      </div>
+    </div>
+  );
 };
 
 export default CreditManager;

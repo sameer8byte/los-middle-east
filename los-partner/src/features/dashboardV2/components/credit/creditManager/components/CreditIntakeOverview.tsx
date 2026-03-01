@@ -50,7 +50,7 @@ export const CreditIntakeOverview: React.FC<Props> = ({ data }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="cursor-pointer bg-[#F5F5F5] px-6 h-12 flex items-center justify-between border-b border-gray-100"
       >
-        <h2 className="text-sm font-semibold text-gray-900">
+        <h2 className="text-[14px] font-semibold text-gray-800">
           Credit Intake Data (Across Employee)
         </h2>
 

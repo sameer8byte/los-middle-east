@@ -37,7 +37,7 @@ const DetailsCard = ({
     className?: string;
 }) => {
     return (
-        <div className={`p-3 lg:p-4 relative border border-[#fafafa] rounded-lg ${className}`}>
+        <div className={`p-3 lg:p-4 relative border border-[#fafafa] rounded-lg ${className} shadow-sm`}>
             <div className="absolute left-1.5 top-0 w-1 h-8 lg:h-10 mt-4 lg:mt-6 rounded" style={{ backgroundColor: borderColor }}></div>
             <div className="text-lg lg:text-xl font-bold text-gray-900">{amount}</div>
             <div className="text-xs lg:text-sm mt-1.5 lg:mt-2 font-light text-gray-500">{title}</div>

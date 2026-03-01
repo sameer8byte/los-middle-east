@@ -132,7 +132,6 @@ const Sidebar = memo(
         "pre-collection": "Pre - Collection",
         "post-collection": "Post - Collection",
         completed: "Completed Loans",
-        reminders: "Reminders",
       };
 
       const sections = [
@@ -143,10 +142,7 @@ const Sidebar = memo(
               ? [
                   {
                     path: "dashboard-v1",
-                    label: getPathLabel(
-                      "dashboard",
-                      defaultLabels["dashboard"],
-                    ),
+                    label: getPathLabel("dashboard", defaultLabels["dashboard"]),
                     icon: <RxDashboard />,
                     permission: [
                       PartnerUserPermissionEnum.ALL,
@@ -159,10 +155,7 @@ const Sidebar = memo(
               ? [
                   {
                     path: "dashboard-v2",
-                    label: getPathLabel(
-                      "dashboard",
-                      defaultLabels["dashboard"],
-                    ),
+                    label: getPathLabel("dashboard", defaultLabels["dashboard"]),
                     icon: <RxDashboard />,
                     permission: [
                       PartnerUserPermissionEnum.ALL,
@@ -379,7 +372,7 @@ const Sidebar = memo(
                   },
                 ]
               : []),
-            // Add V2 collection routes if enabled
+            // Add V2 collection routes if enabled 
             ...(isLoanCollectionV2
               ? [
                   {
@@ -467,15 +460,6 @@ const Sidebar = memo(
                 PartnerUserPermissionEnum.MARKETING_REPORT,
                 PartnerUserPermissionEnum.PROCESS_DISBURSEMENT_TRANSACTION_REPORT,
                 PartnerUserPermissionEnum.FIELD_VISIT_REPORT,
-              ],
-            },
-            {
-              path: "reminders",
-              label: getPathLabel("reminders", defaultLabels["reminders"]),
-              icon: <HiOutlineDocumentChartBar />,
-              permission: [
-                PartnerUserPermissionEnum.ALL,
-                PartnerUserPermissionEnum.USER_REMINDERS,
               ],
             },
           ],
@@ -603,9 +587,7 @@ const Sidebar = memo(
                   : "w-12 h-12 justify-center",
               )}
             >
-              <div
-                className={cn("flex items-center flex-1", !isOpen && "hidden")}
-              >
+              <div className={cn("flex items-center flex-1", !isOpen && "hidden")}>
                 {logoUrl && (
                   <img
                     src={logoUrl}
@@ -687,10 +669,7 @@ const Sidebar = memo(
                     {/* Section Items */}
                     <div className="space-y-1">
                       {visibleItems.map((item: any) => (
-                        <div
-                          key={item.path || item.label}
-                          className="relative group"
-                        >
+                        <div key={item.path || item.label} className="relative group">
                           {item.subItems ? (
                             <>
                               <button

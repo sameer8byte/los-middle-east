@@ -304,123 +304,172 @@ export class AccountAggregatorService {
   /**
    * Store data received from webhook
    */
-  async storeDataSession(params: {
-    clientTransactionId: string;
-    fipId: string;
-    fipName?: string;
-    maskedAccountNumber?: string;
-    accRefNumber?: string;
-    dataType: string;
-    rawData: any;
-    pdfData?: string;
-    jsonData?: any;
-    xmlData?: string;
-    csvData?: string;
-    reportData?: string;
-  }) {
-    if (!params.clientTransactionId) {
-      throw new BadRequestException("clientTransactionId is required");
-    }
-    const consentRequest = await this.prisma.aa_consent_requests.findUnique({
-      where: { clientTransactionId: params.clientTransactionId },
-    });
-
-    if (!consentRequest) {
-      throw new BadRequestException(
-        `Consent request not found for clientTransactionId: ${params.clientTransactionId}`,
-      );
-    }
-
-    let aaPdfKey: string | undefined;
-    let aaReportKey: string | undefined;
-    let aaJsonGzKey: string | undefined;
-
-    try {
-      if (params.pdfData) {
-        const pdfBuffer = Buffer.from(params.pdfData, "base64");
-        aaPdfKey = await this.awsPrivateS3Service.uploadPrivatePdfToS3(
-          pdfBuffer,
-          consentRequest.brandId || "",
-          consentRequest.userId,
-          uuidv4(),
-          "ACCOUNT_AGGREGATOR",
-          `aa_pdf_${Date.now()}.pdf`,
-        );
-      }
-
-      if (params.reportData) {
-        const reportBuffer = Buffer.from(params.reportData, "base64");
-        aaReportKey = await this.awsPrivateS3Service.uploadPrivatePdfToS3(
-          reportBuffer,
-          consentRequest.brandId || "",
-          consentRequest.userId,
-          uuidv4(),
-          "ACCOUNT_AGGREGATOR",
-          `aa_report_${Date.now()}.xlsx`,
-        );
-      }
-
-      // Compress and upload complete response as JSON.GZ
-      try {
-        const gzipBuffer = await this.gzipAsync(
-          JSON.stringify(params.rawData),
-        );
-        const result = await this.awsPrivateS3Service.uploadPrivateDocument(
-          {
-            buffer: gzipBuffer,
-            originalname: `aa-data-${consentRequest.userId}-${Date.now()}.json.gz`,
-            mimetype: "application/gzip",
-            size: gzipBuffer.length,
-            fieldname: "file",
-            encoding: "7bit",
-            stream: null,
-            destination: "",
-            filename: `aa-data-${consentRequest.userId}-${Date.now()}.json.gz`,
-            path: "",
-          } as Express.Multer.File,
-          consentRequest.brandId || "",
-          consentRequest.userId,
-          uuidv4(),
-          "ACCOUNT_AGGREGATOR",
-        );
-        aaJsonGzKey = result.key;
-        this.logger.log(
-          `AA JSON.GZ uploaded for user ${consentRequest.userId}. Key: ${aaJsonGzKey}`,
-        );
-      } catch (err) {
-        this.logger.error(
-          `Failed to upload AA JSON.GZ for user ${consentRequest.userId}: ${err.message}`,
-        );
-      }
-    } catch (error) {
-      this.logger.error(`Failed to upload to S3: ${error.message}`);
-    }
-
-    return this.prisma.aa_data_sessions.create({
-      data: {
-        id: uuidv4(),
-        consentRequestId: consentRequest.id,
-        clientTransactionId: params.clientTransactionId,
-        fipId: params.fipId,
-        fipName: params.fipName,
-        maskedAccountNumber: params.maskedAccountNumber,
-        accRefNumber: params.accRefNumber,
-        dataType: params.dataType,
-        rawData: params.rawData,
-        pdfData: params.pdfData,
-        aa_pdf_key: aaPdfKey,
-        jsonData: params.jsonData,
-        xmlData: params.xmlData,
-        csvData: params.csvData,
-        reportData: params.reportData,
-        aa_report_key: aaReportKey,
-        aa_json_gz_key: aaJsonGzKey,
-        status: "RECEIVED",
-        updatedAt: new Date(),
-        receivedAt: new Date(),
-      },
-    });
+async storeDataSession(params: {
+  clientTransactionId: string;
+  fipId: string;
+  fipName?: string;
+  maskedAccountNumber?: string;
+  accRefNumber?: string;
+  dataType: string;
+  rawData: any;
+  pdfData?: string;
+  jsonData?: any;
+  xmlData?: string;
+  csvData?: string;
+  reportData?: string;
+}) {
+  if (!params.clientTransactionId) {
+    throw new BadRequestException("clientTransactionId is required");
   }
+
+  const consentRequest = await this.prisma.aa_consent_requests.findUnique({
+    where: { clientTransactionId: params.clientTransactionId },
+  });
+
+  if (!consentRequest) {
+    throw new BadRequestException(
+      `Consent request not found for clientTransactionId: ${params.clientTransactionId}`,
+    );
+  }
+
+  const { userId, brandId } = consentRequest;
+  const brand = brandId || "";
+  const ts = Date.now();
+  const now = new Date();
+
+  // ── 1. Persist immediately with no file keys ───────────────────────────────
+
+  const sessionId = uuidv4();
+
+  const session = await this.prisma.aa_data_sessions.create({
+    data: {
+      id: sessionId,
+      consentRequestId: consentRequest.id,
+      clientTransactionId: params.clientTransactionId,
+      fipId: params.fipId,
+      fipName: params.fipName,
+      maskedAccountNumber: params.maskedAccountNumber,
+      accRefNumber: params.accRefNumber,
+      dataType: params.dataType,
+      rawData: params.rawData,
+      pdfData: params.pdfData,
+      jsonData: params.jsonData,
+      xmlData: params.xmlData,
+      csvData: params.csvData,
+      reportData: params.reportData,
+      aa_pdf_key: null,
+      aa_report_key: null,
+      aa_json_gz_key: null,
+      status: "RECEIVED",
+      updatedAt: now,
+      receivedAt: now,
+    },
+  });
+
+  // ── helpers ────────────────────────────────────────────────────────────────
+
+  const makeMulterFile = (
+    buffer: Buffer,
+    filename: string,
+    mimetype: string,
+  ): Express.Multer.File =>
+    ({
+      buffer,
+      originalname: filename,
+      filename,
+      mimetype,
+      size: buffer.length,
+      fieldname: "file",
+      encoding: "7bit",
+      stream: null,
+      destination: "",
+      path: "",
+    }) as Express.Multer.File;
+
+  // ── 2. Fire all uploads concurrently ──────────────────────────────────────
+
+  const [jsonGzResult, pdfResult, reportResult] = await Promise.allSettled([
+    // Raw data → JSON.GZ
+    (async () => {
+      const gzipBuffer = await this.gzipAsync(JSON.stringify(params.rawData));
+      const filename = `aa-data-${userId}-${ts}.json.gz`;
+      const { key } = await this.awsPrivateS3Service.uploadPrivateDocument(
+        makeMulterFile(gzipBuffer, filename, "application/gzip"),
+        brand,
+        userId,
+        uuidv4(),
+        "ACCOUNT_AGGREGATOR",
+      );
+      return key;
+    })(),
+
+    // PDF (conditional)
+    params.pdfData
+      ? this.awsPrivateS3Service.uploadPrivatePdfToS3(
+          Buffer.from(params.pdfData, "base64"),
+          brand,
+          userId,
+          uuidv4(),
+          "ACCOUNT_AGGREGATOR",
+          `aa_pdf_${ts}.pdf`,
+        )
+      : Promise.resolve(undefined),
+
+    // XLSX report (conditional)
+    params.reportData
+      ? (async () => {
+          const filename = `aa-report-${userId}-${ts}.xlsx`;
+          const { key } = await this.awsPrivateS3Service.uploadPrivateDocument(
+            makeMulterFile(
+              Buffer.from(params.reportData, "base64"),
+              filename,
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ),
+            brand,
+            userId,
+            uuidv4(),
+            "ACCOUNT_AGGREGATOR",
+          );
+          return key;
+        })()
+      : Promise.resolve(undefined),
+  ]);
+
+  // ── 3. Resolve keys / log results ─────────────────────────────────────────
+
+  const aaJsonGzKey =
+    jsonGzResult.status === "fulfilled"
+      ? (this.logger.log(`AA JSON.GZ uploaded for user ${userId}. Key: ${jsonGzResult.value}`),
+         jsonGzResult.value)
+      : (this.logger.error(`Failed to upload AA JSON.GZ for user ${userId}: ${jsonGzResult.reason?.message}`),
+         undefined);
+
+  const aaPdfKey =
+    pdfResult.status === "fulfilled"
+      ? pdfResult.value
+      : (this.logger.error(`Failed to upload AA PDF for user ${userId}: ${pdfResult.reason?.message}`),
+         undefined);
+
+  const aaReportKey =
+    reportResult.status === "fulfilled"
+      ? (reportResult.value &&
+           this.logger.log(`AA XLSX Report uploaded for user ${userId}. Key: ${reportResult.value}`),
+         reportResult.value)
+      : (this.logger.error(`Failed to upload AA Report for user ${userId}: ${reportResult.reason?.message}`),
+         undefined);
+
+  // ── 4. Update the record with the resolved file keys ──────────────────────
+
+  return this.prisma.aa_data_sessions.update({
+    where: { id: sessionId },
+    data: {
+      aa_json_gz_key: aaJsonGzKey,
+      aa_pdf_key: aaPdfKey,
+      aa_report_key: aaReportKey,
+      updatedAt: new Date(),
+    },
+  });
+}
 
   /**
    * Get consent request by ID

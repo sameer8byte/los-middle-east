@@ -20,6 +20,7 @@ interface LeadTableProps {
   data?: Lead[];
   loading?: boolean;
   error?: string | null;
+  onToggle?: (isOpen: boolean) => void;
 }
 
 const mockLeads: Lead[] = Array.from({ length: 10 }, (_, i) => ({
@@ -56,8 +57,9 @@ const getStatusBadge = (status?: Lead["status"]) => {
   );
 };
 
-const LeadTable = ({ data, loading, error }: LeadTableProps = {}) => {
+const LeadTable = ({ data, loading, error, onToggle }: LeadTableProps = {}) => {
   const leads = data ?? mockLeads;
+  const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [showDateFilter, setShowDateFilter] = useState(false);
@@ -103,6 +105,13 @@ const LeadTable = ({ data, loading, error }: LeadTableProps = {}) => {
     setCurrentPage(1);
   }, [activeTab]);
 
+  // Trigger API call when table is opened
+  useEffect(() => {
+    if (isOpen && onToggle) {
+      onToggle(true);
+    }
+  }, [isOpen]);
+
   return (
     <div className="bg-white rounded-lg border border-gray-200">
       {error && (
@@ -111,74 +120,88 @@ const LeadTable = ({ data, loading, error }: LeadTableProps = {}) => {
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Lead Table</h2>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between p-4 border-b border-gray-200 cursor-pointer transition-colors ${
+          isOpen ? 'bg-gray-50 hover:bg-gray-100' : 'bg-blue-50 hover:bg-blue-100'
+        }`}
+      >
+        <h2 className={`font-semibold text-gray-900 ${isOpen ? 'text-lg' : 'text-base'}`}>Lead Table</h2>
         <div className="flex items-center gap-2">
-          <div className="relative" ref={dateFilterRef}>
-            <button 
-              onClick={() => setShowDateFilter(!showDateFilter)}
-              className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
-            >
-              <FiCalendar className="w-4 h-4" />
-              Date Filter
-              <FiChevronDown className="w-4 h-4" />
-            </button>
-            
-            {showDateFilter && (
-              <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-4">
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">End Date</label>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      onClick={() => {
-                        setStartDate("");
-                        setEndDate("");
-                      }}
-                      className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50"
-                    >
-                      Clear
-                    </button>
-                    <button
-                      onClick={() => setShowDateFilter(false)}
-                      className="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Apply
-                    </button>
+          {isOpen && (
+            <div className="relative" ref={dateFilterRef}>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDateFilter(!showDateFilter);
+                }}
+                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
+              >
+                <FiCalendar className="w-4 h-4" />
+                Date Filter
+                <FiChevronDown className="w-4 h-4" />
+              </button>
+              
+              {showDateFilter && (
+                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-4">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">End Date</label>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={() => {
+                          setStartDate("");
+                          setEndDate("");
+                        }}
+                        className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                      >
+                        Clear
+                      </button>
+                      <button
+                        onClick={() => setShowDateFilter(false)}
+                        className="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                      >
+                        Apply
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
+          <FiChevronDown className={`w-5 h-5 transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
+
         </div>
       </div>
 
+      {isOpen && (
+        <>
       {/* Tabs */}
-      <div className="flex gap-1 px-4 pt-4 pb-2 border-b border-gray-200">
+      <div className="flex gap-2 px-4 pt-4 pb-4">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
+            className={`px-4 py-2 text-sm font-medium rounded transition-colors ${
               activeTab === tab
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             {tab}
@@ -264,6 +287,8 @@ const LeadTable = ({ data, loading, error }: LeadTableProps = {}) => {
           </button>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

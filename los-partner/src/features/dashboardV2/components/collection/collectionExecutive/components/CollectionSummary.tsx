@@ -26,7 +26,7 @@ const SummaryCard = ({
 }: SummaryCardProps) => (
   <div 
     className="bg-white flex flex-col justify-between relative overflow-hidden"
-    style={{ width: '250px', height: '153px', padding: '16px', borderRadius: '8px', border: '1px solid #E5E7EB' }}
+    style={{ height: '153px', padding: '16px', borderRadius: '8px', border: '1px solid #E5E7EB' }}
   >
     {/* Left Border - Half Height */}
     <div 
@@ -41,24 +41,24 @@ const SummaryCard = ({
     />
     
     <div>
-      <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-3xl font-bold text-gray-900">{amount}</span>
-        {percentage && <span className="text-red-500 text-sm font-semibold">{percentage}</span>}
+      <div className="flex items-baseline gap-2 mb-1 min-w-0">
+        <span className="text-2xl font-bold text-gray-900 break-words">{amount}</span>
+        {percentage && <span className="text-red-500 text-sm font-semibold flex-shrink-0">{percentage}</span>}
       </div>
-      <p className="text-sm text-gray-600">{title}</p>
+      <p className="text-xs text-gray-600 leading-tight">{title}</p>
     </div>
     
     {/* Dashed Divider */}
     <div className="border-t border-dashed border-gray-300"></div>
     
     <div className="flex justify-between text-sm">
-      <div>
+      <div className="min-w-0">
         <p className="text-gray-600">Fresh : <span className="font-semibold text-gray-900">{fresh}</span></p>
-        <p className="text-gray-900 font-semibold">{freshAmount}</p>
+        <p className="text-gray-900 font-semibold break-words">{freshAmount}</p>
       </div>
-      <div className="text-right">
+      <div className="text-right min-w-0">
         <p className="text-gray-600">Repeat : <span className="font-semibold text-gray-900">{repeat}</span></p>
-        <p className="text-gray-900 font-semibold">{repeatAmount}</p>
+        <p className="text-gray-900 font-semibold break-words">{repeatAmount}</p>
       </div>
     </div>
   </div>
@@ -118,8 +118,8 @@ export const CollectionSummary = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '828px', borderRadius: '20px' }}
+      className="bg-white border border-[#F5F5F5] w-full"
+      style={{ borderRadius: '20px' }}
     >
       {/* Header */}
       <div 
@@ -138,19 +138,7 @@ export const CollectionSummary = () => {
       </div>
       
       {/* Cards Container */}
-      <div 
-        className="flex"
-        style={{ 
-          width: '100%',
-          height: '193px',
-          paddingTop: '20px',
-          paddingRight: '15px',
-          paddingBottom: '20px',
-          paddingLeft: '15px',
-          gap: '20px',
-          justifyContent: 'space-between'
-        }}
-      >
+      <div className="grid grid-cols-3 gap-2 p-2">
         {summaryData.map((item, index) => (
           <SummaryCard key={index} {...item} />
         ))}

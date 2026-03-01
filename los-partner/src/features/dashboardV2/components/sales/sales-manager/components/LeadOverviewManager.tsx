@@ -34,7 +34,7 @@ const LeadOverviewManager = ({ data, loading, error }: LeadOverviewManagerProps 
                         icon={<LuClipboardList className="w-6 h-6" />}
                         leadNumber={data?.totalAllotted ?? 1500}
                         title="Total Allotted Leads"
-                        color="#DBEAFE"
+                        color="#2563EB"
                         borderColor="#3B82F6"
                         statusObj={[
                             { label: "Fresh", count: 930, percentage: 62 },

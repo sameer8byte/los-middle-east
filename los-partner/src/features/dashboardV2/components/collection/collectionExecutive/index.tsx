@@ -10,53 +10,59 @@ export const CollectionExecutiveDashboard = () => {
   const [endDate, setEndDate] = useState("");
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Main Layout */}
-      <div className="flex gap-4" style={{ width: '1396px' }}>
-        {/* Left Section */}
-        <div className="flex-1" style={{ width: '828px' }}>
-          {/* Dashboard Header with Filters */}
-          <div className="mb-4" style={{ height: '57px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-sm text-gray-500">Overview of Collection</p>
+    <div className="min-h-screen bg-gray-50 p-2">
+      <div className="w-full mx-auto @container">
+        {/* Main Layout */}
+        <div className="flex gap-2">
+          {/* Left Section */}
+          <div className="flex-1 min-w-0">
+            {/* Dashboard Header with Filters */}
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="flex-shrink-0">
+                <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-xs text-gray-500">Overview of Collection</p>
+              </div>
+              
+              {/* Date Filters */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center gap-1">
+                  <label className="text-xs text-gray-600 whitespace-nowrap">Start:</label>
+                  <input 
+                    type="date" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="border border-gray-300 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 w-28"
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  <label className="text-xs text-gray-600 whitespace-nowrap">End:</label>
+                  <input 
+                    type="date" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="border border-gray-300 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 w-28"
+                  />
+                </div>
+              </div>
             </div>
-            
-            {/* Date Filters */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Start Date:</label>
-                <input 
-                  type="date" 
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">End Date:</label>
-                <input 
-                  type="date" 
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+
+            {/* Content Sections */}
+            <div className="flex flex-col gap-3">
+              <CollectionOverview />
+              <CollectionSummary />
+              <Application />
             </div>
           </div>
 
-          {/* Content Sections */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <CollectionOverview />
-            <CollectionSummary />
-            <Application />
-            <PerformanceSummary />
+          {/* Right Section - Performance Score */}
+          <div className="w-[420px] flex-shrink-0">
+            <PerformanceScore />
           </div>
         </div>
 
-        {/* Right Section - Performance Score */}
-        <div style={{ width: '544px' }}>
-          <PerformanceScore />
+        {/* Performance Summary - Full Width */}
+        <div className="mt-3">
+          <PerformanceSummary />
         </div>
       </div>
     </div>

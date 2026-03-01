@@ -402,13 +402,13 @@ export class UsersService {
         details,
         brandConfig,
       );
-      console.log("Validation DTO:", validationDto);
+      // console.log("Validation DTO:", validationDto);
       // Run validation
       const validationResult = await this.brandRulesValidationService.validate(
         brandId,
         validationDto,
       );
-      console.log("Validation Result:", validationResult);
+      // console.log("Validation Result:", validationResult);
       // Determine which blocklist parameters to check based on available data
       const blocklistParamNames: string[] = [];
       if (panDoc?.documentNumber) blocklistParamNames.push("PAN Card");
@@ -418,14 +418,14 @@ export class UsersService {
         blocklistParamNames.push("Monthly Salary / Turnover");
       if (details?.dateOfBirth) blocklistParamNames.push("Age");
       if (user.occupation_type_id) blocklistParamNames.push("profession"); // profession is always checked if available
-      console.log("Blocklist Parameters to Check:", blocklistParamNames);
+      // console.log("Blocklist Parameters to Check:", blocklistParamNames);
       // Filter only for blocklist failures on available data
       const blocklistFailures = validationResult.results.filter(
         (result) =>
           result.status === "FAIL" &&
           blocklistParamNames.some((param) => result.paramName.includes(param)),
       );
-      console.log("Blocklist Failures:", blocklistFailures);
+      // console.log("Blocklist Failures:", blocklistFailures);
 
       if (blocklistFailures.length > 0) {
         const rejectionReasonIds = blocklistFailures
@@ -492,9 +492,9 @@ export class UsersService {
     userId: string,
     rejectionReasonIds: string[] = [],
   ): Promise<void> {
-    console.log(
-      `Blocking user ${userId} for reasons: ${rejectionReasonIds.join(", ")}`,
-    );
+    // console.log(
+    //   `Blocking user ${userId} for reasons: ${rejectionReasonIds.join(", ")}`,
+    // );
     await this.prisma.user.update({
       where: { id: userId },
       data: { status_id: UserStatusEnum.BLOCKED },

@@ -36,30 +36,27 @@ const StatCard = ({
   return (
     <div 
       className={`${bgColor} ${borderColor} border flex flex-col justify-between`}
-      style={{ width: '185px', height: '155px', padding: '12px', borderRadius: '8px' }}
+      style={{ height: '155px', padding: '12px', borderRadius: '8px' }}
     >
       {/* Top Section */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2">
-          <div style={{ width: '32px', height: '32px' }}>
+        <div className="flex items-center gap-2 min-w-0">
+          <div style={{ width: '32px', height: '32px', flexShrink: 0 }}>
             {icon}
           </div>
-          <p className={`text-2xl font-bold ${isBlueCard ? 'text-white' : 'text-gray-900'}`}>{value}</p>
+          <p className={`text-xl font-bold ${isBlueCard ? 'text-white' : 'text-gray-900'} break-words`}>{value}</p>
         </div>
         {!isBlueCard && (
-          <div className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+          <div className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded flex-shrink-0">
             {percentage}
           </div>
         )}
       </div>
       
       {/* Title */}
-      <p style={{ 
-        fontFamily: 'Open Sans', 
-        fontWeight: 400, 
-        fontSize: '13px', 
-        lineHeight: '16px',
-        color: isBlueCard ? '#FFFFFF' : '#000000'
+      <p className="text-sm leading-tight text-gray-600" style={{ 
+        fontWeight: 400,
+        color: isBlueCard ? '#FFFFFF' : '#6B7280'
       }}>
         {title}
       </p>
@@ -68,12 +65,12 @@ const StatCard = ({
       <div className={`border-t border-dashed ${isBlueCard ? 'border-white/30' : 'border-gray-300'}`}></div>
       
       {/* Bottom Stats */}
-      <div className="flex justify-between" style={{ fontSize: '13px', lineHeight: '16px', fontFamily: 'Open Sans' }}>
-        <div>
+      <div className="flex justify-between text-xs">
+        <div className="min-w-0">
           <p className={isBlueCard ? 'text-white/80' : 'text-gray-600'}>Fresh : <span className={`font-semibold ${isBlueCard ? 'text-white' : 'text-gray-900'}`}>{fresh}</span></p>
           <p className={`font-semibold ${isBlueCard ? 'text-white' : 'text-gray-900'}`}>{freshPercent}%</p>
         </div>
-        <div className="text-right">
+        <div className="text-right min-w-0">
           <p className={isBlueCard ? 'text-white/80' : 'text-gray-600'}>Repeat : <span className={`font-semibold ${isBlueCard ? 'text-white' : 'text-gray-900'}`}>{repeat}</span></p>
           <p className={`font-semibold ${isBlueCard ? 'text-white' : 'text-gray-900'}`}>{repeatPercent}%</p>
         </div>
@@ -156,8 +153,8 @@ export const CollectionOverview = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '828px', height: '243px', borderRadius: '20px', gap: '10px' }}
+      className="bg-white border border-[#F5F5F5] w-full"
+      style={{ borderRadius: '20px', gap: '10px' }}
     >
       {/* Header */}
       <div 
@@ -176,15 +173,7 @@ export const CollectionOverview = () => {
       </div>
       
       {/* Cards Container */}
-      <div 
-        className="flex"
-        style={{ 
-          width: '100%',
-          padding: '15px',
-          gap: '20px',
-          justifyContent: 'space-between'
-        }}
-      >
+      <div className="grid grid-cols-4 gap-2 p-2">
         {stats.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}

@@ -46,7 +46,15 @@ import { PaymentApprovedPage } from "./pages/loanOps/paymentApproved";
 import UnAllocatedLoansPage from "./pages/loans/unallocatedLoans";
 import RemindersPage from "./pages/reminders/RemindersPage";
 import { useVersionGuard } from "./hooks/useVersionGuard";
-import { DashboardV2Page } from "./pages/dashboard/dashboard-v2";
+// import { DashboardV2Page } from "./pages/dashboard/dashboard-v2";
+import { DomainHeadPage } from "./pages/dashboard/domain-head";
+import { CollectionManagerDashboard } from "./features/dashboardV2/components/collection/collectionManager";
+import { CollectionExecutiveDashboard } from "./features/dashboardV2/components/collection/collectionExecutive";
+import CreditExecutiveDashboard from "./features/dashboardV2/components/credit/creditExecutive/page";
+import CreditManagerDashboard from "./features/dashboardV2/components/credit/creditManager/page";
+import SalesManagerDashboard from "./features/dashboardV2/components/sales/sales-manager";
+import SalesExecutiveDashboard from "./features/dashboardV2/components/sales/sales-executive";
+
 // Component to protect routes for super_admin only
 const SuperAdminRoute = ({ children }: { children: JSX.Element }) => {
   const userRoles = useAppSelector((state) => state.auth.data?.role) || [];
@@ -217,19 +225,28 @@ export default function InternalPages() {
             </AdminOrPermissionRoute>
           ),
         },
-        // {
-        //   path: ":brandId/collection-executive-dashboard",
-        //   element: (
-        //     <AdminOrPermissionRoute>
-        //       <CollectionExecutiveDashboard />
-        //     </AdminOrPermissionRoute>
-        //   ),
-        // },
+        {
+          path: ":brandId/collection-executive-dashboard",
+          element: (
+            <AdminOrPermissionRoute>
+              <CollectionExecutiveDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
+        {
+          path: ":brandId/collection-manager-dashboard",
+          element: (
+            <AdminOrPermissionRoute>
+              <CollectionManagerDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
         {
           path: ":brandId/dashboard-v1",
           element: (
             <AdminOrPermissionRoute>
-              <DashboardPage />
+              {/* <DashboardPage /> */}
+              <DomainHeadPage />
             </AdminOrPermissionRoute>
           ),
         },
@@ -237,7 +254,8 @@ export default function InternalPages() {
           path: ":brandId/dashboard-v2",
           element: (
             <AdminOrPermissionRoute>
-              <DashboardV2Page />
+              {/* <DashboardV2Page /> */}
+              <DomainHeadPage />
             </AdminOrPermissionRoute>
           ),
         },
@@ -474,6 +492,63 @@ export default function InternalPages() {
             </AdminOrPermissionRoute>
           ),
         },
+        // {
+        //   path: ":brandId/domain-head",
+        //   element: (
+        //     <AdminOrPermissionRoute>
+        //       <DomainHeadPage />
+        //     </AdminOrPermissionRoute>
+        //   ),
+        // },
+        {
+          path: ":brandId/collection-manager",
+          element: (
+            <AdminOrPermissionRoute>
+              <CollectionManagerDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
+        {
+          path: ":brandId/collection-executive",
+          element: (
+            <AdminOrPermissionRoute>
+              <CollectionExecutiveDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
+        {
+          path: ":brandId/credit-executiveV2",
+          element: (
+            <AdminOrPermissionRoute>
+              <CreditExecutiveDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
+        {
+          path: ":brandId/credit-manager",
+          element: (
+            <AdminOrPermissionRoute>
+              <CreditManagerDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
+        {
+          path: ":brandId/sales-manager",
+          element: (
+            <AdminOrPermissionRoute>
+              <SalesManagerDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        },
+        {
+          path: ":brandId/sales-executive",
+          element: (
+            <AdminOrPermissionRoute>
+              <SalesExecutiveDashboard />
+            </AdminOrPermissionRoute>
+          ),
+        }
+
       ],
     },
     { path: "*", element: <Navigate to="/" /> },

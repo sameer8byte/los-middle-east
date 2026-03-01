@@ -20,6 +20,21 @@ interface ColouredBoxProps {
   subtitle?: string;
 }
 
+// Helper function to determine if a color is dark
+const isDarkColor = (hexColor: string): boolean => {
+  try {
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    // Calculate luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance < 0.5;
+  } catch {
+    return false;
+  }
+};
+
 const ColouredBox = ({
   icon,
   leadNumber = 0,
@@ -35,9 +50,13 @@ const ColouredBox = ({
   loading = false,
   subtitle,
 }: ColouredBoxProps) => {
+  const textColor = isDarkColor(color) ? 'text-white' : 'text-black';
+  const borderDashColor = isDarkColor(color) ? 'border-white' : 'border-black';
+  const spinnerBorderColor = isDarkColor(color) ? 'border-b-2 border-white' : 'border-b-2 border-black';
+  
   return (
     <div
-      className={`rounded-xl p-3 lg:p-4 text-black min-w-0 flex-1 ${onClick ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''} ${className}`}
+      className={`rounded-xl p-3 lg:p-4 ${textColor} min-w-0 flex-1 ${onClick ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''} ${className}`}
       style={{
         backgroundColor: color,
         border: borderColor ? `2px solid ${borderColor}` : "none",
@@ -46,7 +65,7 @@ const ColouredBox = ({
     >
       {loading ? (
         <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+          <div className={`animate-spin rounded-full h-8 w-8 ${spinnerBorderColor}`}></div>
         </div>
       ) : (
         <>
@@ -75,7 +94,7 @@ const ColouredBox = ({
               </div>
             </div>
           </div>
-          <div className="border-t border-black border-dashed mb-3"></div>
+          <div className={`border-t ${borderDashColor} border-dashed mb-3`}></div>
           <div className="flex gap-2 lg:gap-3 text-[11px] lg:text-xs">
             {statusObj.map((status) => (
               <div key={status.label} className="flex justify-between gap-2 flex-1 min-w-0">

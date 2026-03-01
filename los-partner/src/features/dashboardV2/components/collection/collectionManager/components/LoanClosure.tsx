@@ -11,9 +11,9 @@ interface SmallCardProps {
 const SmallCard = ({ value, label }: SmallCardProps) => (
   <div 
     className="bg-[#F8FAFF] border border-[#F1F3F7]"
-    style={{ width: '149px', height: '68px', borderRadius: '12px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+    style={{ height: '83px', borderRadius: '12px', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minWidth: '110px' }}
   >
-    <span className="text-2xl font-bold text-gray-900">{value}</span>
+    <span className="text-xl font-bold text-gray-900">{value}</span>
     <span className="text-xs text-gray-600">{label}</span>
   </div>
 );
@@ -27,7 +27,7 @@ interface ClosureCardProps {
 const ClosureCard = ({ amount, title, borderColor }: ClosureCardProps) => (
   <div 
     className="bg-white border border-[#F3F4F6] relative overflow-hidden"
-    style={{ width: '250px', height: '79px', borderRadius: '12px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '16px' }}
+    style={{ height: '77px', borderRadius: '12px', padding: '10px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, minWidth: '180px' }}
   >
     <div 
       style={{ 
@@ -40,7 +40,7 @@ const ClosureCard = ({ amount, title, borderColor }: ClosureCardProps) => (
       }}
     />
     <div>
-      <div className="text-xl font-bold text-gray-900">{amount}</div>
+      <div className="text-lg font-bold text-gray-900">{amount}</div>
       <p className="text-xs text-gray-600">{title}</p>
     </div>
   </div>
@@ -88,8 +88,8 @@ export const LoanClosure = () => {
 
   return (
     <div 
-      className="bg-white border border-[#F5F5F5]"
-      style={{ width: '834px', height: '370px', borderRadius: '20px' }}
+      className="bg-white border border-[#F5F5F5] w-full"
+      style={{ borderRadius: '20px' }}
     >
       {/* Header */}
       <div 
@@ -108,9 +108,9 @@ export const LoanClosure = () => {
       </div>
       
       {/* Content */}
-      <div style={{ padding: '20px 15px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ padding: '16px 15px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {/* Small Cards Row */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           {smallCards.map((card, index) => (
             <SmallCard key={index} {...card} />
           ))}
@@ -123,20 +123,20 @@ export const LoanClosure = () => {
           </div>
           
           {/* Progress Bar */}
-          <div className="w-full bg-gray-200 h-8 overflow-hidden mb-2" style={{ borderRadius: '4px' }}>
+          <div className="w-full bg-gray-200 h-6 overflow-hidden mb-2" style={{ borderRadius: '4px' }}>
             <div className="h-full bg-blue-500" style={{ width: '40%' }}></div>
           </div>
         </div>
 
         {/* Percentage Bar */}
-        <div className="flex" style={{ width: '798px', height: '24px', borderRadius: '4px', overflow: 'hidden' }}>
+        <div className="flex w-full h-6 rounded overflow-hidden">
           <div className="bg-purple-200 flex items-center justify-center text-xs font-semibold" style={{ width: '28%' }}>28%</div>
           <div className="bg-green-200 flex items-center justify-center text-xs font-semibold" style={{ width: '47%' }}>47%</div>
           <div className="bg-red-200 flex items-center justify-center text-xs font-semibold" style={{ width: '25%' }}>25%</div>
         </div>
 
         {/* Closure Cards */}
-        <div className="flex" style={{ width: '798px', gap: '24px' }}>
+        <div className="flex gap-6 flex-wrap">
           {closureCards.map((item, index) => (
             <ClosureCard key={index} {...item} />
           ))}
