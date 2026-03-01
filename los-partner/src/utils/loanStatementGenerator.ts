@@ -286,7 +286,7 @@ export const generateLoanStatement = async (
     yPos -= 20;
 
     const summaryData = [
-      ["Sanction date", formatDate(data.loanSummary.sanctionDate), "Loan Type", "Short Term Loan"],
+      ["Sanction date", formatDate(data.loanSummary.sanctionDate), "Loan Type", "Short Term Facility"],
       ["Sanction loan amount", data.loanSummary.sanctionLoanAmount.toLocaleString(), "Current rate of interest", String(data.loanSummary.currentRateOfInterest || "0")],
       ["Disbursed Amount", data.loanSummary.disbursedAmount.toLocaleString(), "Balance loan tenure", `${data.loanSummary.balanceLoanTenureDays} Days`],
       ["Current instalment", data.loanSummary.currentInstallmentAmount.toLocaleString(), "Sanction loan tenure", `${data.loanSummary.sanctionLoanTenureDays} Days`],

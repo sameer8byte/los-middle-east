@@ -2317,7 +2317,7 @@ export function NonGetwayPayment({
 
                           {isRazorpayAutopay && (
                             <div className="text-xs text-blue-700 bg-blue-50 p-2 rounded -mt-2">
-                              Razorpay Autopay initiates recurring UPI.
+                              Razorpay Autopay initiates recurring BENEFIT Pay.
                               Processed 48 hours before due.
                             </div>
                           )}

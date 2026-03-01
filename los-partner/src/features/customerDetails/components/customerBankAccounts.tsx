@@ -287,9 +287,9 @@ export function CustomerBankAccounts() {
   };
 
   const validateIFSC = (ifsc: string): string | undefined => {
-    if (!ifsc) return "IFSC code is required";
+    if (!ifsc) return "IBAN code is required";
     if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc.toUpperCase()))
-      return "Invalid IFSC code format";
+      return "Invalid IBAN code format";
     return undefined;
   };
 
@@ -321,10 +321,10 @@ export function CustomerBankAccounts() {
         }));
         showSuccess("Bank details fetched successfully!");
       } else {
-        showError("Unable to fetch bank details for this IFSC code");
+        showError("Unable to fetch bank details for this IBAN code");
       }
     } catch (error) {
-      console.error("Error fetching IFSC details:", error);
+      console.error("Error fetching IBAN details:", error);
       showError("Failed to fetch bank details");
     } finally {
       setFetchingIfsc(false);
@@ -396,7 +396,7 @@ export function CustomerBankAccounts() {
 
     // Check if bank name is filled (from IFSC lookup)
     if (!form.bankName) {
-      showError("Please enter a valid IFSC code to fetch bank details");
+      showError("Please enter a valid IBAN code to fetch bank details");
       return;
     }
 
@@ -430,7 +430,7 @@ export function CustomerBankAccounts() {
 
     // Check if bank name is filled (from IFSC lookup)
     if (!form.bankName) {
-      showError("Please enter a valid IFSC code to fetch bank details");
+      showError("Please enter a valid IBAN code to fetch bank details");
       return;
     }
 
@@ -828,7 +828,7 @@ export function CustomerBankAccounts() {
                 </div>
                 <div>
                   <p className="text-xs text-[var(--color-on-surface)] opacity-50 mb-0.5">
-                    IFSC CODE
+                    IBAN CODE
                   </p>
                   <p className="text-sm font-medium text-[var(--color-on-surface)] font-mono">
                     {account.ifscCode}
@@ -1977,7 +1977,7 @@ export function CustomerBankAccounts() {
                 htmlFor="add-ifscCode"
                 className="block text-sm font-medium text-[var(--color-on-surface)] mb-1"
               >
-                IFSC CODE <span className="text-red-500">*</span>
+                IBAN CODE <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -2055,7 +2055,7 @@ export function CustomerBankAccounts() {
                     ? "border-red-500"
                     : "border-[var(--color-muted)]"
                 }`}
-                placeholder="Auto-filled from IFSC or enter manually"
+                placeholder="Auto-filled from IBAN or enter manually"
                 readOnly={!!form.bankName}
               />
               {fieldErrors.bankName && touched.bankName && (
@@ -2065,7 +2065,7 @@ export function CustomerBankAccounts() {
               )}
               {form.bankName && (
                 <p className="mt-1 text-xs text-blue-600">
-                  Auto-filled from IFSC lookup
+                  Auto-filled from IBAN lookup
                 </p>
               )}
             </div>
@@ -2306,7 +2306,7 @@ export function CustomerBankAccounts() {
                   />
                 </svg>
                 <p className="text-sm text-amber-800">
-                  This is a verified account. Only IFSC Code and Account Holder
+                  This is a verified account. Only IBAN Code and Account Holder
                   Name can be edited.
                 </p>
               </div>
@@ -2382,7 +2382,7 @@ export function CustomerBankAccounts() {
                 htmlFor="edit-ifscCode"
                 className="block text-sm font-medium text-[var(--color-on-surface)] mb-1"
               >
-                IFSC Code <span className="text-red-500">*</span>
+                IBAN Code <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -2465,7 +2465,7 @@ export function CustomerBankAccounts() {
                     ? "border-red-500"
                     : "border-[var(--color-muted)]"
                 }`}
-                placeholder="Auto-filled from IFSC or enter manually"
+                placeholder="Auto-filled from IBAN or enter manually"
                 readOnly={!!form.bankName}
               />
               {fieldErrors.bankName && touched.bankName && (
@@ -2475,7 +2475,7 @@ export function CustomerBankAccounts() {
               )}
               {form.bankName && (
                 <p className="mt-1 text-xs text-blue-600">
-                  Auto-filled from IFSC lookup
+                  Auto-filled from IBAN lookup
                 </p>
               )}
             </div>
