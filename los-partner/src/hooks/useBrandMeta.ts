@@ -7,8 +7,8 @@ export function useBrandMeta() {
     () => ({
       name: brand.name || "Payday loan",
       logoUrl: brand.logoUrl || "",
-      description: brand.brandDetails.description || "CMS-driven Personal Loan App",
-      title: brand.brandDetails.title || "PaydayLoan - Best Instant Personal Loan App | Apply Online Now",
+      description: brand.brandDetails.description || "CMS-driven Personal Finance App",
+      title: brand.brandDetails.title || "PaydayLoan - Best Instant Personal Finance App | Apply Online Now",
       themeColor: brand.brand_themes?.primaryColor || "#ffffff",
     }),
     [brand]

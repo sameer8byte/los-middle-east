@@ -369,7 +369,7 @@ export function BankDetailsSettings() {
                     </div>
                     <div className="flex items-center">
                       <svg
-                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns="http://www.w3.org/2000/svg" 
                         className="h-4 w-4 text-[var(--color-on-surface)] opacity-50 mr-2"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -383,7 +383,7 @@ export function BankDetailsSettings() {
                         />
                       </svg>
                       <span className="text-sm text-[var(--color-on-surface)] opacity-70">
-                        IFSC:{" "}
+                        IBAN:{" "}
                         <span className="font-medium text-[var(--color-on-background)]">
                           {account.ifscCode}
                         </span>
@@ -532,7 +532,7 @@ export function BankDetailsSettings() {
                   icon: "credit-card",
                 },
                 {
-                  label: "IFSC Code",
+                  label: "IBAN Code",
                   name: "ifscCode",
                   required: true,
                   icon: "shield-check",

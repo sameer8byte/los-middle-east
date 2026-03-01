@@ -3,7 +3,7 @@ import BusinessSnapshot from "./businessSnapshot";
 import TeamPerformance from "./TeamPerformance";
 import SalesDashboard from "./Sales";
 import CreditDashboard from "./Credit";
-import CollectionSnapshot from "./CollectionSnapshot";
+import CollectionSnapshot from "./collectionSnapshot";
 
 // Inline SVG icons (no external dependency needed)
 // const CalendarIcon = () => (
