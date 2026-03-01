@@ -174,7 +174,7 @@ const ProfitabilitySnapshot: React.FC<ProfitabilitySnapshotProps> = ({ data }) =
                     {/* Column 1 matches segment 1 width roughly, but we can just flex them out */}
                     <div style={{ width: `${currentData.breakdown.interestAmount.percentage}%` }} className="flex flex-col min-w-0 pr-1">
                         <span className="text-gray-900 font-bold text-[10px] 2xl:text-[12px] truncate">{currentData.breakdown.interestAmount.value}</span>
-                        <span className="text-gray-500 text-[9px] 2xl:text-[10px] truncate">Interest Amount</span>
+                        <span className="text-gray-500 text-[9px] 2xl:text-[10px] truncate">Murabaha margin Amount</span>
                     </div>
                     <div style={{ width: `${currentData.breakdown.processingFee.percentage}%` }} className="flex flex-col min-w-0 pr-1">
                         <span className="text-gray-900 font-bold text-[10px] 2xl:text-[12px] truncate">{currentData.breakdown.processingFee.value}</span>

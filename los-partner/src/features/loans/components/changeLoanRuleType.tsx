@@ -1056,7 +1056,7 @@ export function ChangeLoanRuleType({
                       
                       return (
                         <option key={rule.id} value={rule.ruleType}>
-                          {getRiskCategoryLabel(rule.ruleType)} | Processing Fees: {processingFee} | Interest: {interestRate}
+                          {getRiskCategoryLabel(rule.ruleType)} | Processing Fees: {processingFee} | Murabaha margin: {interestRate}
                         </option>
                       );
                     })}

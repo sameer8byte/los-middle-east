@@ -129,7 +129,7 @@ export function DigiLocker20LogsSetting() {
           DigiLocker 2.0 Logs
         </h2>
         <p className="text-[var(--color-on-surface)] opacity-70 mt-2">
-          View all Aadhaar DigiLocker verification request logs for debugging and monitoring.
+          View all CPR Card verification request logs for debugging and monitoring.
         </p>
       </div>
 

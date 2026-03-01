@@ -303,7 +303,7 @@ const ConversionPerformance: React.FC<Props> = ({ data }) => {
       'Age Criteria',
       'Collateral Insufficient',
       'Business Vintage',
-      'CIBIL < 650',
+      'BENEFIT Credit Bureau < 650',
       'FOIR > 50%'
     ];
     

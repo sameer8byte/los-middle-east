@@ -1306,7 +1306,7 @@ export function NonGetwayPayment({
                           formData.amount.interest > 0) && (
                           <div className="text-center">
                             <span className="text-[var(--color-on-surface)] opacity-60 block">
-                              Interest
+                              Murabaha margin
                             </span>
                             <span className="font-semibold">
                               ₹
@@ -2377,7 +2377,7 @@ export function NonGetwayPayment({
                                               .principalDueAtPayment,
                                         },
                                         {
-                                          label: "Interest",
+                                          label: "Murabaha margin",
                                           value:
                                             initialPartialPaymentSummary
                                               .paymentDetails
@@ -2661,7 +2661,7 @@ export function NonGetwayPayment({
                                   {/* Interest Discount */}
                                   <div>
                                     <label className="block text-xs font-medium text-[var(--color-on-surface)] opacity-80 mb-1">
-                                      Interest Disc.
+                                      Murabaha margin Disc.
                                       <span className="text-[10px] opacity-60 ml-1">
                                         (Max:{" "}
                                         {Math.min(
@@ -2783,7 +2783,7 @@ export function NonGetwayPayment({
                                 {/* Interest */}
                                 <div>
                                   <label className="block text-xs font-medium opacity-80 mb-1">
-                                    Interest
+                                    Murabaha margin
                                     {formData.amount.interest_discount > 0 && (
                                       <span className="ml-1 text-[10px] text-green-600">
                                         (-{formData.amount.interest_discount})
