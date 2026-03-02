@@ -14,6 +14,10 @@ import {
 import { FeeValueType, PenaltyType, TaxType } from "../../../constant/enum";
 import { toast } from "react-toastify";
 import axios from "axios";
+import {
+  getCustomerDetails,
+  getCustomerEmployment,
+} from "../../../shared/services/api/customer.api";
 type LoanDetails = {
   type: "PAYDAY_LOAN" | string;
   durationDays: number;
@@ -258,6 +262,8 @@ interface CamCalculatorProps {
     };
     userId?: string;
     id?: string;
+    loanType?: string;
+    isRepeatLoan?: boolean;
   };
   readonly brandId?: string;
   refresh: boolean;
@@ -711,33 +717,79 @@ export function CamCalculator({
   };
 
   const checkCreditRisk = async () => {
+    if (!loan?.userId || !brandId) {
+      toast.error("Missing user or brand information");
+      return;
+    }
+
     setLoadingCreditRisk(true);
     setCreditRiskError(null);
 
     try {
+      // Fetch user-details, employment, and CAM data in parallel
+      const [userDetails, employmentData, camData] = await Promise.all([
+        getCustomerDetails(loan.userId, brandId),
+        getCustomerEmployment(loan.userId, brandId),
+        getCAMCalculatorByUser(loan.userId, brandId),
+      ]);
+
+      // Extract fields from user-details
+      const creditScore: number = userDetails?.creditScore ?? 650;
+      const rawGender: string = userDetails?.gender ?? "MALE";
+      const state: string = userDetails?.state ?? "Lagos";
+
+      // Normalize gender: "MALE" → "Male", "FEMALE" → "Female"
+      const gender = rawGender.charAt(0).toUpperCase() + rawGender.slice(1).toLowerCase();
+
+      // Extract fields from employment
+      const rawEmploymentType: string = employmentData?.employmenttype ?? "FULL_TIME";
+      const joiningDate: string = employmentData?.joiningDate
+        ? new Date(employmentData.joiningDate).toISOString().split("T")[0]
+        : formData.salaryCreditDate1 || "2023-01-15";
+
+      // Normalize employmenttype: "FULL_TIME" → "Salaried", "SELF_EMPLOYED" → "Self-Employed"
+      const employmentTypeMap: Record<string, string> = {
+        FULL_TIME: "Salaried",
+        SELF_EMPLOYED: "Self-Employed",
+        PART_TIME: "Part-Time",
+        CONTRACTUAL: "Contractual",
+      };
+      const employmenttype = employmentTypeMap[rawEmploymentType.toUpperCase()] ?? rawEmploymentType;
+
+      // Get actualSalary from CAM data (most recent entry) or fall back to employment salary
+      const latestCam = Array.isArray(camData?.data) && camData.data.length > 0
+        ? camData.data[0]
+        : null;
+      const salary: number =
+        latestCam?.actualSalary ??
+        employmentData?.salary ??
+        (formData.actualSalary ? parseNum(formData.actualSalary) : 800);
+
       const payload = {
-        salary: formData.actualSalary ? parseNum(formData.actualSalary) : 800,
-        creditScore: 650,
+        salary,
+        creditScore,
         loan_applied_amount: formData.loanRecommended ? parseNum(formData.loanRecommended) : 1000,
-        "Loan.tenure": formData.tenureId ? tenures.find(t => t.id === formData.tenureId)?.minTermDays || 90 : 90,
-        gender: "Male",
-        employmenttype: "Self-Employed",
-        loanType: "Personal",
-        state: "Lagos",
-        verificationStatus: "Verified",
+        "Loan.tenure": formData.tenureId
+          ? tenures.find((t) => t.id === formData.tenureId)?.minTermDays ?? 90
+          : 90,
+        gender,
+        employmenttype,
+        loanType: loan?.loanType ?? "Personal",
+        state,
+        verificationStatus: userDetails?.userDataStatus === "VERIFIED" ? "Verified" : "Unverified",
         accountExists: true,
-        is_repeat_loan: false,
-        joiningDate: formData.salaryCreditDate1 || "2023-01-15",
+        is_repeat_loan: loan?.isRepeatLoan ?? false,
+        joiningDate,
       };
 
       console.log("Credit Risk API Payload:", payload);
 
       const response = await axios({
-        method: 'POST',
-        url: '/api/credit_risk',
+        method: "POST",
+        url: "/api/credit_risk",
         data: payload,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -747,7 +799,11 @@ export function CamCalculator({
     } catch (error: any) {
       console.error("Credit Risk API Error:", error);
       console.error("Error Response:", error?.response?.data);
-      const errorMsg = error?.response?.data?.message || error?.response?.data?.error || error?.message || "Failed to assess credit risk";
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to assess credit risk";
       setCreditRiskError(errorMsg);
       toast.error(errorMsg);
     } finally {
