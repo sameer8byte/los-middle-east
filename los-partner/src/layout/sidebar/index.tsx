@@ -591,7 +591,7 @@ const Sidebar = memo(
                 {logoUrl && (
                   <img
                     // src={logoUrl}
-                    src="https://8byte-middle-east-logo.s3.ap-south-1.amazonaws.com/test.webp" 
+                    src="https://8byte-middle-east-logo.s3.ap-south-1.amazonaws.com/Stc_pay.svg.png" 
                     alt="Stc Pay Loan Logo"
                     className="w-[112px] h-[62px] object-contain"
                   />
