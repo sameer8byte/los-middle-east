@@ -2557,7 +2557,7 @@ const CirProV2ReportDisplay = ({
                               className="hover:bg-[var(--color-success)] hover:bg-opacity-5"
                             >
                               <td className="px-2 py-2">
-                                {account["ACCT-TYPE"] || "N/A"}
+                                {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                               </td>
                               <td className="px-2 py-2">
                                 {account["SECURITY-STATUS"] || "N/A"}
@@ -2773,7 +2773,7 @@ const CirProV2ReportDisplay = ({
                               className="hover:bg-[var(--color-muted)] hover:bg-opacity-5"
                             >
                               <td className="px-2 py-2">
-                                {account["ACCT-TYPE"] || "N/A"}
+                                {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                               </td>
                               <td className="px-2 py-2">
                                 {account["SECURITY-STATUS"] || "N/A"}
@@ -2999,7 +2999,7 @@ const CirProV2ReportDisplay = ({
                               className="hover:bg-[var(--color-error)] hover:bg-opacity-5"
                             >
                               <td className="px-2 py-2">
-                                {account["ACCT-TYPE"] || "N/A"}
+                                {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                               </td>
                               <td className="px-2 py-2">
                                 {account["SECURITY-STATUS"] || "N/A"}
@@ -3223,7 +3223,7 @@ const CirProV2ReportDisplay = ({
                               className="hover:bg-[var(--color-warning)] hover:bg-opacity-5"
                             >
                               <td className="px-2 py-2">
-                                {account["ACCT-TYPE"] || "N/A"}
+                                {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                               </td>
                               <td className="px-2 py-2">
                                 {account["SECURITY-STATUS"] || "N/A"}
@@ -3430,7 +3430,7 @@ const CirProV2ReportDisplay = ({
                               className="hover:bg-[var(--color-error)] hover:bg-opacity-5"
                             >
                               <td className="px-2 py-2">
-                                {account["ACCT-TYPE"] || "N/A"}
+                                {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                               </td>
                               <td className="px-2 py-2">
                                 {account["SECURITY-STATUS"] || "N/A"}
@@ -3722,7 +3722,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-success)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -3923,7 +3923,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-muted)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -4132,7 +4132,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-error)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -4355,7 +4355,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-warning)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -4562,7 +4562,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-error)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -4843,7 +4843,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-success)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -5044,7 +5044,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-muted)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                             {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -5253,7 +5253,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-error)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                             {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -5476,7 +5476,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-warning)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
@@ -5683,7 +5683,7 @@ const CirProV2ReportDisplay = ({
                             className="hover:bg-[var(--color-error)] hover:bg-opacity-5"
                           >
                             <td className="px-2 py-2">
-                              {account["ACCT-TYPE"] || "N/A"}
+                              {(account["ACCT-TYPE"] === "PERSONAL LOAN" ? "Tawarruq " : `${account["ACCT-TYPE"] }` )|| "N/A"}
                             </td>
                             <td className="px-2 py-2">
                               {account["SECURITY-STATUS"] || "N/A"}
