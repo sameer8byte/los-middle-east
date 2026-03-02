@@ -622,7 +622,7 @@ export function CamCalculator({
 
       const response = await axios({
         method: "POST",
-        url: "/api/credit_risk",
+        url: `${import.meta.env.VITE_ML_SERVICE_URL || ''}/api/credit_risk`,
         data: payload,
         headers: {
           "Content-Type": "application/json",
