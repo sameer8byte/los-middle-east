@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useParams } from "react-router-dom";
 import {
   HiXCircle,
@@ -107,16 +108,14 @@ const TypeBadge = ({ type }: { type: string }) => {
   const isFull = type === "COLLECTION";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide rounded-full border ${
-        isFull
-          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-          : "bg-amber-50 text-amber-700 border-amber-200"
-      }`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide rounded-full border ${isFull
+        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+        : "bg-amber-50 text-amber-700 border-amber-200"
+        }`}
     >
       <span
-        className={`w-1.5 h-1.5 rounded-full ${
-          isFull ? "bg-emerald-500" : "bg-amber-500"
-        }`}
+        className={`w-1.5 h-1.5 rounded-full ${isFull ? "bg-emerald-500" : "bg-amber-500"
+          }`}
       />
       {isFull ? "Full" : "Partial"}
     </span>
@@ -181,10 +180,9 @@ const FilterTab = ({
     onClick={onClick}
     className={`
       relative px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200
-      ${
-        isActive
-          ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25"
-          : "text-[var(--on-surface)]/60 hover:text-[var(--on-surface)] hover:bg-[var(--muted)]/15"
+      ${isActive
+        ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25"
+        : "text-[var(--on-surface)]/60 hover:text-[var(--on-surface)] hover:bg-[var(--muted)]/15"
       }
     `}
   >
@@ -192,10 +190,9 @@ const FilterTab = ({
     <span
       className={`
         ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold
-        ${
-          isActive
-            ? "bg-white/20 text-white"
-            : "bg-[var(--muted)]/20 text-[var(--on-surface)]/50"
+        ${isActive
+          ? "bg-white/20 text-white"
+          : "bg-[var(--muted)]/20 text-[var(--on-surface)]/50"
         }
       `}
     >
@@ -505,10 +502,9 @@ export function PaymentApprovedPageComponent() {
                     text-[var(--on-surface)]
                     placeholder-[var(--on-surface)]/40
                     focus:outline-none
-                    ${
-                      isSearchFocused || searchTerm
-                        ? "border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10"
-                        : "border-[var(--muted)]/30 hover:border-[var(--muted)]/50"
+                    ${isSearchFocused || searchTerm
+                      ? "border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10"
+                      : "border-[var(--muted)]/30 hover:border-[var(--muted)]/50"
                     }
                   `}
                 />
@@ -600,123 +596,120 @@ export function PaymentApprovedPageComponent() {
               </thead>
               <tbody className="divide-y divide-[var(--muted)]/8">
                 {loading &&
-                collectionTransactions.length === 0 &&
-                partialCollectionTransactions.length === 0
+                  collectionTransactions.length === 0 &&
+                  partialCollectionTransactions.length === 0
                   ? Array.from({ length: 5 }).map((_, i) => (
-                      <SkeletonRow
-                        key={`skeleton-${transactionType}-${pagination.page}-${i}`}
-                        index={i}
-                      />
-                    ))
+                    <SkeletonRow
+                      key={`skeleton-${transactionType}-${pagination.page}-${i}`}
+                      index={i}
+                    />
+                  ))
                   : sortedTransactions.map((transaction) => (
-                      <tr
-                        key={transaction.id}
-                        className="hover:bg-[var(--muted)]/5 transition-colors text-sm"
-                      >
-                        {/* Type */}
-                        <td className="px-4 py-3.5">
-                          <TypeBadge
-                            type={
-                              transaction.paymentRequest?.type === "COLLECTION"
-                                ? "COLLECTION"
-                                : "PARTIAL_COLLECTION"
-                            }
-                          />
-                        </td>
+                    <tr
+                      key={transaction.id}
+                      className="hover:bg-[var(--muted)]/5 transition-colors text-sm"
+                    >
+                      {/* Type */}
+                      <td className="px-4 py-3.5">
+                        <TypeBadge
+                          type={
+                            transaction.paymentRequest?.type === "COLLECTION"
+                              ? "COLLECTION"
+                              : "PARTIAL_COLLECTION"
+                          }
+                        />
+                      </td>
 
-                        {/* Loan ID */}
-                        <td className="px-4 py-3.5">
-                          <div className="font-semibold text-[var(--on-surface)]">
-                            {transaction.paymentRequest?.loan?.formattedLoanId}
-                          </div>
-                          <div className="text-xs text-[var(--on-surface)]/50">
-                            {transaction.receiptId}
-                          </div>
-                        </td>
+                      {/* Loan ID */}
+                      <td className="px-4 py-3.5">
+                        <div className="font-semibold text-[var(--on-surface)]">
+                          {transaction.paymentRequest?.loan?.formattedLoanId}
+                        </div>
+                        <div className="text-xs text-[var(--on-surface)]/50">
+                          {transaction.receiptId}
+                        </div>
+                      </td>
 
-                        {/* Customer */}
-                        <td className="px-4 py-3.5">
-                          <div className="font-medium text-[var(--on-surface)]">
-                            {`${
-                              transaction.paymentRequest?.loan?.user
-                                ?.userDetails?.firstName || ""
-                            } ${
-                              transaction.paymentRequest?.loan?.user
-                                ?.userDetails?.lastName || ""
+                      {/* Customer */}
+                      <td className="px-4 py-3.5">
+                        <div className="font-medium text-[var(--on-surface)]">
+                          {`${transaction.paymentRequest?.loan?.user
+                            ?.userDetails?.firstName || ""
+                            } ${transaction.paymentRequest?.loan?.user
+                              ?.userDetails?.lastName || ""
                             }`.trim()}
-                          </div>
-                          <div className="text-xs text-[var(--on-surface)]/50">
-                            {
-                              transaction.paymentRequest?.loan?.user
-                                ?.phoneNumber
-                            }
-                          </div>
-                        </td>
+                        </div>
+                        <div className="text-xs text-[var(--on-surface)]/50">
+                          {
+                            transaction.paymentRequest?.loan?.user
+                              ?.phoneNumber
+                          }
+                        </div>
+                      </td>
 
-                        {/* Amount */}
-                        <td className="px-4 py-3.5 hidden md:table-cell">
-                          <div className="font-semibold text-[var(--on-surface)]">
-                            ₹
-                            {Number(transaction.amount).toLocaleString("en-IN")}
-                          </div>
-                        </td>
+                      {/* Amount */}
+                      <td className="px-4 py-3.5 hidden md:table-cell">
+                        <div className="font-semibold text-[var(--on-surface)]">
+                          {Conversion.formatCurrency(transaction.amount)}
+                        </div>
+                      </td>
 
-                        {/* Loan Status */}
-                        <td className="px-4 py-3.5">
-                          <LoanStatusBadge
-                            status={transaction.paymentRequest?.loan?.status || "N/A"}
-                          />
-                        </td>
+                      {/* Loan Status */}
+                      <td className="px-4 py-3.5">
+                        <LoanStatusBadge
+                          status={transaction.paymentRequest?.loan?.status || "N/A"}
+                        />
+                      </td>
 
-                        {/* Payment Method */}
-                        <td className="px-4 py-3.5">
-                          <MethodBadge method={transaction.method} />
-                        </td>
+                      {/* Payment Method */}
+                      <td className="px-4 py-3.5">
+                        <MethodBadge method={transaction.method} />
+                      </td>
 
-                        {/* External Ref */}
-                        <td className="px-4 py-3.5">
-                          <div className="text-sm text-[var(--on-surface)] font-mono break-all">
-                            {transaction.externalRef || "N/A"}
-                          </div>
-                        </td>
+                      {/* External Ref */}
+                      <td className="px-4 py-3.5">
+                        <div className="text-sm text-[var(--on-surface)] font-mono break-all">
+                          {transaction.externalRef || "N/A"}
+                        </div>
+                      </td>
 
-                        {/* Created By */}
-                        <td className="px-4 py-3.5">
-                          <div className="text-sm text-[var(--on-surface)]">
-                            {transaction.createdByPartner?.name || "N/A"}
-                          </div>
-                        </td>
+                      {/* Created By */}
+                      <td className="px-4 py-3.5">
+                        <div className="text-sm text-[var(--on-surface)]">
+                          {transaction.createdByPartner?.name || "N/A"}
+                        </div>
+                      </td>
 
-                        {/* Approved Date */}
-                        <td className="px-4 py-3.5">
-                          <div className="text-sm text-[var(--on-surface)]">
-                            {formatDate(
-                              transaction.completedAt || transaction.createdAt,
-                            )}
-                          </div>
-                        </td>
+                      {/* Approved Date */}
+                      <td className="px-4 py-3.5">
+                        <div className="text-sm text-[var(--on-surface)]">
+                          {formatDate(
+                            transaction.completedAt || transaction.createdAt,
+                          )}
+                        </div>
+                      </td>
 
-                        {/* Actions */}
-                        <td className="px-4 py-3.5 text-center">
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleView(
-                                transaction.paymentRequest?.loan?.user?.id ||
-                                  "",
-                                brandId || "",
-                                "payment",
-                              );
-                            }}
-                            variant="outline"
-                            className=""
-                          >
-                            <HiEye className="w-4 h-4 mr" />
-                            View
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                      {/* Actions */}
+                      <td className="px-4 py-3.5 text-center">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleView(
+                              transaction.paymentRequest?.loan?.user?.id ||
+                              "",
+                              brandId || "",
+                              "payment",
+                            );
+                          }}
+                          variant="outline"
+                          className=""
+                        >
+                          <HiEye className="w-4 h-4 mr" />
+                          View
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -755,7 +748,7 @@ export function PaymentApprovedPageComponent() {
                 }
                 disabled={
                   pagination.page >=
-                    Math.ceil(pagination.total / pagination.limit) || loading
+                  Math.ceil(pagination.total / pagination.limit) || loading
                 }
               >
                 <HiChevronRight className="w-4 h-4" />

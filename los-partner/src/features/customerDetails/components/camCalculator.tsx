@@ -13,6 +13,7 @@ import {
 } from "../../../shared/services/api/cam-calculator.api";
 import { FeeValueType, PenaltyType, TaxType } from "../../../constant/enum";
 import { toast } from "react-toastify";
+import axios from "axios";
 type LoanDetails = {
   type: "PAYDAY_LOAN" | string;
   durationDays: number;
@@ -319,6 +320,9 @@ export function CamCalculator({
     Set<keyof FormData>
   >(new Set());
   const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [creditRiskData, setCreditRiskData] = useState<any>(null);
+  const [loadingCreditRisk, setLoadingCreditRisk] = useState(false);
+  const [creditRiskError, setCreditRiskError] = useState<string | null>(null);
   const isReadOnly = loan?.status !== "PENDING";
 
   // Fetch loan rule tenures when dialog opens
@@ -704,6 +708,51 @@ export function CamCalculator({
     }
 
     setFormData((prev) => ({ ...prev, ...updates }));
+  };
+
+  const checkCreditRisk = async () => {
+    setLoadingCreditRisk(true);
+    setCreditRiskError(null);
+
+    try {
+      const payload = {
+        salary: formData.actualSalary ? parseNum(formData.actualSalary) : 800,
+        creditScore: 650,
+        loan_applied_amount: formData.loanRecommended ? parseNum(formData.loanRecommended) : 1000,
+        "Loan.tenure": formData.tenureId ? tenures.find(t => t.id === formData.tenureId)?.minTermDays || 90 : 90,
+        gender: "Male",
+        employmenttype: "Self-Employed",
+        loanType: "Personal",
+        state: "Lagos",
+        verificationStatus: "Verified",
+        accountExists: true,
+        is_repeat_loan: false,
+        joiningDate: formData.salaryCreditDate1 || "2023-01-15",
+      };
+
+      console.log("Credit Risk API Payload:", payload);
+
+      const response = await axios({
+        method: 'POST',
+        url: '/api/credit_risk',
+        data: payload,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log("Credit Risk API Response:", response.data);
+      setCreditRiskData(response.data);
+      toast.success("Credit risk assessment completed!");
+    } catch (error: any) {
+      console.error("Credit Risk API Error:", error);
+      console.error("Error Response:", error?.response?.data);
+      const errorMsg = error?.response?.data?.message || error?.response?.data?.error || error?.message || "Failed to assess credit risk";
+      setCreditRiskError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoadingCreditRisk(false);
+    }
   };
 
   const handleSave = async () => {
@@ -1760,7 +1809,143 @@ export function CamCalculator({
               </div>
 
               {/* Column 3 - Status & Summary */}
-              <div>{renderRepaymentDetailsSection()}</div>
+              <div>
+                {renderRepaymentDetailsSection()}
+                
+                {/* Credit Risk Assessment Section */}
+                <div className="mt-4">
+                  <div className="flex items-center gap-1 mb-2">
+                    <h4 className="text-xs font-bold text-gray-900">Credit Risk Assessment</h4>
+                  </div>
+                  
+                  <Button
+                    onClick={checkCreditRisk}
+                    disabled={loadingCreditRisk}
+                    loading={loadingCreditRisk}
+                    className="w-full mb-2"
+                  >
+                    {loadingCreditRisk ? "Assessing..." : "Check Credit Risk"}
+                  </Button>
+
+                  {creditRiskError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-2 mt-2">
+                      <p className="text-xs text-red-700">{creditRiskError}</p>
+                    </div>
+                  )}
+
+                  {creditRiskData && (
+                    <div className="space-y-2 mt-2">
+                      {/* Risk Score Card */}
+                      <div className={`p-2 rounded-lg border ${
+                        creditRiskData.risk_score?.risk_band === 'High Risk' ? 'bg-red-50 border-red-200' :
+                        creditRiskData.risk_score?.risk_band === 'Medium Risk' ? 'bg-yellow-50 border-yellow-200' :
+                        'bg-green-50 border-green-200'
+                      }`}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs font-semibold text-gray-700">Risk Score</span>
+                          <span className={`text-sm font-bold ${
+                            creditRiskData.risk_score?.risk_band === 'High Risk' ? 'text-red-700' :
+                            creditRiskData.risk_score?.risk_band === 'Medium Risk' ? 'text-yellow-700' :
+                            'text-green-700'
+                          }`}>{creditRiskData.risk_score?.risk_score}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span className="text-gray-600">Grade:</span>
+                          <span className="font-bold">{creditRiskData.risk_score?.risk_grade}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span className="text-gray-600">Default Probability:</span>
+                          <span className="font-bold text-red-600">{(creditRiskData.default_probability * 100).toFixed(1)}%</span>
+                        </div>
+                        <p className="text-[9px] text-gray-600 mt-1 italic">{creditRiskData.risk_score?.summary}</p>
+                      </div>
+
+                      {/* Credit Limit */}
+                      <div className="bg-blue-50 border border-blue-200 p-2 rounded-lg">
+                        <p className="text-xs font-semibold text-gray-700 mb-1">Credit Limit</p>
+                        <div className="flex justify-between text-[10px] mb-0.5">
+                          <span className="text-gray-600">Approved Amount:</span>
+                          <span className="font-bold text-blue-700">BHD {creditRiskData.credit_limit?.credit_limit_bhd || 0}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] mb-0.5">
+                          <span className="text-gray-600">DTI Ratio:</span>
+                          <span className="font-bold text-orange-600">{creditRiskData.credit_limit?.dti_ratio_pct?.toFixed(1)}%</span>
+                        </div>
+                        <p className="text-[9px] text-gray-600 mt-1 italic">{creditRiskData.credit_limit?.justification}</p>
+                      </div>
+
+                      {/* Eligibility Cards */}
+                      <div className="grid grid-cols-3 gap-1">
+                        <div className={`p-1.5 rounded border text-center ${
+                          creditRiskData.credit_card_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                        }`}>
+                          <p className="text-[9px] text-gray-600">Credit Card</p>
+                          <p className={`text-[10px] font-bold ${
+                            creditRiskData.credit_card_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                          }`}>{creditRiskData.credit_card_eligibility?.decision}</p>
+                        </div>
+                        <div className={`p-1.5 rounded border text-center ${
+                          creditRiskData.micro_lending_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                        }`}>
+                          <p className="text-[9px] text-gray-600">Micro Loan</p>
+                          <p className={`text-[10px] font-bold ${
+                            creditRiskData.micro_lending_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                          }`}>{creditRiskData.micro_lending_eligibility?.decision}</p>
+                        </div>
+                        <div className={`p-1.5 rounded border text-center ${
+                          creditRiskData.device_financing_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                        }`}>
+                          <p className="text-[9px] text-gray-600">Device Finance</p>
+                          <p className={`text-[10px] font-bold ${
+                            creditRiskData.device_financing_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                          }`}>{creditRiskData.device_financing_eligibility?.decision}</p>
+                        </div>
+                      </div>
+
+                      {/* Pricing Tier */}
+                      <div className="bg-purple-50 border border-purple-200 p-2 rounded-lg">
+                        <p className="text-xs font-semibold text-gray-700 mb-1">Pricing Tier</p>
+                        <div className="flex justify-between text-[10px] mb-0.5">
+                          <span className="text-gray-600">Tier:</span>
+                          <span className="font-bold text-purple-700">{creditRiskData.pricing_tier?.tier_name} (T{creditRiskData.pricing_tier?.pricing_tier})</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] mb-0.5">
+                          <span className="text-gray-600">Recommended APR:</span>
+                          <span className="font-bold text-purple-700">{creditRiskData.pricing_tier?.recommended_apr_pct}%</span>
+                        </div>
+                      </div>
+
+                      {/* Adverse Factors */}
+                      {creditRiskData.reason_codes?.adverse_factors?.length > 0 && (
+                        <div className="bg-red-50 border border-red-200 p-2 rounded-lg">
+                          <p className="text-xs font-semibold text-red-700 mb-1">⚠️ Risk Factors</p>
+                          <div className="space-y-1">
+                            {creditRiskData.reason_codes.adverse_factors.slice(0, 3).map((factor: any, idx: number) => (
+                              <div key={idx} className="text-[9px]">
+                                <span className="font-semibold text-red-600">{factor.factor}:</span>
+                                <span className="text-gray-600 ml-1">{factor.description}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Confidence Score */}
+                      <div className={`p-2 rounded-lg border ${
+                        creditRiskData.confidence_score?.confidence_level === 'Very Low' ? 'bg-red-50 border-red-200' :
+                        creditRiskData.confidence_score?.confidence_level === 'Low' ? 'bg-yellow-50 border-yellow-200' :
+                        'bg-green-50 border-green-200'
+                      }`}>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-semibold text-gray-700">Confidence</span>
+                          <span className="text-sm font-bold text-gray-900">{creditRiskData.confidence_score?.confidence_score_pct}%</span>
+                        </div>
+                        <p className="text-[9px] text-gray-600 mt-1">{creditRiskData.confidence_score?.explanation}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 

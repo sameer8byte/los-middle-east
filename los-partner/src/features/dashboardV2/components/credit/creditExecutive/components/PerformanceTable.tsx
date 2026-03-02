@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiEye, FiChevronLeft, FiChevronRight, FiFilter, FiMoreVertical, FiEdit, FiDownload, FiChevronDown } from 'react-icons/fi';
 import { LuArrowUpDown } from "react-icons/lu";
+import { Conversion } from "../../../../../../utils/conversion";
 
 export interface TableRowData {
   srNo: number;
@@ -112,10 +113,10 @@ const PerformanceTable: React.FC<PerformanceTableProps> = ({ data, onActionClick
                       <td className="px-3 py-3 text-gray-700 font-semibold">{row.month}</td>
                       <td className="px-3 py-3 text-gray-700 font-medium">{row.employee}</td>
                       <td className="px-3 py-3 text-center font-bold text-gray-800">{row.totalCaseCount}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.totalLoanAmount}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.totalLoanAmount)}</td>
                       <td className="px-3 py-3 text-center font-bold text-gray-800">{row.closedLoans}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.collectedLoanAmount}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.closedLoanAmountIpc}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.collectedLoanAmount)}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.closedLoanAmountIpc)}</td>
                       <td className="px-3 py-3 text-center">
                         <span className={`inline-block px-3 py-0.5 rounded-md border font-bold text-[9px] ${getCollectionStyle(row.collectionPercentage)}`}>
                           {row.collectionPercentage}%

@@ -1,4 +1,4 @@
-
+import { Conversion } from "../../../../../../../utils/conversion";
 
 // --- Icons ---
 const BlueDocIcon = () => (
@@ -36,12 +36,12 @@ const MOCK_DATA: LoanPortfolioData = {
         { title: 'Closed Loans', value: 224 },
     ],
     bottomCards: [
-        { title: 'Total Loan Amount', value: '₹12.6 Cr', themeColor: '#3b82f6' },        // Blue
-        { title: 'Total Repayment Amount', value: '₹4.20 Cr', percentage: '33 %', themeColor: '#c084fc' }, // Purple
-        { title: 'Total Amount Collected', value: '₹3.32 Cr', percentage: '79 %', themeColor: '#059669' }, // Green
-        { title: 'Closed Loan Amount', value: '₹5.10 Cr', percentage: '30 %', themeColor: '#f472b6' },     // Pink
-        { title: 'Outstanding Amount', value: '₹3.48 Cr', percentage: '27 %', themeColor: '#eab308' },     // Yellow
-        { title: 'Overdue Amount', value: '₹72 L', percentage: '5.7 %', themeColor: '#ef4444' },         // Red
+        { title: 'Total Loan Amount', value: Conversion.formatCurrency(126000000), themeColor: '#3b82f6' },
+        { title: 'Total Repayment Amount', value: Conversion.formatCurrency(42000000), percentage: '33 %', themeColor: '#c084fc' },
+        { title: 'Total Amount Collected', value: Conversion.formatCurrency(33200000), percentage: '79 %', themeColor: '#059669' },
+        { title: 'Closed Loan Amount', value: Conversion.formatCurrency(51000000), percentage: '30 %', themeColor: '#f472b6' },
+        { title: 'Outstanding Amount', value: Conversion.formatCurrency(34800000), percentage: '27 %', themeColor: '#eab308' },
+        { title: 'Overdue Amount', value: Conversion.formatCurrency(7200000), percentage: '5.7 %', themeColor: '#ef4444' },
     ]
 };
 

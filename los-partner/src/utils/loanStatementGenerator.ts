@@ -262,7 +262,7 @@ export const generateLoanStatement = async (
 
   // Right column
   let rightY = yPos;
-  currentPage.drawText("Account Type: Short Term Personal Loan", { x: 350, y: rightY, size: 10, font });
+  currentPage.drawText("Account Type: Short Term Tawarruq", { x: 350, y: rightY, size: 10, font });
   rightY -= 18;
   currentPage.drawText(`Loan A/c No.: ${data.formattedLoanId}`, { x: 350, y: rightY, size: 10, font });
   rightY -= 18;

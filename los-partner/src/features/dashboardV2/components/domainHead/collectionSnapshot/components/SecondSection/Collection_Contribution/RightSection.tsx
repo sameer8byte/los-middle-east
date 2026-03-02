@@ -1,29 +1,30 @@
 'use client';
 
 import { useState } from 'react';
+import { Conversion as ConversionUtil } from '../../../../../../../../utils/conversion';
 
 interface ChartData {
     name: string;
     value: number;
-    amount: string;
+    amount: number;
     color: string;
 }
 
 interface ChartProps {
     data?: ChartData[];
-    totalAmount?: string;
+    totalAmount?: number;
     label?: string;
 }
 
 const defaultData: ChartData[] = [
-    { name: 'Collected', value: 63, amount: '₹3.8 Cr', color: '#ecfccb' }, // Light green
-    { name: 'Pending', value: 20, amount: '₹1.2 Cr', color: '#fde047' },   // Yellow
-    { name: 'Overdue', value: 17, amount: '₹1 Cr', color: '#fca5a5' },     // Light red
+    { name: 'Collected', value: 63, amount: 38000000, color: '#ecfccb' }, // Light green
+    { name: 'Pending', value: 20, amount: 12000000, color: '#fde047' },   // Yellow
+    { name: 'Overdue', value: 17, amount: 10000000, color: '#fca5a5' },     // Light red
 ];
 
 export default function RightSection({
     data = defaultData,
-    totalAmount = "₹6 Cr",
+    totalAmount = 60000000,
     label = "Total Due"
 }: ChartProps) {
     const [hoverData, setHoverData] = useState<{ index: number, x: number, y: number } | null>(null);
@@ -116,7 +117,7 @@ export default function RightSection({
                     {/* Center Text Overlays */}
                     <div className="relative z-0 flex flex-col items-center justify-center pointer-events-none">
                         <span className="text-[18px] 2xl:text-[24px] font-bold text-[#334155] leading-none mb-0.5 2xl:mb-1">
-                            {totalAmount}
+                            {ConversionUtil.formatCurrency(totalAmount)}
                         </span>
                         <span className="text-[11px] 2xl:text-[14px] font-medium text-[#64748b]">
                             {label}
@@ -140,7 +141,7 @@ export default function RightSection({
                             </span>
                         </div>
                         <div className="text-gray-500 font-medium ml-4.5">
-                            {data[hoverData.index].value} % <span className="mx-1 text-gray-300">|</span> {data[hoverData.index].amount}
+                            {data[hoverData.index].value} % <span className="mx-1 text-gray-300">|</span> {ConversionUtil.formatCurrency(data[hoverData.index].amount)}
                         </div>
                     </div>
                 )}
@@ -157,7 +158,7 @@ export default function RightSection({
                         <div className="flex flex-col 2xl:flex-row 2xl:items-center text-[11px] 2xl:text-[14px]">
                             <span className="font-bold text-gray-900">{item.value} %</span>
                             <span className="hidden 2xl:inline mx-1.5 text-gray-300">|</span>
-                            <span className="font-medium text-gray-700">{item.amount}</span>
+                            <span className="font-medium text-gray-700">{ConversionUtil.formatCurrency(item.amount)}</span>
                         </div>
                     </div>
                 ))}

@@ -30,7 +30,7 @@ interface PaginationProps {
   centerContent?: React.ReactNode;
 }
 
-const TableSkeleton = ({}: { columns: TableColumn[] }) => (
+const TableSkeleton = ({ }: { columns: TableColumn[] }) => (
   <div className="space-y-4">
     {Array.from({ length: 5 }, (_, idx) => (
       <div
@@ -135,7 +135,7 @@ export const Table: React.FC<TableProps> = ({
     );
   }
 
-  
+
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
@@ -159,9 +159,8 @@ export const Table: React.FC<TableProps> = ({
                     ref={(el) => {
                       columnRefs.current[index] = el;
                     }}
-                    className={`relative group px-2 py-3 text-left text-md border-r border-[var(--color-muted)] border-opacity-30 font-normal text-[var(--color-on-surface)]  z-20 shadow-sm ${
-                      column.className || ""
-                    }`}
+                    className={`relative group px-2 py-3 text-left text-md border-r border-[var(--color-muted)] border-opacity-30 font-normal text-[var(--color-on-surface)]  z-20 shadow-sm ${column.className || ""
+                      }`}
                   >
                     {column.label}
                     {/* Resizer handle */}
@@ -178,17 +177,15 @@ export const Table: React.FC<TableProps> = ({
                 <tr
                   key={row.id || index}
                   onClick={() => onRowClick?.(row)}
-                  className={`hover:bg-[var(--color-background)] transition-colors duration-150 ${
-                    onRowClick ? "cursor-pointer" : ""
-                  }`}
+                  className={`hover:bg-[var(--color-background)] transition-colors duration-150 ${onRowClick ? "cursor-pointer" : ""
+                    }`}
                 >
                   <td className="text-left text-sm border-[var(--color-muted)] border-opacity-30 font-light text-[var(--color-on-surface)] opacity-70" />
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className={`px-2 py-3 align-top ${
-                        column.className || ""
-                      }`}
+                      className={`px-2 py-3 align-top ${column.className || ""
+                        }`}
                     >
                       {column.render
                         ? column.render(row[column.key], row)
@@ -300,7 +297,7 @@ export const SearchInput: React.FC<SearchProps> = ({
   onClear,
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
-  
+
   return (
     <div className="relative group">
       {/* Input Field */}
@@ -320,14 +317,13 @@ export const SearchInput: React.FC<SearchProps> = ({
           bg-[var(--color-surface)]
           transition-all duration-200 ease-in-out
           focus:outline-none
-          ${
-            isFocused || value
-              ? "border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10"
-              : "border-[var(--color-muted)] border-opacity-30 hover:border-[var(--color-muted)] hover:border-opacity-50"
+          ${isFocused || value
+            ? "border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10"
+            : "border-[var(--color-muted)] border-opacity-30 hover:border-[var(--color-muted)] hover:border-opacity-50"
           }
         `}
       />
-      
+
       {/* Search Icon */}
       <div
         className={`
@@ -353,7 +349,7 @@ export const SearchInput: React.FC<SearchProps> = ({
           />
         </svg>
       </div>
-      
+
       {/* Clear Button */}
       {value && onClear && (
         <button
@@ -368,12 +364,12 @@ export const SearchInput: React.FC<SearchProps> = ({
           "
           aria-label="Clear search"
         >
-          <HiOutlineXCircle 
-            className="h-5 w-5 transition-all duration-200 group-hover/clear:scale-110" 
+          <HiOutlineXCircle
+            className="h-5 w-5 transition-all duration-200 group-hover/clear:scale-110"
           />
         </button>
       )}
-      
+
       {/* Active Indicator (Bottom Border Animation) */}
       <div
         className={`
@@ -383,7 +379,7 @@ export const SearchInput: React.FC<SearchProps> = ({
           ${isFocused ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"}
         `}
       />
-      
+
       {/* Result Count Badge (Optional - shows when there's a value) */}
       {value && (
         <div className="absolute -top-2 -right-2 bg-[var(--color-primary)] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md animate-in fade-in zoom-in duration-200">
@@ -415,13 +411,13 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   message,
   onRetry,
 }) => (
-  <div className="mb-4 p-4 bg-[var(--color-error)] bg-opacity-10 text-[var(--color-on-error)] rounded-lg flex items-center gap-2">
+  <div className="mb-4 p-4 bg-[var(--color-error)] bg-opacity-10 text-[var(--color-error)] rounded-lg flex items-center gap-2">
     <HiOutlineXCircle className="h-5 w-5" />
     {message}
     {onRetry && (
       <button
         onClick={onRetry}
-        className="ml-auto text-[var(--color-on-primary)] hover:text-[var(--color-on-primary)] text-sm font-semibold transition-colors"
+        className="ml-auto text-[var(--color-error)] hover:opacity-80 text-sm font-semibold transition-colors"
       >
         Retry
       </button>

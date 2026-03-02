@@ -1,28 +1,29 @@
 import React from 'react';
+import { Conversion } from "../../../../../../../utils/conversion";
 
 export interface ProfitabilityData {
     netProfit: {
-        value: string;
+        value: number;
         percentage: string;
         targetProfitability: string;
     };
     metrics: {
-        totalRevenue: string;
-        netRevenue: string;
-        opnLoss: string;
-        netProfit: string;
+        totalRevenue: number;
+        netRevenue: number;
+        opnLoss: number;
+        netProfit: number;
     };
     breakdown: {
         interestAmount: {
-            value: string;
+            value: number;
             percentage: number; // For the pill bar width
         };
         processingFee: {
-            value: string;
+            value: number;
             percentage: number; // For the pill bar width
         };
         penalties: {
-            value: string;
+            value: number;
             percentage: number; // For the pill bar width
         };
     };
@@ -36,27 +37,27 @@ const ProfitabilitySnapshot: React.FC<ProfitabilitySnapshotProps> = ({ data }) =
     // Mock dynamic data fallback
     const currentData = data ?? {
         netProfit: {
-            value: "₹ 1.9 Cr",
+            value: 19000000,
             percentage: "42%",
             targetProfitability: "50%",
         },
         metrics: {
-            totalRevenue: "₹ 6.8 Cr",
-            netRevenue: "₹ 6.2 Cr",
-            opnLoss: "₹ 0.6 Cr",
-            netProfit: "₹ 1.9 Cr",
+            totalRevenue: 68000000,
+            netRevenue: 62000000,
+            opnLoss: 6000000,
+            netProfit: 19000000,
         },
         breakdown: {
             interestAmount: {
-                value: "₹5.2 Cr",
+                value: 52000000,
                 percentage: 55, // 55% width
             },
             processingFee: {
-                value: "₹1.1 Cr",
+                value: 11000000,
                 percentage: 35, // 35% width
             },
             penalties: {
-                value: "₹0.5 Cr",
+                value: 5000000,
                 percentage: 10, // 10% width
             },
         },
@@ -77,7 +78,7 @@ const ProfitabilitySnapshot: React.FC<ProfitabilitySnapshotProps> = ({ data }) =
                 <div className="mb-2">
                     <div className="text-gray-500 text-[10px] 2xl:text-xs font-semibold mb-0.5">Net Profit</div>
                     <div className="text-gray-900 text-[18px] 2xl:text-[22px] font-bold tracking-tight leading-none mb-2 2xl:mb-4 line-clamp-1">
-                        {currentData.netProfit.value}
+                        {Conversion.formatCurrency(currentData.netProfit.value)}
                     </div>
                 </div>
 
@@ -131,19 +132,19 @@ const ProfitabilitySnapshot: React.FC<ProfitabilitySnapshotProps> = ({ data }) =
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 2xl:gap-3 mb-2 w-full">
                     <div className="flex flex-col min-w-0">
                         <div className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Total Revenue</div>
-                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{currentData.metrics.totalRevenue}</div>
+                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{Conversion.formatCurrency(currentData.metrics.totalRevenue)}</div>
                     </div>
                     <div className="flex flex-col min-w-0">
                         <div className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Net Revenue</div>
-                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{currentData.metrics.netRevenue}</div>
+                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{Conversion.formatCurrency(currentData.metrics.netRevenue)}</div>
                     </div>
                     <div className="flex flex-col min-w-0">
                         <div className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Opn Loss</div>
-                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{currentData.metrics.opnLoss}</div>
+                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{Conversion.formatCurrency(currentData.metrics.opnLoss)}</div>
                     </div>
                     <div className="flex flex-col min-w-0">
                         <div className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Net Profit</div>
-                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{currentData.metrics.netProfit}</div>
+                        <div className="text-gray-900 text-[10px] 2xl:text-[11px] font-semibold tracking-tight truncate">{Conversion.formatCurrency(currentData.metrics.netProfit)}</div>
                     </div>
                 </div>
 
@@ -177,11 +178,11 @@ const ProfitabilitySnapshot: React.FC<ProfitabilitySnapshotProps> = ({ data }) =
                         <span className="text-gray-500 text-[9px] 2xl:text-[10px] truncate">Murabaha margin Amount</span>
                     </div>
                     <div style={{ width: `${currentData.breakdown.processingFee.percentage}%` }} className="flex flex-col min-w-0 pr-1">
-                        <span className="text-gray-900 font-bold text-[10px] 2xl:text-[12px] truncate">{currentData.breakdown.processingFee.value}</span>
-                        <span className="text-gray-500 text-[9px] 2xl:text-[10px] truncate">Processing Fixed</span>
+                        <span className="text-gray-900 font-bold text-[10px] 2xl:text-[12px] truncate">{Conversion.formatCurrency(currentData.breakdown.processingFee.value)}</span>
+                        <span className="text-gray-500 text-[9px] 2xl:text-[10px] truncate">Processing Fee</span>
                     </div>
                     <div style={{ width: `${currentData.breakdown.penalties.percentage}%` }} className="flex flex-col min-w-0">
-                        <span className="text-gray-900 font-bold text-[10px] 2xl:text-[12px] truncate">{currentData.breakdown.penalties.value}</span>
+                        <span className="text-gray-900 font-bold text-[10px] 2xl:text-[12px] truncate">{Conversion.formatCurrency(currentData.breakdown.penalties.value)}</span>
                         <span className="text-gray-500 text-[9px] 2xl:text-[10px] truncate">Penalties</span>
                     </div>
                 </div>
