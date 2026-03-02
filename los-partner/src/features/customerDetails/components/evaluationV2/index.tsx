@@ -77,7 +77,7 @@ export function EvaluationV2Component({
   const [selectedStage, setSelectedStage] = useState<
     "ALL" | "ONE" | "TWO" | "THREE" | "FOUR"
   >("ALL");
-  const [statusFilter, setStatusFilter] = useState<
+  const [statusFilter] = useState<
     "ALL" | "ELIGIBLE" | "NOT_ELIGIBLE" | "OVERRIDDEN"
   >("ALL");
   const [pendingComments, setPendingComments] = useState<
@@ -754,7 +754,9 @@ export function EvaluationV2Component({
                     <FaBolt className="inline w-3 h-3 mr-1" /> Override (
                     {stats.overridden})
                   </button> */}
-                  <span>{(stats.eligible/stats.total * 100).toFixed(2)}%</span>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-100 text-green-700 font-semibold text-sm">
+                    {(stats.eligible/stats.total * 100).toFixed(2)}% Pass Rate
+                  </span>
                 </div>
               </div>
             </div>

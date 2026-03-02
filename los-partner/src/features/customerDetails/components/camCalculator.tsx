@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaCheckCircle, FaClipboardList, FaCoins } from "react-icons/fa";
+import { FaCheckCircle, FaCoins } from "react-icons/fa";
 import Dialog from "../../../common/dialog";
 import { Button } from "../../../common/ui/button";
 import { useParams } from "react-router-dom";
@@ -8,7 +8,6 @@ import {
   calculateRepaymentForPartner,
 } from "../../../shared/services/api/loan.api";
 import {
-  saveCAMCalculator,
   getCAMCalculatorByUser,
 } from "../../../shared/services/api/cam-calculator.api";
 import { FeeValueType, PenaltyType, TaxType } from "../../../constant/enum";
@@ -188,68 +187,6 @@ const calculateEligibleLoan = (
 };
 
 // --- START OF UI ADJUSTMENTS ---
-// Reusable Input Component with adjusted styles for compactness
-interface CompactInputFieldProps {
-  readonly id: keyof FormData;
-  readonly label: string;
-  readonly value: string;
-  readonly onChange?: (val: string) => void;
-  readonly type?: string;
-  readonly readOnly?: boolean;
-  readonly placeholder?: string;
-  readonly required?: boolean;
-  readonly step?: string;
-  readonly hint?: string;
-  readonly error?: string;
-}
-
-const getInputClassName = (error: string, readOnly: boolean): string => {
-  // Adjusted: py-1.5 instead of py-2, text-xs instead of text-sm
-  const baseClass = "w-full px-3 py-1.5 border rounded text-xs transition-all ";
-  if (error) return baseClass + "border-red-300 bg-red-50";
-  if (readOnly) return baseClass + "bg-gray-50 border-gray-200 text-gray-700";
-  return (
-    baseClass +
-    "border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-  );
-};
-
-function CompactInputField({
-  id,
-  label,
-  value,
-  onChange,
-  type = "text",
-  readOnly = false,
-  placeholder = "",
-  required = false,
-  step = "1",
-  // hint = "", // Removed hint for compactness
-  error = "",
-}: Readonly<CompactInputFieldProps>) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        {/* Adjusted: text-xs instead of text-sm */}
-        <label htmlFor={id} className="block text-xs font-medium text-gray-600">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        {/* {hint && <span className="text-xs text-gray-500 truncate">{hint}</span>} */}
-      </div>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        placeholder={placeholder}
-        readOnly={readOnly}
-        step={step}
-        className={getInputClassName(error, readOnly)}
-      />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
 // --- END OF UI ADJUSTMENTS ---
 
 interface CamCalculatorProps {
@@ -266,8 +203,8 @@ interface CamCalculatorProps {
     isRepeatLoan?: boolean;
   };
   readonly brandId?: string;
-  refresh: boolean;
-  setRefresh: (val: boolean) => void;
+  readonly refresh?: boolean;
+  readonly setRefresh?: (val: boolean) => void;
 }
 
 interface TenureOption {
@@ -300,13 +237,12 @@ interface TenureOption {
 
 export function CamCalculator({
   loan,
-  refresh,
-  setRefresh,
 }: Readonly<CamCalculatorProps>) {
   const { brandId } = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(true);
   const [tenures, setTenures] = useState<TenureOption[]>([]);
+  // @ts-ignore
   const [loadingTenures, setLoadingTenures] = useState(false);
   const [existingCalculations, setExistingCalculations] = useState<any[]>([]);
   const [loadingExisting, setLoadingExisting] = useState(false);
@@ -321,7 +257,6 @@ export function CamCalculator({
   );
   const [repaymentError, setRepaymentError] = useState<string | null>(null);
   const [isCalculatingRepayment, setIsCalculatingRepayment] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [manuallyEditedFields, setManuallyEditedFields] = useState<
     Set<keyof FormData>
   >(new Set());
@@ -329,6 +264,7 @@ export function CamCalculator({
   const [creditRiskData, setCreditRiskData] = useState<any>(null);
   const [loadingCreditRisk, setLoadingCreditRisk] = useState(false);
   const [creditRiskError, setCreditRiskError] = useState<string | null>(null);
+  // @ts-ignore
   const isReadOnly = loan?.status !== "PENDING";
 
   // Fetch loan rule tenures when dialog opens
@@ -616,106 +552,6 @@ export function CamCalculator({
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    // If user is typing in the recommended field
-    if (field === "loanRecommended") {
-      // Mark it as manually edited if it has a value
-      if (value !== "" && value !== formData.loanRecommended) {
-        setManuallyEditedFields((prev) => new Set(prev).add(field));
-      }
-      // If user clears the field (empty string), keep it cleared
-      if (value === "") {
-        setManuallyEditedFields((prev) => new Set(prev).add(field));
-        setFormData((prev) => ({ ...prev, [field]: value }));
-        return;
-      }
-    }
-
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // ADDED: Reset function
-  const handleReset = () => {
-    setFormData({
-      ...INITIAL_DATA,
-      disbursalDate: formatDate(new Date()),
-      loanApplied: loan?.amount ? loan.amount.toString() : "",
-      loanRecommended: loan?.amount ? loan.amount.toString() : "",
-    });
-    setManuallyEditedFields(new Set()); // Clear the manual edits tracking
-    setRepaymentData(null);
-    setRepaymentError(null);
-  };
-
-  const handleSalaryDateChange = (
-    field: "salaryCreditDate1" | "salaryCreditDate2" | "salaryCreditDate3",
-    value: string
-  ) => {
-    const updates: Partial<FormData> = { [field]: value };
-
-    // When first date is set, calculate previous two months going backwards
-    if (field === "salaryCreditDate1" && value) {
-      const date1 = new Date(value);
-
-      // Go back 1 month for date 2
-      const date2 = new Date(date1);
-      date2.setMonth(date2.getMonth() - 1);
-      updates.salaryCreditDate2 = formatDate(date2);
-
-      // Go back 2 months for date 3
-      const date3 = new Date(date1);
-      date3.setMonth(date3.getMonth() - 2);
-      updates.salaryCreditDate3 = formatDate(date3);
-
-      // Auto-set next pay date (next month)
-      const nextPayDate = new Date(date1);
-      nextPayDate.setMonth(nextPayDate.getMonth() + 1);
-      updates.nextPayDate = formatDate(nextPayDate);
-    }
-
-    // When second date is set, auto-calculate first and third
-    if (field === "salaryCreditDate2" && value) {
-      const date2 = new Date(value);
-
-      // Calculate date 1 (next month)
-      const date1 = new Date(date2);
-      date1.setMonth(date1.getMonth() + 1);
-      updates.salaryCreditDate1 = formatDate(date1);
-
-      // Calculate date 3 (previous month)
-      const date3 = new Date(date2);
-      date3.setMonth(date3.getMonth() - 1);
-      updates.salaryCreditDate3 = formatDate(date3);
-
-      // Auto-set next pay date
-      const nextPayDate = new Date(date1);
-      nextPayDate.setMonth(nextPayDate.getMonth() + 1);
-      updates.nextPayDate = formatDate(nextPayDate);
-    }
-
-    // When third date is set, auto-calculate date 1 and 2
-    if (field === "salaryCreditDate3" && value) {
-      const date3 = new Date(value);
-
-      // Calculate date 2 (next month)
-      const date2 = new Date(date3);
-      date2.setMonth(date2.getMonth() + 1);
-      updates.salaryCreditDate2 = formatDate(date2);
-
-      // Calculate date 1 (two months ahead)
-      const date1 = new Date(date3);
-      date1.setMonth(date1.getMonth() + 2);
-      updates.salaryCreditDate1 = formatDate(date1);
-
-      // Auto-set next pay date
-      const nextPayDate = new Date(date1);
-      nextPayDate.setMonth(nextPayDate.getMonth() + 1);
-      updates.nextPayDate = formatDate(nextPayDate);
-    }
-
-    setFormData((prev) => ({ ...prev, ...updates }));
-  };
-
   const checkCreditRisk = async () => {
     if (!loan?.userId || !brandId) {
       toast.error("Missing user or brand information");
@@ -809,215 +645,6 @@ export function CamCalculator({
     } finally {
       setLoadingCreditRisk(false);
     }
-  };
-
-  const handleSave = async () => {
-    if (!loan?.id || !loan?.userId || !brandId) {
-      alert("Missing required loan information");
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      const savePayload = {
-        loanId: loan.id,
-        userId: loan.userId,
-        partnerUserId: loan?.userId || "",
-        salaryCreditDate1: formData.salaryCreditDate1,
-        salaryCreditDate2: formData.salaryCreditDate2,
-        salaryCreditDate3: formData.salaryCreditDate3,
-        salaryAmount1: formData.salaryAmount1
-          ? parseNum(formData.salaryAmount1)
-          : undefined,
-        salaryAmount2: formData.salaryAmount2
-          ? parseNum(formData.salaryAmount2)
-          : undefined,
-        salaryAmount3: formData.salaryAmount3
-          ? parseNum(formData.salaryAmount3)
-          : undefined,
-        nextPayDate: formData.nextPayDate,
-        salaryVariance: formData.salaryVariance
-          ? parseNum(formData.salaryVariance)
-          : undefined,
-        actualSalary: formData.actualSalary
-          ? parseNum(formData.actualSalary)
-          : undefined,
-        eligibleFoir: formData.eligibleFoir
-          ? parseNum(formData.eligibleFoir)
-          : undefined,
-        loanApplied: formData.loanApplied
-          ? parseNum(formData.loanApplied)
-          : undefined,
-        eligibleLoan: formData.eligibleLoan
-          ? parseNum(formData.eligibleLoan)
-          : undefined,
-        loanRecommended: formData.loanRecommended
-          ? parseNum(formData.loanRecommended)
-          : undefined,
-        disbursalDate: formData.disbursalDate,
-        repayDate: formData.repayDate,
-        tenureId: formData.tenureId,
-        avgSalary: formData.avgSalary
-          ? parseNum(formData.avgSalary)
-          : undefined,
-        foirAchieved: formData.foirAchieved
-          ? parseNum(formData.foirAchieved)
-          : undefined,
-        proposedFoir: formData.proposedFoir
-          ? parseNum(formData.proposedFoir)
-          : undefined,
-        obligations: formData.obligations
-          ? parseNum(formData.obligations)
-          : undefined,
-        repaymentData: repaymentData,
-      };
-
-      const result = await saveCAMCalculator(brandId, savePayload);
-
-      if (result.success) {
-        toast.success("✅ CAM Calculator data saved successfully!");
-        setExistingCalculations([result.data, ...existingCalculations]);
-        setRefresh(!refresh);
-        setIsOpen(false);
-      } else {
-        alert("❌ " + (result.message || "Failed to save CAM Calculator data"));
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to save CAM Calculator data";
-      alert("❌ " + errorMessage);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const getTenurePlaceholder = () => {
-    if (loadingTenures) return "Loading tenures...";
-    if (tenures.length === 0) return "No tenures available";
-    return "Select a tenure option";
-  };
-
-  const renderTenureChargesSection = () => {
-    const selectedTenureObj = formData.tenureId
-      ? tenures.find((t) => t.id === formData.tenureId)
-      : null;
-
-    if (
-      !selectedTenureObj ||
-      !selectedTenureObj.loan_charge_config ||
-      selectedTenureObj.loan_charge_config.length === 0
-    ) {
-      return null;
-    }
-    // Reduced padding and font sizes here
-    return (
-      <div>
-        <div className="flex items-center gap-1 mb-2">
-          <FaClipboardList className="w-3 h-3 text-blue-600" />
-          <h4 className="text-xs font-bold text-gray-900">
-            Tenure Charges Configuration
-          </h4>
-        </div>
-
-        <div className="space-y-1">
-          {/* Tenure Info */}
-          <div className="bg-white/80 p-2 rounded-lg border border-blue-100 grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <p className="text-gray-500 text-[10px]">Duration</p>
-              <p className="font-bold text-blue-700">
-                {selectedTenureObj.minTermDays}-{selectedTenureObj.maxTermDays}d
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-[10px]">Grace Period</p>
-              <p className="font-bold text-blue-700">
-                {selectedTenureObj.gracePeriod}d
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-[10px]">Repayment</p>
-              <p className="font-bold text-blue-700">
-                {selectedTenureObj.minRepaymentDays}d
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-[10px]">Type</p>
-              <p className="font-bold text-blue-700 text-[10px]">
-                {selectedTenureObj.loan_type}
-              </p>
-            </div>
-          </div>
-
-          {/* Charges */}
-          {selectedTenureObj.loan_charge_config.map((charge, cidx) => (
-            <div
-              key={`charge-tenure-${cidx}`}
-              className="bg-white/80 p-2 rounded-lg border border-amber-100 hover:shadow-sm transition-shadow"
-            >
-              <div className="flex justify-between items-start mb-1">
-                <div>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    {charge.type}
-                  </p>
-                  <div className="flex gap-1 mt-0.5 text-[10px] text-gray-500">
-                    <span
-                      className={`px-1 py-0.5 rounded ${
-                        charge.chargeMode === "INCLUSIVE"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-teal-100 text-teal-700"
-                      }`}
-                    >
-                      {charge.chargeMode.substring(0, 3)}
-                    </span>
-                    <span className="px-1 py-0.5 bg-gray-100 rounded">
-                      {charge.valueType === "percentage"
-                        ? charge.chargeValue + "%"
-                        : "₹" + charge.chargeValue}
-                    </span>
-                    {charge.isRecurringDaily && (
-                      <span className="px-1 py-0.5 bg-blue-100 text-blue-700 rounded">
-                        Daily
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Taxes for this charge */}
-              {charge.loan_charge_taxes &&
-                charge.loan_charge_taxes.length > 0 && (
-                  <div className="ml-2 mt-1 space-y-0.5 border-t pt-1">
-                    {charge.loan_charge_taxes.map((tax, tidx) => (
-                      <div
-                        key={`tax-tenure-${cidx}-${tidx}`}
-                        className="flex justify-between text-xs bg-amber-50 p-1 rounded"
-                      >
-                        <span className="text-gray-700 text-[10px]">
-                          <span className="font-medium">{tax.type}:</span>{" "}
-                          {tax.valueType === "percentage"
-                            ? tax.chargeValue + "%"
-                            : "₹" + tax.chargeValue}
-                        </span>
-                        <span
-                          className={`text-[10px] ${
-                            tax.isInclusive
-                              ? "text-amber-600"
-                              : "text-orange-600"
-                          }`}
-                        >
-                          {tax.isInclusive ? "(Incl.)" : "(Excl.)"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
   };
 
   const renderRepaymentDetailsSection = () => {
@@ -1797,7 +1424,7 @@ export function CamCalculator({
                         tenures.length === 0 || loadingTenures || isReadOnly
                       }
                     >
-                      <option value="">{getTenurePlaceholder()}</option>
+                      <option value="">Select a tenure option</option>
                       {tenures
                         .filter((tenure) => {
                           const ruleType = tenure.ruleType?.toLowerCase() || "";
