@@ -720,7 +720,7 @@ export function CustomerLoans(
                         {/* Amount */}
                         <td className="px-3 py-3">
                           <span className="text-[13px] font-bold text-slate-900">
-                            {Conversion.formatCurrency(loan.amount.toLocaleString())}
+                            {Conversion.formatCurrency(loan.amount)}
                           </span>
                           {loan.purpose && (
                             <p className="text-[10px] text-slate-400 capitalize truncate max-w-[120px] mt-0.5">
