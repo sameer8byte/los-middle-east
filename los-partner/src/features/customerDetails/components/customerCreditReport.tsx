@@ -17,6 +17,7 @@ import { useAppSelector } from "../../../shared/redux/store";
 import { selectProvidersByType } from "../../../shared/redux/slices/brand.slice";
 import { BrandProviderName, BrandProviderType } from "../../../constant/enum";
 import { useAwsSignedUrl } from "../../../hooks/useAwsSignedUrl";
+import { Conversion } from "../../../utils/conversion";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
@@ -71,8 +72,8 @@ export interface ERSData {
 
 // Bureau Loan Summary Types - New Format
 export interface BureauLoanCategoryData {
-  secured: number;  // Value in Lakhs
-  unsecured: number;  // Value in Lakhs
+  secured: number;  // Value in BHD
+  unsecured: number;  // Value in BHD
   closed: { tlCount: number; tlValue: number };
   live: { tlCount: number; tlValue: number };
   securedLive: { tlCount: number; tlValue: number };
@@ -115,9 +116,9 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
     return Number.parseFloat(val.replace(/,/g, "")) || 0;
   };
 
-  // Convert to Lakhs (1 Lakh = 100,000)
-  const toLakhs = (amount: number): number => {
-    return Number.parseFloat((amount / 100000).toFixed(2));
+  // Helper to format amount as BHD
+  const toBHDValue = (amount: number): number => {
+    return Number.parseFloat(amount.toFixed(3));
   };
 
   // Date helpers
@@ -140,9 +141,9 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
   const hasDPD = (loan: any): boolean => {
     const history = loan.HISTORY?.[0];
     const values = history?.VALUES || "";
-    return values.includes("030") || values.includes("060") || values.includes("090") || 
-           values.includes("180") || values.includes("900") || values.includes("XXX") ||
-           values.includes("SUB") || values.includes("DBT") || values.includes("LSS");
+    return values.includes("030") || values.includes("060") || values.includes("090") ||
+      values.includes("180") || values.includes("900") || values.includes("XXX") ||
+      values.includes("SUB") || values.includes("DBT") || values.includes("LSS");
   };
 
   // Check if loan is written off
@@ -150,8 +151,8 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
     const status = (loan["ACCOUNT-STATUS"] || "").toUpperCase();
     const history = loan.HISTORY?.[0];
     const values = history?.VALUES || "";
-    return status.includes("WRITE") || status.includes("WOF") || 
-           values.includes("WOF") || values.includes("900") || values.includes("SMA");
+    return status.includes("WRITE") || status.includes("WOF") ||
+      values.includes("WOF") || values.includes("900") || values.includes("SMA");
   };
 
   // Get the date reported or open date for a loan
@@ -173,41 +174,41 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
     // Separate by security status
     const secLoans = loans.filter((t: any) => t["SECURITY-STATUS"]?.toUpperCase() === "SECURED");
     const unsecLoans = loans.filter((t: any) => t["SECURITY-STATUS"]?.toUpperCase() !== "SECURED");
-    
+
     // Secured/Unsecured values (current balance for all loans in category)
-    const securedValue = toLakhs(secLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
-    const unsecuredValue = toLakhs(unsecLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
-    
+    const securedValue = toBHDValue(secLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
+    const unsecuredValue = toBHDValue(unsecLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
+
     // Closed loans
     const closedLoans = loans.filter((t: any) => t["ACCOUNT-STATUS"] === "Closed");
     const closedTlCount = closedLoans.length;
-    const closedTlValue = toLakhs(closedLoans.reduce((sum: number, t: any) => sum + parseAmount(t["DISBURSED-AMT"]), 0));
+    const closedTlValue = toBHDValue(closedLoans.reduce((sum: number, t: any) => sum + parseAmount(t["DISBURSED-AMT"]), 0));
 
     // Live (Active) loans
     const liveLoans = loans.filter((t: any) => t["ACCOUNT-STATUS"] === "Active");
     const liveTlCount = liveLoans.length;
-    const liveTlValue = toLakhs(liveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
+    const liveTlValue = toBHDValue(liveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
 
     // Secured Live loans
     const securedLiveLoans = liveLoans.filter((t: any) => t["SECURITY-STATUS"]?.toUpperCase() === "SECURED");
     const securedLiveTlCount = securedLiveLoans.length;
-    const securedLiveTlValue = toLakhs(securedLiveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
+    const securedLiveTlValue = toBHDValue(securedLiveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
 
     // Unsecured Live loans
     const unsecuredLiveLoans = liveLoans.filter((t: any) => t["SECURITY-STATUS"]?.toUpperCase() !== "SECURED");
     const unsecuredLiveTlCount = unsecuredLiveLoans.length;
-    const unsecuredLiveTlValue = toLakhs(unsecuredLiveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
+    const unsecuredLiveTlValue = toBHDValue(unsecuredLiveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
 
-    // Payday loans (Credit Cards always payday, OR unsecured loans with disbursed amount < 100,000)
+    // Payday loans (Credit Cards always payday, OR unsecured loans with disbursed amount < 500)
     const paydayLoans = liveLoans.filter((t: any) => {
       const acctType = (t["ACCT-TYPE"] || "").toUpperCase();
       const isCreditCard = acctType.includes("CREDIT CARD") || acctType.includes("CARD") || acctType.includes("CC");
       if (isCreditCard) return true; // Credit cards are always payday
       const disbursedAmt = parseAmount(t["DISBURSED-AMT"]);
-      return t["SECURITY-STATUS"]?.toUpperCase() !== "SECURED" && disbursedAmt < 100000;
+      return t["SECURITY-STATUS"]?.toUpperCase() !== "SECURED" && disbursedAmt < 500;
     });
     const paydayTlCount = paydayLoans.length;
-    const paydayTlValue = toLakhs(paydayLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
+    const paydayTlValue = toBHDValue(paydayLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0));
 
     const result: BureauLoanCategoryData = {
       secured: securedValue,
@@ -221,11 +222,11 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
 
     if (includeScoreAndLeverage) {
       result.score = creditScore;
-      
+
       const paydayLiability = paydayLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0);
       const totalLiveLiability = liveLoans.reduce((sum: number, t: any) => sum + parseAmount(t["CURRENT-BAL"]), 0);
-      
-      result.leverageVsPaydayLiability = paydayLiability > 0 
+
+      result.leverageVsPaydayLiability = paydayLiability > 0
         ? Number.parseFloat((totalLiveLiability / paydayLiability).toFixed(2))
         : 0;
 
@@ -234,7 +235,7 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
         if (monthlyPayment > 0) return sum + monthlyPayment;
         return sum + parseAmount(t["CURRENT-BAL"]) * 0.03; // Assume 3% of balance as EMI
       }, 0);
-      
+
       result.leverageVsMonthlyLiability = monthlyLiability > 0
         ? Number.parseFloat((totalLiveLiability / monthlyLiability).toFixed(2))
         : 0;
@@ -249,18 +250,18 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
       const inquiryDate = parseDate(inq["INQUIRY-DT"]);
       return inquiryDate && inquiryDate >= startDate;
     });
-    
+
     // Calculate amounts from enquiries (use enquiry amount if available)
     let securedAmount = 0;
     let unsecuredAmount = 0;
-    
+
     enquiriesInPeriod.forEach((inq: any) => {
       const amount = parseAmount(inq["AMOUNT"]);
       const purpose = (inq["PURPOSE"] || "").toUpperCase();
-      
+
       // Classify as secured or unsecured based on purpose
-      if (purpose.includes("HOME") || purpose.includes("AUTO") || purpose.includes("PROPERTY") || 
-          purpose.includes("VEHICLE") || purpose.includes("LAP") || purpose.includes("GOLD")) {
+      if (purpose.includes("HOME") || purpose.includes("AUTO") || purpose.includes("PROPERTY") ||
+        purpose.includes("VEHICLE") || purpose.includes("LAP") || purpose.includes("GOLD")) {
         securedAmount += amount;
       } else {
         unsecuredAmount += amount;
@@ -268,18 +269,22 @@ const transformToBureauLoanSummary = (rawReportJson: any): BureauLoanSummaryData
     });
 
     return {
-      secured: toLakhs(securedAmount),
-      unsecured: toLakhs(unsecuredAmount),
+      secured: toBHDValue(securedAmount),
+      unsecured: toBHDValue(unsecuredAmount),
       closed: { tlCount: 0, tlValue: 0 },
-      live: { tlCount: enquiriesInPeriod.length, tlValue: toLakhs(securedAmount + unsecuredAmount) },
-      securedLive: { tlCount: enquiriesInPeriod.filter((inq: any) => {
-        const purpose = (inq["PURPOSE"] || "").toUpperCase();
-        return purpose.includes("HOME") || purpose.includes("AUTO") || purpose.includes("PROPERTY");
-      }).length, tlValue: toLakhs(securedAmount) },
-      unsecuredLive: { tlCount: enquiriesInPeriod.filter((inq: any) => {
-        const purpose = (inq["PURPOSE"] || "").toUpperCase();
-        return !purpose.includes("HOME") && !purpose.includes("AUTO") && !purpose.includes("PROPERTY");
-      }).length, tlValue: toLakhs(unsecuredAmount) },
+      live: { tlCount: enquiriesInPeriod.length, tlValue: toBHDValue(securedAmount + unsecuredAmount) },
+      securedLive: {
+        tlCount: enquiriesInPeriod.filter((inq: any) => {
+          const purpose = (inq["PURPOSE"] || "").toUpperCase();
+          return purpose.includes("HOME") || purpose.includes("AUTO") || purpose.includes("PROPERTY");
+        }).length, tlValue: toBHDValue(securedAmount)
+      },
+      unsecuredLive: {
+        tlCount: enquiriesInPeriod.filter((inq: any) => {
+          const purpose = (inq["PURPOSE"] || "").toUpperCase();
+          return !purpose.includes("HOME") && !purpose.includes("AUTO") && !purpose.includes("PROPERTY");
+        }).length, tlValue: toBHDValue(unsecuredAmount)
+      },
       payday: { tlCount: 0, tlValue: 0 },
     };
   };
@@ -563,7 +568,7 @@ export function CreditReport() {
             )}
             {cirProV2Report && (
               <div className="mt-4 space-y-4">
-      
+
                 {cirProV2Report.reportDocumentUrl && (
                   <DocumentUrlHandler
                     documentUrl={cirProV2Report.reportDocumentUrl}
@@ -575,7 +580,7 @@ export function CreditReport() {
                     reportData={cirProV2Report.rawReportJson}
                   />
                 )}
-                          {
+                {
                   cirProV2Report.rawReportJson && (
                     <BureauLoanSummary data={transformToBureauLoanSummary(cirProV2Report.rawReportJson)} />
                   )
@@ -947,7 +952,7 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                       <span className="font-medium text-[var(--color-on-surface)] opacity-70">
                         Income:
                       </span>
-                      <div>₹{parseFloat(emp.Income).toLocaleString()}</div>
+                      <div>{Conversion.formatCurrency(emp.Income)}</div>
                     </div>
                   )}
                   {emp.DateReported && (
@@ -1005,9 +1010,8 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
 
                   return (
                     <tr
-                      key={`account-${
-                        account.AccountNumber || account.AccountType
-                      }-${account.Institution}-${idx}`}
+                      key={`account-${account.AccountNumber || account.AccountType
+                        }-${account.Institution}-${idx}`}
                       className="hover:bg-[var(--color-background)]"
                     >
                       <td className="px-2 py-2">
@@ -1017,21 +1021,17 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                         {account.Institution || "N/A"}
                       </td>
                       <td className="px-2 py-2 text-right">
-                        ₹{parseFloat(account.HighCredit || 0).toLocaleString()}
+                        {Conversion.formatCurrency(account.HighCredit || 0)}
                       </td>
                       <td className="px-2 py-2 text-right">
-                        ₹
-                        {parseFloat(
-                          account.CurrentBalance || 0,
-                        ).toLocaleString()}
+                        {Conversion.formatCurrency(account.CurrentBalance || 0)}
                       </td>
                       <td className="px-2 py-2 text-center">
                         <span
-                          className={`px-2 py-0.5 rounded-full text-xs ${
-                            isActive
-                              ? "bg-[var(--color-success)] bg-opacity-20 text-[var(--color-on-success)]"
-                              : "bg-[var(--color-muted)] bg-opacity-30 text-[var(--color-on-surface)] opacity-70"
-                          }`}
+                          className={`px-2 py-0.5 rounded-full text-xs ${isActive
+                            ? "bg-[var(--color-success)] bg-opacity-20 text-[var(--color-on-success)]"
+                            : "bg-[var(--color-muted)] bg-opacity-30 text-[var(--color-on-surface)] opacity-70"
+                            }`}
                         >
                           {account.AccountStatus || "Unknown"}
                         </span>
@@ -1041,11 +1041,10 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                       </td>
                       <td className="px-2 py-2 text-center">
                         <span
-                          className={`font-medium ${
-                            isDpd
-                              ? "text-[var(--color-error)]"
-                              : "text-[var(--color-success)]"
-                          }`}
+                          className={`font-medium ${isDpd
+                            ? "text-[var(--color-error)]"
+                            : "text-[var(--color-success)]"
+                            }`}
                         >
                           {account.PaymentHistoryProfile?.DPD || 0}
                         </span>
@@ -1109,23 +1108,21 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
 
                   const daysAgo = enq.Date
                     ? Math.floor(
-                        (new Date().getTime() - new Date(enq.Date).getTime()) /
-                          (1000 * 60 * 60 * 24),
-                      )
+                      (new Date().getTime() - new Date(enq.Date).getTime()) /
+                      (1000 * 60 * 60 * 24),
+                    )
                     : null;
 
                   const isRecent = daysAgo !== null && daysAgo <= 30;
 
                   return (
                     <tr
-                      key={`enquiry-${enq.Date}-${enq.Institution}-${
-                        enq.seq || idx
-                      }`}
-                      className={`hover:bg-[var(--color-background)] ${
-                        isRecent
-                          ? "bg-[var(--color-warning)] bg-opacity-10"
-                          : ""
-                      }`}
+                      key={`enquiry-${enq.Date}-${enq.Institution}-${enq.seq || idx
+                        }`}
+                      className={`hover:bg-[var(--color-background)] ${isRecent
+                        ? "bg-[var(--color-warning)] bg-opacity-10"
+                        : ""
+                        }`}
                     >
                       <td className="px-2 py-2">
                         <div className="font-medium">
@@ -1162,17 +1159,13 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                       <td className="px-2 py-2 text-right font-medium">
                         {(() => {
                           if (enq.Amount && parseFloat(enq.Amount) > 0) {
-                            return `₹${parseFloat(
-                              enq.Amount,
-                            ).toLocaleString()}`;
+                            return Conversion.formatCurrency(enq.Amount);
                           }
                           if (
                             enq.EnquiryAmount &&
                             parseFloat(enq.EnquiryAmount) > 0
                           ) {
-                            return `₹${parseFloat(
-                              enq.EnquiryAmount,
-                            ).toLocaleString()}`;
+                            return Conversion.formatCurrency(enq.EnquiryAmount);
                           }
                           return "-";
                         })()}
@@ -1180,11 +1173,10 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                       <td className="px-2 py-2 text-center">
                         {daysAgo !== null && (
                           <span
-                            className={`px-2 py-0.5 rounded-full font-medium ${
-                              isRecent
-                                ? "bg-[var(--color-warning)] bg-opacity-20 text-[var(--color-on-warning)]"
-                                : "text-[var(--color-on-surface)] opacity-60"
-                            }`}
+                            className={`px-2 py-0.5 rounded-full font-medium ${isRecent
+                              ? "bg-[var(--color-warning)] bg-opacity-20 text-[var(--color-on-warning)]"
+                              : "text-[var(--color-on-surface)] opacity-60"
+                              }`}
                           >
                             {daysAgo === 0 ? "Today" : `${daysAgo}d`}
                           </span>
@@ -1231,14 +1223,12 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
               Total Exposure
             </div>
             <div className="text-xl font-bold text-[var(--color-primary)]">
-              ₹
-              {accounts
+              {Conversion.formatCurrency(accounts
                 .reduce(
                   (sum: number, a: any) =>
-                    sum + parseFloat(a.Balance || a.CurrentBalance || 0),
+                    sum + parseFloat((a.Balance || a.CurrentBalance || 0).toString().replace(/,/g, "")),
                   0,
-                )
-                .toLocaleString()}
+                ))}
             </div>
           </div>
           <div className="bg-[var(--color-background)] p-3 rounded-lg">
@@ -1300,10 +1290,7 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                   Total Balance
                 </div>
                 <div className="text-lg font-bold">
-                  ₹
-                  {parseFloat(
-                    accountsSummary.TotalBalanceAmount,
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(accountsSummary.TotalBalanceAmount)}
                 </div>
               </div>
             )}
@@ -1313,10 +1300,7 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                   Total Sanctioned
                 </div>
                 <div className="text-lg font-bold">
-                  ₹
-                  {parseFloat(
-                    accountsSummary.TotalSanctionAmount,
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(accountsSummary.TotalSanctionAmount)}
                 </div>
               </div>
             )}
@@ -1326,10 +1310,7 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                   Credit Limit
                 </div>
                 <div className="text-lg font-bold">
-                  ₹
-                  {parseFloat(
-                    accountsSummary.TotalCreditLimit,
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(accountsSummary.TotalCreditLimit)}
                 </div>
               </div>
             )}
@@ -1339,10 +1320,7 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                   Highest Balance
                 </div>
                 <div className="text-lg font-bold">
-                  ₹
-                  {parseFloat(
-                    accountsSummary.SingleHighestBalance,
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(accountsSummary.SingleHighestBalance)}
                 </div>
               </div>
             )}
@@ -1352,10 +1330,7 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                   Avg Balance
                 </div>
                 <div className="text-lg font-bold">
-                  ₹
-                  {parseFloat(
-                    accountsSummary.AverageOpenBalance,
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(accountsSummary.AverageOpenBalance)}
                 </div>
               </div>
             )}
@@ -1397,66 +1372,65 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
       {(writeOffAccounts.length > 0 ||
         settledAccounts.length > 0 ||
         overdueAccounts.length > 0) && (
-        <div className="bg-[var(--color-error)] bg-opacity-10 p-4 rounded-lg border-2 border-[var(--color-error)] border-opacity-30">
-          <h4 className="font-semibold text-sm mb-3 text-[var(--color-on-error)] flex items-center gap-2">
-            <span className="text-lg">⚠️</span> Risk Indicators
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            {writeOffAccounts.length > 0 && (
-              <div className="p-3 bg-[var(--color-background)] rounded-lg border border-[var(--color-error)] border-opacity-30">
-                <div className="text-[var(--color-error)] font-bold mb-2">
-                  Write-offs: {writeOffAccounts.length}
+          <div className="bg-[var(--color-error)] bg-opacity-10 p-4 rounded-lg border-2 border-[var(--color-error)] border-opacity-30">
+            <h4 className="font-semibold text-sm mb-3 text-[var(--color-on-error)] flex items-center gap-2">
+              <span className="text-lg">⚠️</span> Risk Indicators
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              {writeOffAccounts.length > 0 && (
+                <div className="p-3 bg-[var(--color-background)] rounded-lg border border-[var(--color-error)] border-opacity-30">
+                  <div className="text-[var(--color-error)] font-bold mb-2">
+                    Write-offs: {writeOffAccounts.length}
+                  </div>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {writeOffAccounts.map((acc: any, idx: number) => (
+                      <div
+                        key={`writeoff-${acc.seq || idx}`}
+                        className="text-[var(--color-on-surface)] opacity-80"
+                      >
+                        • {acc.AccountType} - {Conversion.formatCurrency(acc.SanctionAmount || 0)}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {writeOffAccounts.map((acc: any, idx: number) => (
-                    <div
-                      key={`writeoff-${acc.seq || idx}`}
-                      className="text-[var(--color-on-surface)] opacity-80"
-                    >
-                      • {acc.AccountType} - ₹
-                      {parseFloat(acc.SanctionAmount || 0).toLocaleString()}
-                    </div>
-                  ))}
+              )}
+              {settledAccounts.length > 0 && (
+                <div className="p-3 bg-[var(--color-background)] rounded-lg border border-[var(--color-warning)] border-opacity-30">
+                  <div className="text-[var(--color-warning)] font-bold mb-2">
+                    Settled Accounts: {settledAccounts.length}
+                  </div>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {settledAccounts.map((acc: any, idx: number) => (
+                      <div
+                        key={`settled-${acc.seq || idx}`}
+                        className="text-[var(--color-on-surface)] opacity-80"
+                      >
+                        • {acc.AccountType} at {acc.Institution}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {settledAccounts.length > 0 && (
-              <div className="p-3 bg-[var(--color-background)] rounded-lg border border-[var(--color-warning)] border-opacity-30">
-                <div className="text-[var(--color-warning)] font-bold mb-2">
-                  Settled Accounts: {settledAccounts.length}
+              )}
+              {overdueAccounts.length > 0 && (
+                <div className="p-3 bg-[var(--color-background)] rounded-lg border border-[var(--color-error)] border-opacity-30">
+                  <div className="text-[var(--color-error)] font-bold mb-2">
+                    Overdue Accounts: {overdueAccounts.length}
+                  </div>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {overdueAccounts.map((acc: any, idx: number) => (
+                      <div
+                        key={`overdue-${acc.seq || idx}`}
+                        className="text-[var(--color-on-surface)] opacity-80"
+                      >
+                        • {acc.AccountType} - {acc.AccountStatus}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {settledAccounts.map((acc: any, idx: number) => (
-                    <div
-                      key={`settled-${acc.seq || idx}`}
-                      className="text-[var(--color-on-surface)] opacity-80"
-                    >
-                      • {acc.AccountType} at {acc.Institution}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {overdueAccounts.length > 0 && (
-              <div className="p-3 bg-[var(--color-background)] rounded-lg border border-[var(--color-error)] border-opacity-30">
-                <div className="text-[var(--color-error)] font-bold mb-2">
-                  Overdue Accounts: {overdueAccounts.length}
-                </div>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {overdueAccounts.map((acc: any, idx: number) => (
-                    <div
-                      key={`overdue-${acc.seq || idx}`}
-                      className="text-[var(--color-on-surface)] opacity-80"
-                    >
-                      • {acc.AccountType} - {acc.AccountStatus}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Account Type Distribution */}
       <div className="bg-[var(--color-surface)] p-4 rounded-lg border border-[var(--color-muted)] border-opacity-30">
@@ -1510,21 +1484,19 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
             )}
             {enquirySummary.Past30Days !== undefined && (
               <div
-                className={`p-3 rounded-lg shadow-sm ${
-                  parseInt(enquirySummary.Past30Days) > 3
-                    ? "bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] border-opacity-30"
-                    : "bg-[var(--color-background)]"
-                }`}
+                className={`p-3 rounded-lg shadow-sm ${parseInt(enquirySummary.Past30Days) > 3
+                  ? "bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] border-opacity-30"
+                  : "bg-[var(--color-background)]"
+                  }`}
               >
                 <div className="text-[var(--color-on-surface)] opacity-70 mb-1">
                   Last 30 Days
                 </div>
                 <div
-                  className={`text-2xl font-bold ${
-                    parseInt(enquirySummary.Past30Days) > 3
-                      ? "text-[var(--color-error)]"
-                      : "text-[var(--color-success)]"
-                  }`}
+                  className={`text-2xl font-bold ${parseInt(enquirySummary.Past30Days) > 3
+                    ? "text-[var(--color-error)]"
+                    : "text-[var(--color-success)]"
+                    }`}
                 >
                   {enquirySummary.Past30Days}
                 </div>
@@ -1897,7 +1869,7 @@ const CirProV2ReportDisplay = ({
     const disbursedAmount = parseFloat(
       t["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
     );
-    return disbursedAmount < 100000;
+    return disbursedAmount < 500;
   });
 
   const unsecuredNonPaydayLoans = unsecuredLoans.filter((t: any) => {
@@ -1907,7 +1879,7 @@ const CirProV2ReportDisplay = ({
     const disbursedAmount = parseFloat(
       t["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
     );
-    return disbursedAmount >= 100000;
+    return disbursedAmount >= 500;
   });
   return (
     <div className="space-y-4">
@@ -2074,10 +2046,7 @@ const CirProV2ReportDisplay = ({
                 Total Balance
               </div>
               <div className="text-xl font-bold text-[var(--color-primary)]">
-                ₹
-                {parseFloat(
-                  primarySummary["TOTAL-CURRENT-BALANCE"] || "0",
-                ).toLocaleString()}
+                {Conversion.formatCurrency(primarySummary["TOTAL-CURRENT-BALANCE"] || "0")}
               </div>
             </div>
             <div className="bg-[var(--color-background)] p-3 rounded-lg">
@@ -2132,69 +2101,56 @@ const CirProV2ReportDisplay = ({
                   }
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    securedLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) =>
-                          sum +
-                          parseFloat(
-                            l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                          ),
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(securedLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active").reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                        ),
+                      0,
+                    ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    securedLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) =>
-                          sum +
-                          parseFloat(
-                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                          ),
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(securedLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                        ),
+                      0,
+                    ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30">
                   <span className="text-[var(--color-error)]">
-                    ₹
-                    {Math.round(
-                      securedLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ),
-                    ).toLocaleString()}
+                    {Conversion.formatCurrency(securedLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ))}
                   </span>
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    securedLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) => sum + calculateEMI(l).emi,
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(securedLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) => sum + calculateEMI(l).emi,
+                      0,
+                    ))}
                 </td>
               </tr>
 
               {/* Unsecured - Non-Payday Row */}
               <tr className="border-t border-[var(--color-muted)] border-opacity-20">
                 <td className="px-4 py-2 font-medium text-[var(--color-on-surface)]">
-                  Unsecured - Non-Payday (≥₹100k)
+                  Unsecured - Non-Payday (≥ BHD 500)
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
                   {
@@ -2204,69 +2160,57 @@ const CirProV2ReportDisplay = ({
                   }
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    unsecuredNonPaydayLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) =>
-                          sum +
-                          parseFloat(
-                            l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                          ),
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(unsecuredNonPaydayLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                        ),
+                      0,
+                    ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    unsecuredNonPaydayLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) =>
-                          sum +
-                          parseFloat(
-                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                          ),
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(unsecuredNonPaydayLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                        ),
+                      0,
+                    ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30">
                   <span className="text-[var(--color-error)]">
-                    ₹
-                    {Math.round(
-                      unsecuredNonPaydayLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ),
-                    ).toLocaleString()}
+                    {Conversion.formatCurrency(unsecuredNonPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ))}
                   </span>
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    unsecuredNonPaydayLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) => sum + calculateEMI(l).emi,
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(unsecuredNonPaydayLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) => sum + calculateEMI(l).emi,
+                      0,
+                    ))}
                 </td>
               </tr>
 
               {/* Unsecured - Payday Row */}
               <tr className="border-t border-[var(--color-muted)] border-opacity-20">
                 <td className="px-4 py-2 font-medium text-[var(--color-on-surface)]">
-                  Unsecured - Payday (&lt;₹100k)
+                  Unsecured - Payday (&lt; BHD 500)
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
                   {
@@ -2276,66 +2220,54 @@ const CirProV2ReportDisplay = ({
                   }
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    unsecuredPaydayLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) =>
-                          sum +
-                          parseFloat(
-                            l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                          ),
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(unsecuredPaydayLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                        ),
+                      0,
+                    ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    unsecuredPaydayLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) =>
-                          sum +
-                          parseFloat(
-                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                          ),
-                        0,
-                      ),
-                  ).toLocaleString()}
+                  {Conversion.formatCurrency(unsecuredPaydayLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["CURRENT-BAL"]?.replace(/RP/g, "") || "0", // Corrected typo in original code if it was there, or just keeping match
+                        ),
+                      0,
+                    ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30">
                   <span className="text-[var(--color-error)]">
-                    ₹
-                    {Math.round(
-                      unsecuredPaydayLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ),
-                    ).toLocaleString()}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    unsecuredPaydayLoans
+                    {Conversion.formatCurrency(unsecuredPaydayLoans
                       .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
                       .reduce(
                         (sum: number, l: any) =>
                           sum +
                           parseFloat(
-                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                            l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                           ),
                         0,
-                      ),
-                  ).toLocaleString()}
+                      ))}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 text-[var(--color-on-surface)]">
+                  {Conversion.formatCurrency(unsecuredPaydayLoans
+                    .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                    .reduce(
+                      (sum: number, l: any) =>
+                        sum +
+                        parseFloat(
+                          l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                        ),
+                      0,
+                    ))}
                 </td>
               </tr>
 
@@ -2356,8 +2288,7 @@ const CirProV2ReportDisplay = ({
                     ).length}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 font-bold text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
+                  {Conversion.formatCurrency(Math.round(
                     securedLoans
                       .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
                       .reduce(
@@ -2368,31 +2299,30 @@ const CirProV2ReportDisplay = ({
                           ),
                         0,
                       ) +
-                      unsecuredNonPaydayLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ) +
-                      unsecuredPaydayLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ),
-                  ).toLocaleString()}
+                    unsecuredNonPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ) +
+                    unsecuredPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ),
+                  ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 font-bold text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
+                  {Conversion.formatCurrency(Math.round(
                     securedLoans
                       .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
                       .reduce(
@@ -2403,32 +2333,31 @@ const CirProV2ReportDisplay = ({
                           ),
                         0,
                       ) +
-                      unsecuredNonPaydayLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ) +
-                      unsecuredPaydayLoans
-                        .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                        .reduce(
-                          (sum: number, l: any) =>
-                            sum +
-                            parseFloat(
-                              l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                            ),
-                          0,
-                        ),
-                  ).toLocaleString()}
+                    unsecuredNonPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ) +
+                    unsecuredPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ),
+                  ))}
                 </td>
                 <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30">
                   <span className="font-bold text-[var(--color-error)]">
-                    ₹
-                    {Math.round(
+                    {Conversion.formatCurrency(Math.round(
                       securedLoans
                         .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
                         .reduce(
@@ -2439,42 +2368,14 @@ const CirProV2ReportDisplay = ({
                             ),
                           0,
                         ) +
-                        unsecuredNonPaydayLoans
-                          .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                          .reduce(
-                            (sum: number, l: any) =>
-                              sum +
-                              parseFloat(
-                                l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                              ),
-                            0,
-                          ) +
-                        unsecuredPaydayLoans
-                          .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                          .reduce(
-                            (sum: number, l: any) =>
-                              sum +
-                              parseFloat(
-                                l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                              ),
-                            0,
-                          ),
-                    ).toLocaleString()}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 font-bold text-[var(--color-on-surface)]">
-                  ₹
-                  {Math.round(
-                    securedLoans
-                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-                      .reduce(
-                        (sum: number, l: any) => sum + calculateEMI(l).emi,
-                        0,
-                      ) +
                       unsecuredNonPaydayLoans
                         .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
                         .reduce(
-                          (sum: number, l: any) => sum + calculateEMI(l).emi,
+                          (sum: number, l: any) =>
+                            sum +
+                            parseFloat(
+                              l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
+                            ),
                           0,
                         ) +
                       unsecuredPaydayLoans
@@ -2483,11 +2384,39 @@ const CirProV2ReportDisplay = ({
                           (sum: number, l: any) =>
                             sum +
                             parseFloat(
-                              l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                              l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                             ),
                           0,
                         ),
-                  ).toLocaleString()}
+                    ))}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-center border-l border-[var(--color-muted)] border-opacity-30 font-bold text-[var(--color-on-surface)]">
+
+                  {Math.round(
+                    securedLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) => sum + calculateEMI(l).emi,
+                        0,
+                      ) +
+                    unsecuredNonPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) => sum + calculateEMI(l).emi,
+                        0,
+                      ) +
+                    unsecuredPaydayLoans
+                      .filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
+                      .reduce(
+                        (sum: number, l: any) =>
+                          sum +
+                          parseFloat(
+                            l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                          ),
+                        0,
+                      ),
+                  )}
                 </td>
               </tr>
             </tbody>
@@ -2514,27 +2443,27 @@ const CirProV2ReportDisplay = ({
               const count =
                 status === "Delinquent"
                   ? securedLoans.filter((t: any) => {
-                      const history = t.HISTORY?.[0];
-                      return (
-                        history?.VALUES?.includes("900") ||
-                        history?.VALUES?.includes("030") ||
-                        history?.VALUES?.includes("060") ||
-                        history?.VALUES?.includes("090")
-                      );
-                    }).length
+                    const history = t.HISTORY?.[0];
+                    return (
+                      history?.VALUES?.includes("900") ||
+                      history?.VALUES?.includes("030") ||
+                      history?.VALUES?.includes("060") ||
+                      history?.VALUES?.includes("090")
+                    );
+                  }).length
                   : status === "Settled"
                     ? securedLoans.filter((t: any) =>
-                        t["ACCOUNT-STATUS"]?.includes("Settled"),
-                      ).length
+                      t["ACCOUNT-STATUS"]?.includes("Settled"),
+                    ).length
                     : status === "Write-Off"
                       ? securedLoans.filter(
-                          (t: any) =>
-                            t["ACCOUNT-STATUS"]?.includes("Write Off") ||
-                            t["ACCOUNT-STATUS"]?.includes("WOF"),
-                        ).length
+                        (t: any) =>
+                          t["ACCOUNT-STATUS"]?.includes("Write Off") ||
+                          t["ACCOUNT-STATUS"]?.includes("WOF"),
+                      ).length
                       : securedLoans.filter(
-                          (t: any) => t["ACCOUNT-STATUS"] === status,
-                        ).length;
+                        (t: any) => t["ACCOUNT-STATUS"] === status,
+                      ).length;
 
               if (count === 0) return null;
 
@@ -2550,11 +2479,10 @@ const CirProV2ReportDisplay = ({
                 <button
                   key={status}
                   onClick={() => setSecuredLoansTab(status)}
-                  className={`px-3 py-2 text-xs font-medium rounded-t-lg transition-all ${
-                    securedLoansTab === status
-                      ? `${statusColors[status]} bg-opacity-20 border-b-2 ${statusColors[status]}`
-                      : "text-[var(--color-on-surface)] opacity-60 hover:opacity-80"
-                  }`}
+                  className={`px-3 py-2 text-xs font-medium rounded-t-lg transition-all ${securedLoansTab === status
+                    ? `${statusColors[status]} bg-opacity-20 border-b-2 ${statusColors[status]}`
+                    : "text-[var(--color-on-surface)] opacity-60 hover:opacity-80"
+                    }`}
                 >
                   {status} ({count})
                 </button>
@@ -2564,8 +2492,7 @@ const CirProV2ReportDisplay = ({
 
           {/* Tab Content */}
           {securedLoansTab === "Active" &&
-            securedLoans.filter((t: any) => t["ACCOUNT-STATUS"] === "Active")
-              .length > 0 && (
+            securedLoans.filter((t: any) => t["ACCOUNT-STATUS"] === "Active").length > 0 && (
               <div>
                 <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
                   <table className="w-full text-xs ">
@@ -2642,44 +2569,31 @@ const CirProV2ReportDisplay = ({
                                 {account["CREDIT-GRANTOR"] || "N/A"}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
                                 {isOverdue && (
                                   <span className="text-[var(--color-error)] font-medium">
-                                    ₹
-                                    {parseFloat(
-                                      account["OVERDUE-AMT"]?.replace(
-                                        /,/g,
-                                        "",
-                                      ) || "0",
-                                    ).toLocaleString()}
+                                    {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(
+                                      /,/g,
+                                      "",
+                                    ) || "0",)}
                                   </span>
                                 )}
                                 {!isOverdue && (
                                   <span className="text-[var(--color-success)]">
-                                    ₹0
+                                    {Conversion.formatCurrency(0)}
                                   </span>
                                 )}
                               </td>
                               <td className="px-2 py-2 text-center group relative">
                                 <span className="cursor-help">
-                                  ₹
-                                  {calculateEMI(account).emi.toLocaleString(
-                                    "en-IN",
-                                    { maximumFractionDigits: 0 },
-                                  )}
+                                  {Conversion.formatCurrency(calculateEMI(account).emi)}
                                 </span>
                                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                   {calculateEMI(account).description}
@@ -2723,77 +2637,68 @@ const CirProV2ReportDisplay = ({
                       {securedLoans.filter(
                         (t: any) => t["ACCOUNT-STATUS"] === "Active",
                       ).length > 0 && (
-                        <tr className="bg-[var(--color-success)] bg-opacity-10 font-bold border-t-2 border-[var(--color-success)] border-opacity-30">
-                          <td colSpan={4} className="px-2 py-2 text-center">
-                            TOTAL
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                          <tr className="bg-[var(--color-success)] bg-opacity-10 font-bold border-t-2 border-[var(--color-success)] border-opacity-30">
+                            <td colSpan={4} className="px-2 py-2 text-center">
+                              TOTAL
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Active",
+                                ).reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["DISBURSED-AMT"]?.replace(/,/g, "") ||
                                       "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum + calculateEMI(l).emi,
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td colSpan={2} className="px-2 py-2 text-center">
-                            -
-                          </td>
-                        </tr>
-                      )}
+                                    ),
+                                  0,
+                                ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Active",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                                    ),
+                                  0,
+                                ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Active",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
+                                    ),
+                                  0,
+                                ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Active",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum + calculateEMI(l).emi,
+                                  0,
+                                ))}
+                            </td>
+                            <td colSpan={2} className="px-2 py-2 text-center">
+                              -
+                            </td>
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>
@@ -2880,44 +2785,31 @@ const CirProV2ReportDisplay = ({
                                 {account["CREDIT-GRANTOR"] || "N/A"}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
                                 {isOverdue && (
                                   <span className="text-[var(--color-error)] font-medium">
-                                    ₹
-                                    {parseFloat(
-                                      account["OVERDUE-AMT"]?.replace(
-                                        /,/g,
-                                        "",
-                                      ) || "0",
-                                    ).toLocaleString()}
+                                    {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(
+                                      /,/g,
+                                      "",
+                                    ) || "0",)}
                                   </span>
                                 )}
                                 {!isOverdue && (
                                   <span className="text-[var(--color-success)]">
-                                    ₹0
+                                    {Conversion.formatCurrency(0)}
                                   </span>
                                 )}
                               </td>
                               <td className="px-2 py-2 text-center group relative">
                                 <span className="cursor-help">
-                                  ₹
-                                  {calculateEMI(account).emi.toLocaleString(
-                                    "en-IN",
-                                    { maximumFractionDigits: 0 },
-                                  )}
+                                  {Conversion.formatCurrency(calculateEMI(account).emi)}
                                 </span>
                                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                   {calculateEMI(account).description}
@@ -2961,77 +2853,69 @@ const CirProV2ReportDisplay = ({
                       {securedLoans.filter(
                         (t: any) => t["ACCOUNT-STATUS"] === "Closed",
                       ).length > 0 && (
-                        <tr className="bg-[var(--color-muted)] bg-opacity-10 font-bold border-t-2 border-[var(--color-muted)] border-opacity-30">
-                          <td colSpan={4} className="px-2 py-2 text-center">
-                            TOTAL
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                          <tr className="bg-[var(--color-muted)] bg-opacity-10 font-bold border-t-2 border-[var(--color-muted)] border-opacity-30">
+                            <td colSpan={4} className="px-2 py-2 text-center">
+                              TOTAL
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Closed",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["DISBURSED-AMT"]?.replace(/,/g, "") ||
                                       "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum + calculateEMI(l).emi,
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td colSpan={2} className="px-2 py-2 text-center">
-                            -
-                          </td>
-                        </tr>
-                      )}
+                                    ),
+                                  0,
+                                ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Closed",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
+                                    ),
+                                  0,
+                                ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Closed",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
+                                    ),
+                                  0,
+                                ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              {Conversion.formatCurrency(securedLoans
+                                .filter(
+                                  (t: any) => t["ACCOUNT-STATUS"] === "Closed",
+                                )
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum + calculateEMI(l).emi,
+                                  0,
+                                ))}
+                            </td>
+                            <td colSpan={2} className="px-2 py-2 text-center">
+                              -
+                            </td>
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>
@@ -3127,44 +3011,31 @@ const CirProV2ReportDisplay = ({
                                 {account["CREDIT-GRANTOR"] || "N/A"}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
                                 {isOverdue && (
                                   <span className="text-[var(--color-error)] font-medium">
-                                    ₹
-                                    {parseFloat(
-                                      account["OVERDUE-AMT"]?.replace(
-                                        /,/g,
-                                        "",
-                                      ) || "0",
-                                    ).toLocaleString()}
+                                    {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(
+                                      /,/g,
+                                      "",
+                                    ) || "0",)}
                                   </span>
                                 )}
                                 {!isOverdue && (
                                   <span className="text-[var(--color-success)]">
-                                    ₹0
+                                    {Conversion.formatCurrency(0)}
                                   </span>
                                 )}
                               </td>
                               <td className="px-2 py-2 text-center group relative">
                                 <span className="cursor-help">
-                                  ₹
-                                  {calculateEMI(account).emi.toLocaleString(
-                                    "en-IN",
-                                    { maximumFractionDigits: 0 },
-                                  )}
+                                  {Conversion.formatCurrency(calculateEMI(account).emi)}
                                 </span>
                                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                   {calculateEMI(account).description}
@@ -3196,37 +3067,35 @@ const CirProV2ReportDisplay = ({
                           history?.VALUES?.includes("090")
                         );
                       }).length > 0 && (
-                        <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
-                          <td colSpan={4} className="px-2 py-2 text-center">
-                            TOTAL
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) => {
-                                const history = t.HISTORY?.[0];
-                                return (
-                                  history?.VALUES?.includes("900") ||
-                                  history?.VALUES?.includes("030") ||
-                                  history?.VALUES?.includes("060") ||
-                                  history?.VALUES?.includes("090")
-                                );
-                              })
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                          <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
+                            <td colSpan={4} className="px-2 py-2 text-center">
+                              TOTAL
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {securedLoans
+                                .filter((t: any) => {
+                                  const history = t.HISTORY?.[0];
+                                  return (
+                                    history?.VALUES?.includes("900") ||
+                                    history?.VALUES?.includes("030") ||
+                                    history?.VALUES?.includes("060") ||
+                                    history?.VALUES?.includes("090")
+                                  );
+                                })
+                                .reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["DISBURSED-AMT"]?.replace(/,/g, "") ||
                                       "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) => {
+                                    ),
+                                  0,
+                                )}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter((t: any) => {
                                 const history = t.HISTORY?.[0];
                                 return (
                                   history?.VALUES?.includes("900") ||
@@ -3234,21 +3103,18 @@ const CirProV2ReportDisplay = ({
                                   history?.VALUES?.includes("060") ||
                                   history?.VALUES?.includes("090")
                                 );
-                              })
-                              .reduce(
+                              }).reduce(
                                 (sum: number, l: any) =>
                                   sum +
                                   parseFloat(
                                     l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                   ),
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) => {
+                              ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter((t: any) => {
                                 const history = t.HISTORY?.[0];
                                 return (
                                   history?.VALUES?.includes("900") ||
@@ -3256,21 +3122,18 @@ const CirProV2ReportDisplay = ({
                                   history?.VALUES?.includes("060") ||
                                   history?.VALUES?.includes("090")
                                 );
-                              })
-                              .reduce(
+                              }).reduce(
                                 (sum: number, l: any) =>
                                   sum +
                                   parseFloat(
                                     l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                   ),
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) => {
+                              ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter((t: any) => {
                                 const history = t.HISTORY?.[0];
                                 return (
                                   history?.VALUES?.includes("900") ||
@@ -3278,19 +3141,17 @@ const CirProV2ReportDisplay = ({
                                   history?.VALUES?.includes("060") ||
                                   history?.VALUES?.includes("090")
                                 );
-                              })
-                              .reduce(
+                              }).reduce(
                                 (sum: number, l: any) =>
                                   sum + calculateEMI(l).emi,
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td colSpan={2} className="px-2 py-2 text-center">
-                            -
-                          </td>
-                        </tr>
-                      )}
+                              ))}
+                            </td>
+                            <td colSpan={2} className="px-2 py-2 text-center">
+                              -
+                            </td>
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>
@@ -3374,34 +3235,25 @@ const CirProV2ReportDisplay = ({
                                 {account["CREDIT-GRANTOR"] || "N/A"}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
                                 {isOverdue && (
                                   <span className="text-[var(--color-error)] font-medium">
-                                    ₹
-                                    {parseFloat(
-                                      account["OVERDUE-AMT"]?.replace(
-                                        /,/g,
-                                        "",
-                                      ) || "0",
-                                    ).toLocaleString()}
+                                    {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(
+                                      /,/g,
+                                      "",
+                                    ) || "0",)}
                                   </span>
                                 )}
                                 {!isOverdue && (
                                   <span className="text-[var(--color-success)]">
-                                    ₹0
+                                    {Conversion.formatCurrency(0)}
                                   </span>
                                 )}
                               </td>
@@ -3443,77 +3295,66 @@ const CirProV2ReportDisplay = ({
                       {securedLoans.filter((t: any) =>
                         t["ACCOUNT-STATUS"]?.includes("Settled"),
                       ).length > 0 && (
-                        <tr className="bg-[var(--color-warning)] bg-opacity-10 font-bold border-t-2 border-[var(--color-warning)] border-opacity-30">
-                          <td colSpan={4} className="px-2 py-2 text-center">
-                            TOTAL
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) =>
-                                t["ACCOUNT-STATUS"]?.includes("Settled"),
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                          <tr className="bg-[var(--color-warning)] bg-opacity-10 font-bold border-t-2 border-[var(--color-warning)] border-opacity-30">
+                            <td colSpan={4} className="px-2 py-2 text-center">
+                              TOTAL
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {securedLoans
+                                .filter((t: any) =>
+                                  t["ACCOUNT-STATUS"]?.includes("Settled"),
+                                ).reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["DISBURSED-AMT"]?.replace(/,/g, "") ||
                                       "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) =>
+                                    ),
+                                  0,
+                                )}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter((t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Settled"),
-                              )
-                              .reduce(
+                              ).reduce(
                                 (sum: number, l: any) =>
                                   sum +
                                   parseFloat(
                                     l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                   ),
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) =>
+                              ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter((t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Settled"),
-                              )
-                              .reduce(
+                              ).reduce(
                                 (sum: number, l: any) =>
                                   sum +
                                   parseFloat(
                                     l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                   ),
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter((t: any) =>
+                              ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter((t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Settled"),
-                              )
-                              .reduce(
+                              ).reduce(
                                 (sum: number, l: any) =>
                                   sum + calculateEMI(l).emi,
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td colSpan={2} className="px-2 py-2 text-center">
-                            -
-                          </td>
-                        </tr>
-                      )}
+                              ))}
+                            </td>
+                            <td colSpan={2} className="px-2 py-2 text-center">
+                              -
+                            </td>
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>
@@ -3601,34 +3442,25 @@ const CirProV2ReportDisplay = ({
                                 {account["CREDIT-GRANTOR"] || "N/A"}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
-                                ₹
-                                {parseFloat(
-                                  account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                    "0",
-                                ).toLocaleString()}
+                                {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                  "0",)}
                               </td>
                               <td className="px-2 py-2 text-center">
                                 {isOverdue && (
                                   <span className="text-[var(--color-error)] font-medium">
-                                    ₹
-                                    {parseFloat(
-                                      account["OVERDUE-AMT"]?.replace(
-                                        /,/g,
-                                        "",
-                                      ) || "0",
-                                    ).toLocaleString()}
+                                    {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(
+                                      /,/g,
+                                      "",
+                                    ) || "0",)}
                                   </span>
                                 )}
                                 {!isOverdue && (
                                   <span className="text-[var(--color-success)]">
-                                    ₹0
+                                    {Conversion.formatCurrency(0)}
                                   </span>
                                 )}
                               </td>
@@ -3672,85 +3504,74 @@ const CirProV2ReportDisplay = ({
                           t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                           t["ACCOUNT-STATUS"]?.includes("WOF"),
                       ).length > 0 && (
-                        <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
-                          <td colSpan={4} className="px-2 py-2 text-center">
-                            TOTAL
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
-                                (t: any) =>
-                                  t["ACCOUNT-STATUS"]?.includes("Write Off") ||
-                                  t["ACCOUNT-STATUS"]?.includes("WOF"),
-                              )
-                              .reduce(
-                                (sum: number, l: any) =>
-                                  sum +
-                                  parseFloat(
-                                    l["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                          <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
+                            <td colSpan={4} className="px-2 py-2 text-center">
+                              TOTAL
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {securedLoans
+                                .filter(
+                                  (t: any) =>
+                                    t["ACCOUNT-STATUS"]?.includes("Write Off") ||
+                                    t["ACCOUNT-STATUS"]?.includes("WOF"),
+                                ).reduce(
+                                  (sum: number, l: any) =>
+                                    sum +
+                                    parseFloat(
+                                      l["DISBURSED-AMT"]?.replace(/,/g, "") ||
                                       "0",
-                                  ),
-                                0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
+                                    ),
+                                  0,
+                                )}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter(
                                 (t: any) =>
                                   t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                   t["ACCOUNT-STATUS"]?.includes("WOF"),
-                              )
-                              .reduce(
+                              ).reduce(
                                 (sum: number, l: any) =>
                                   sum +
                                   parseFloat(
                                     l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                   ),
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
+                              ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter(
                                 (t: any) =>
                                   t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                   t["ACCOUNT-STATUS"]?.includes("WOF"),
-                              )
-                              .reduce(
+                              ).reduce(
                                 (sum: number, l: any) =>
                                   sum +
                                   parseFloat(
                                     l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                   ),
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            ₹
-                            {securedLoans
-                              .filter(
+                              ))}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+
+                              {Conversion.formatCurrency(securedLoans.filter(
                                 (t: any) =>
                                   t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                   t["ACCOUNT-STATUS"]?.includes("WOF"),
-                              )
-                              .reduce(
+                              ).reduce(
                                 (sum: number, l: any) =>
                                   sum + calculateEMI(l).emi,
                                 0,
-                              )
-                              .toLocaleString()}
-                          </td>
-                          <td colSpan={2} className="px-2 py-2 text-center">
-                            -
-                          </td>
-                        </tr>
-                      )}
+                              ))}
+                            </td>
+                            <td colSpan={2} className="px-2 py-2 text-center">
+                              -
+                            </td>
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>
@@ -3780,27 +3601,27 @@ const CirProV2ReportDisplay = ({
               const count =
                 status === "Delinquent"
                   ? unsecuredNonPaydayLoans.filter((t: any) => {
-                      const history = t.HISTORY?.[0];
-                      return (
-                        history?.VALUES?.includes("900") ||
-                        history?.VALUES?.includes("030") ||
-                        history?.VALUES?.includes("060") ||
-                        history?.VALUES?.includes("090")
-                      );
-                    }).length
+                    const history = t.HISTORY?.[0];
+                    return (
+                      history?.VALUES?.includes("900") ||
+                      history?.VALUES?.includes("030") ||
+                      history?.VALUES?.includes("060") ||
+                      history?.VALUES?.includes("090")
+                    );
+                  }).length
                   : status === "Settled"
                     ? unsecuredNonPaydayLoans.filter((t: any) =>
-                        t["ACCOUNT-STATUS"]?.includes("Settled"),
-                      ).length
+                      t["ACCOUNT-STATUS"]?.includes("Settled"),
+                    ).length
                     : status === "Write-Off"
                       ? unsecuredNonPaydayLoans.filter(
-                          (t: any) =>
-                            t["ACCOUNT-STATUS"]?.includes("Write Off") ||
-                            t["ACCOUNT-STATUS"]?.includes("WOF"),
-                        ).length
+                        (t: any) =>
+                          t["ACCOUNT-STATUS"]?.includes("Write Off") ||
+                          t["ACCOUNT-STATUS"]?.includes("WOF"),
+                      ).length
                       : unsecuredNonPaydayLoans.filter(
-                          (t: any) => t["ACCOUNT-STATUS"] === status,
-                        ).length;
+                        (t: any) => t["ACCOUNT-STATUS"] === status,
+                      ).length;
 
               if (count === 0) return null;
 
@@ -3816,11 +3637,10 @@ const CirProV2ReportDisplay = ({
                 <button
                   key={status}
                   onClick={() => setUnsecuredNonPaydayTab(status)}
-                  className={`px-3 py-2 text-xs font-medium rounded-t-lg transition-all ${
-                    unsecuredNonPaydayTab === status
-                      ? `${statusColors[status]} bg-opacity-20 border-b-2 ${statusColors[status]}`
-                      : "text-[var(--color-on-surface)] opacity-60 hover:opacity-80"
-                  }`}
+                  className={`px-3 py-2 text-xs font-medium rounded-t-lg transition-all ${unsecuredNonPaydayTab === status
+                    ? `${statusColors[status]} bg-opacity-20 border-b-2 ${statusColors[status]}`
+                    : "text-[var(--color-on-surface)] opacity-60 hover:opacity-80"
+                    }`}
                 >
                   {status} ({count})
                 </button>
@@ -3831,7 +3651,7 @@ const CirProV2ReportDisplay = ({
           {/* Disclosure */}
           <div className="text-xs text-[var(--color-on-surface)] opacity-70 mb-2 p-2 bg-[var(--color-background)] rounded">
             💡 Non-Payday Loans: Unsecured loans with disbursed amount ≥
-            ₹100,000
+            BHD 500
           </div>
 
           {/* Tab Content - Active */}
@@ -3914,41 +3734,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -3984,76 +3791,65 @@ const CirProV2ReportDisplay = ({
                     {unsecuredNonPaydayLoans.filter(
                       (t: any) => t["ACCOUNT-STATUS"] === "Active",
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-success)] bg-opacity-10 font-bold border-t-2 border-[var(--color-success)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                        <tr className="bg-[var(--color-success)] bg-opacity-10 font-bold border-t-2 border-[var(--color-success)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredNonPaydayLoans
+                              .filter(
+                                (t: any) => t["ACCOUNT-STATUS"] === "Active",
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
-                              (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -4139,41 +3935,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -4209,76 +3992,65 @@ const CirProV2ReportDisplay = ({
                     {unsecuredNonPaydayLoans.filter(
                       (t: any) => t["ACCOUNT-STATUS"] === "Closed",
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-muted)] bg-opacity-10 font-bold border-t-2 border-[var(--color-muted)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                        <tr className="bg-[var(--color-muted)] bg-opacity-10 font-bold border-t-2 border-[var(--color-muted)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredNonPaydayLoans
+                              .filter(
+                                (t: any) => t["ACCOUNT-STATUS"] === "Closed",
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
-                              (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -4372,41 +4144,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -4438,14 +4197,33 @@ const CirProV2ReportDisplay = ({
                         history?.VALUES?.includes("090")
                       );
                     }).length > 0 && (
-                      <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) => {
+                        <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredNonPaydayLoans
+                              .filter((t: any) => {
+                                const history = t.HISTORY?.[0];
+                                return (
+                                  history?.VALUES?.includes("900") ||
+                                  history?.VALUES?.includes("030") ||
+                                  history?.VALUES?.includes("060") ||
+                                  history?.VALUES?.includes("090")
+                                );
+                              }).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter((t: any) => {
                               const history = t.HISTORY?.[0];
                               return (
                                 history?.VALUES?.includes("900") ||
@@ -4453,43 +4231,18 @@ const CirProV2ReportDisplay = ({
                                 history?.VALUES?.includes("060") ||
                                 history?.VALUES?.includes("090")
                               );
-                            })
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) => {
-                              const history = t.HISTORY?.[0];
-                              return (
-                                history?.VALUES?.includes("900") ||
-                                history?.VALUES?.includes("030") ||
-                                history?.VALUES?.includes("060") ||
-                                history?.VALUES?.includes("090")
-                              );
-                            })
-                            .reduce(
+                            }).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) => {
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter((t: any) => {
                               const history = t.HISTORY?.[0];
                               return (
                                 history?.VALUES?.includes("900") ||
@@ -4497,21 +4250,18 @@ const CirProV2ReportDisplay = ({
                                 history?.VALUES?.includes("060") ||
                                 history?.VALUES?.includes("090")
                               );
-                            })
-                            .reduce(
+                            }).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) => {
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter((t: any) => {
                               const history = t.HISTORY?.[0];
                               return (
                                 history?.VALUES?.includes("900") ||
@@ -4519,19 +4269,17 @@ const CirProV2ReportDisplay = ({
                                 history?.VALUES?.includes("060") ||
                                 history?.VALUES?.includes("090")
                               );
-                            })
-                            .reduce(
+                            }).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -4619,41 +4367,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -4689,76 +4424,65 @@ const CirProV2ReportDisplay = ({
                     {unsecuredNonPaydayLoans.filter((t: any) =>
                       t["ACCOUNT-STATUS"]?.includes("Settled"),
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-warning)] bg-opacity-10 font-bold border-t-2 border-[var(--color-warning)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) =>
+                        <tr className="bg-[var(--color-warning)] bg-opacity-10 font-bold border-t-2 border-[var(--color-warning)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredNonPaydayLoans
+                              .filter((t: any) =>
+                                t["ACCOUNT-STATUS"]?.includes("Settled"),
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter((t: any) =>
                               t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) =>
-                              t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) =>
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter((t: any) =>
                               t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter((t: any) =>
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter((t: any) =>
                               t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -4850,41 +4574,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -4922,84 +4633,73 @@ const CirProV2ReportDisplay = ({
                         t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                         t["ACCOUNT-STATUS"]?.includes("WOF"),
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                        <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredNonPaydayLoans
+                              .filter(
+                                (t: any) =>
+                                  t["ACCOUNT-STATUS"]?.includes("Write Off") ||
+                                  t["ACCOUNT-STATUS"]?.includes("WOF"),
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                 t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
-                              (t: any) =>
-                                t["ACCOUNT-STATUS"]?.includes("Write Off") ||
-                                t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                 t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredNonPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredNonPaydayLoans.filter(
                               (t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                 t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -5027,27 +4727,27 @@ const CirProV2ReportDisplay = ({
               const count =
                 status === "Delinquent"
                   ? unsecuredPaydayLoans.filter((t: any) => {
-                      const history = t.HISTORY?.[0];
-                      return (
-                        history?.VALUES?.includes("900") ||
-                        history?.VALUES?.includes("030") ||
-                        history?.VALUES?.includes("060") ||
-                        history?.VALUES?.includes("090")
-                      );
-                    }).length
+                    const history = t.HISTORY?.[0];
+                    return (
+                      history?.VALUES?.includes("900") ||
+                      history?.VALUES?.includes("030") ||
+                      history?.VALUES?.includes("060") ||
+                      history?.VALUES?.includes("090")
+                    );
+                  }).length
                   : status === "Settled"
                     ? unsecuredPaydayLoans.filter((t: any) =>
-                        t["ACCOUNT-STATUS"]?.includes("Settled"),
-                      ).length
+                      t["ACCOUNT-STATUS"]?.includes("Settled"),
+                    ).length
                     : status === "Write-Off"
                       ? unsecuredPaydayLoans.filter(
-                          (t: any) =>
-                            t["ACCOUNT-STATUS"]?.includes("Write Off") ||
-                            t["ACCOUNT-STATUS"]?.includes("WOF"),
-                        ).length
+                        (t: any) =>
+                          t["ACCOUNT-STATUS"]?.includes("Write Off") ||
+                          t["ACCOUNT-STATUS"]?.includes("WOF"),
+                      ).length
                       : unsecuredPaydayLoans.filter(
-                          (t: any) => t["ACCOUNT-STATUS"] === status,
-                        ).length;
+                        (t: any) => t["ACCOUNT-STATUS"] === status,
+                      ).length;
 
               if (count === 0) return null;
 
@@ -5063,11 +4763,10 @@ const CirProV2ReportDisplay = ({
                 <button
                   key={status}
                   onClick={() => setUnsecuredPaydayTab(status)}
-                  className={`px-3 py-2 text-xs font-medium rounded-t-lg transition-all ${
-                    unsecuredPaydayTab === status
-                      ? `${statusColors[status]} bg-opacity-20 border-b-2 ${statusColors[status]}`
-                      : "text-[var(--color-on-surface)] opacity-60 hover:opacity-80"
-                  }`}
+                  className={`px-3 py-2 text-xs font-medium rounded-t-lg transition-all ${unsecuredPaydayTab === status
+                    ? `${statusColors[status]} bg-opacity-20 border-b-2 ${statusColors[status]}`
+                    : "text-[var(--color-on-surface)] opacity-60 hover:opacity-80"
+                    }`}
                 >
                   {status} ({count})
                 </button>
@@ -5078,7 +4777,7 @@ const CirProV2ReportDisplay = ({
           {/* Disclosure */}
           <div className="text-xs text-[var(--color-on-surface)] opacity-70 mb-2 p-2 bg-[var(--color-background)] rounded">
             💡 Payday Loans: Unsecured loans with disbursed amount less than
-            ₹100,000
+            BHD 500
           </div>
 
           {/* Tab Content - Active */}
@@ -5156,37 +4855,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             {/* <td className="px-2 py-2 text-center group relative">
                           <span className="cursor-help">
-                            ₹{calculateEMI(account).emi.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                            {Conversion.formatCurrency(calculateEMI(account).emi)}
                           </span>
                           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                             {calculateEMI(account).description}
@@ -5222,76 +4912,65 @@ const CirProV2ReportDisplay = ({
                     {unsecuredPaydayLoans.filter(
                       (t: any) => t["ACCOUNT-STATUS"] === "Active",
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-success)] bg-opacity-10 font-bold border-t-2 border-[var(--color-success)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                        <tr className="bg-[var(--color-success)] bg-opacity-10 font-bold border-t-2 border-[var(--color-success)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredPaydayLoans
+                              .filter(
+                                (t: any) => t["ACCOUNT-STATUS"] === "Active",
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
-                              (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Active",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -5377,41 +5056,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -5447,76 +5113,65 @@ const CirProV2ReportDisplay = ({
                     {unsecuredPaydayLoans.filter(
                       (t: any) => t["ACCOUNT-STATUS"] === "Closed",
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-muted)] bg-opacity-10 font-bold border-t-2 border-[var(--color-muted)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                        <tr className="bg-[var(--color-muted)] bg-opacity-10 font-bold border-t-2 border-[var(--color-muted)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredPaydayLoans
+                              .filter(
+                                (t: any) => t["ACCOUNT-STATUS"] === "Closed",
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
-                              (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) => t["ACCOUNT-STATUS"] === "Closed",
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -5610,41 +5265,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -5676,14 +5318,33 @@ const CirProV2ReportDisplay = ({
                         history?.VALUES?.includes("090")
                       );
                     }).length > 0 && (
-                      <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) => {
+                        <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredPaydayLoans
+                              .filter((t: any) => {
+                                const history = t.HISTORY?.[0];
+                                return (
+                                  history?.VALUES?.includes("900") ||
+                                  history?.VALUES?.includes("030") ||
+                                  history?.VALUES?.includes("060") ||
+                                  history?.VALUES?.includes("090")
+                                );
+                              }).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter((t: any) => {
                               const history = t.HISTORY?.[0];
                               return (
                                 history?.VALUES?.includes("900") ||
@@ -5691,43 +5352,18 @@ const CirProV2ReportDisplay = ({
                                 history?.VALUES?.includes("060") ||
                                 history?.VALUES?.includes("090")
                               );
-                            })
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) => {
-                              const history = t.HISTORY?.[0];
-                              return (
-                                history?.VALUES?.includes("900") ||
-                                history?.VALUES?.includes("030") ||
-                                history?.VALUES?.includes("060") ||
-                                history?.VALUES?.includes("090")
-                              );
-                            })
-                            .reduce(
+                            }).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) => {
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter((t: any) => {
                               const history = t.HISTORY?.[0];
                               return (
                                 history?.VALUES?.includes("900") ||
@@ -5735,21 +5371,18 @@ const CirProV2ReportDisplay = ({
                                 history?.VALUES?.includes("060") ||
                                 history?.VALUES?.includes("090")
                               );
-                            })
-                            .reduce(
+                            }).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) => {
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter((t: any) => {
                               const history = t.HISTORY?.[0];
                               return (
                                 history?.VALUES?.includes("900") ||
@@ -5757,19 +5390,17 @@ const CirProV2ReportDisplay = ({
                                 history?.VALUES?.includes("060") ||
                                 history?.VALUES?.includes("090")
                               );
-                            })
-                            .reduce(
+                            }).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -5857,41 +5488,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -5927,76 +5545,65 @@ const CirProV2ReportDisplay = ({
                     {unsecuredPaydayLoans.filter((t: any) =>
                       t["ACCOUNT-STATUS"]?.includes("Settled"),
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-warning)] bg-opacity-10 font-bold border-t-2 border-[var(--color-warning)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) =>
+                        <tr className="bg-[var(--color-warning)] bg-opacity-10 font-bold border-t-2 border-[var(--color-warning)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredPaydayLoans
+                              .filter((t: any) =>
+                                t["ACCOUNT-STATUS"]?.includes("Settled"),
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter((t: any) =>
                               t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) =>
-                              t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) =>
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter((t: any) =>
                               t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter((t: any) =>
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter((t: any) =>
                               t["ACCOUNT-STATUS"]?.includes("Settled"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -6088,41 +5695,28 @@ const CirProV2ReportDisplay = ({
                               {account["CREDIT-GRANTOR"] || "N/A"}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["DISBURSED-AMT"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["DISBURSED-AMT"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              ₹
-                              {parseFloat(
-                                account["CURRENT-BAL"]?.replace(/,/g, "") ||
-                                  "0",
-                              ).toLocaleString()}
+                              {Conversion.formatCurrency(account["CURRENT-BAL"]?.replace(/,/g, "") ||
+                                "0",)}
                             </td>
                             <td className="px-2 py-2 text-center">
                               {isOverdue ? (
                                 <span className="text-[var(--color-error)] font-medium">
-                                  ₹
-                                  {parseFloat(
-                                    account["OVERDUE-AMT"]?.replace(/,/g, "") ||
-                                      "0",
-                                  ).toLocaleString()}
+                                  {Conversion.formatCurrency(account["OVERDUE-AMT"]?.replace(/,/g, "") ||
+                                    "0",)}
                                 </span>
                               ) : (
                                 <span className="text-[var(--color-success)]">
-                                  ₹0
+                                  {Conversion.formatCurrency(0)}
                                 </span>
                               )}
                             </td>
                             <td className="px-2 py-2 text-center group relative">
                               <span className="cursor-help">
-                                ₹
-                                {calculateEMI(account).emi.toLocaleString(
-                                  "en-IN",
-                                  { maximumFractionDigits: 0 },
-                                )}
+                                {Conversion.formatCurrency(calculateEMI(account).emi)}
                               </span>
                               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--color-on-surface)] text-[var(--color-surface)] text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 {calculateEMI(account).description}
@@ -6160,84 +5754,73 @@ const CirProV2ReportDisplay = ({
                         t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                         t["ACCOUNT-STATUS"]?.includes("WOF"),
                     ).length > 0 && (
-                      <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
-                        <td colSpan={4} className="px-2 py-2 text-center">
-                          TOTAL
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                        <tr className="bg-[var(--color-error)] bg-opacity-10 font-bold border-t-2 border-[var(--color-error)] border-opacity-30">
+                          <td colSpan={4} className="px-2 py-2 text-center">
+                            TOTAL
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {unsecuredPaydayLoans
+                              .filter(
+                                (t: any) =>
+                                  t["ACCOUNT-STATUS"]?.includes("Write Off") ||
+                                  t["ACCOUNT-STATUS"]?.includes("WOF"),
+                              ).reduce(
+                                (sum: number, l: any) =>
+                                  sum +
+                                  parseFloat(
+                                    l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
+                                  ),
+                                0,
+                              )}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                 t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
-                              (sum: number, l: any) =>
-                                sum +
-                                parseFloat(
-                                  l["DISBURSED-AMT"]?.replace(/,/g, "") || "0",
-                                ),
-                              0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
-                              (t: any) =>
-                                t["ACCOUNT-STATUS"]?.includes("Write Off") ||
-                                t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["CURRENT-BAL"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                 t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum +
                                 parseFloat(
                                   l["OVERDUE-AMT"]?.replace(/,/g, "") || "0",
                                 ),
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          ₹
-                          {unsecuredPaydayLoans
-                            .filter(
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center">
+
+                            {Conversion.formatCurrency(unsecuredPaydayLoans.filter(
                               (t: any) =>
                                 t["ACCOUNT-STATUS"]?.includes("Write Off") ||
                                 t["ACCOUNT-STATUS"]?.includes("WOF"),
-                            )
-                            .reduce(
+                            ).reduce(
                               (sum: number, l: any) =>
                                 sum + calculateEMI(l).emi,
                               0,
-                            )
-                            .toLocaleString()}
-                        </td>
-                        <td colSpan={2} className="px-2 py-2 text-center">
-                          -
-                        </td>
-                      </tr>
-                    )}
+                            ))}
+                          </td>
+                          <td colSpan={2} className="px-2 py-2 text-center">
+                            -
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>
@@ -6279,11 +5862,10 @@ const CirProV2ReportDisplay = ({
                     return (
                       <tr
                         key={`inquiry-${inquiryDate}-${idx}`}
-                        className={`hover:bg-[var(--color-background)] ${
-                          isRecent
-                            ? "bg-[var(--color-warning)] bg-opacity-5"
-                            : ""
-                        }`}
+                        className={`hover:bg-[var(--color-background)] ${isRecent
+                          ? "bg-[var(--color-warning)] bg-opacity-5"
+                          : ""
+                          }`}
                       >
                         <td className="px-2 py-2">{inquiryDate || "N/A"}</td>
                         <td className="px-2 py-2">
@@ -6294,10 +5876,8 @@ const CirProV2ReportDisplay = ({
                         </td>
                         <td className="px-2 py-2 text-right">
                           {inquiry.AMOUNT &&
-                          parseFloat(inquiry.AMOUNT.replace(/,/g, "")) > 0
-                            ? `₹${parseFloat(
-                                inquiry.AMOUNT.replace(/,/g, ""),
-                              ).toLocaleString()}`
+                            parseFloat(inquiry.AMOUNT.replace(/,/g, "")) > 0
+                            ? Conversion.formatCurrency(inquiry.AMOUNT)
                             : "-"}
                         </td>
                         <td className="px-2 py-2 text-center">
@@ -6362,38 +5942,38 @@ const CirProV2ReportDisplay = ({
       {(overdueAccounts.length > 0 ||
         totalOverdueAmount > 0 ||
         recentInquiries.length > 3) && (
-        <div className="bg-[var(--color-error)] bg-opacity-10 p-4 rounded-lg border-2 border-[var(--color-error)] border-opacity-30">
-          <h4 className="font-semibold text-sm mb-3 text-[var(--color-on-error)] flex items-center gap-2">
-            <span>⚠️</span> Risk Indicators
-          </h4>
-          <div className="space-y-3 text-xs">
-            {overdueAccounts.length > 0 && (
-              <div className="flex items-center justify-between p-2 bg-[var(--color-background)] rounded">
-                <span className="font-medium">Accounts with Overdue:</span>
-                <span className="text-[var(--color-error)] font-bold">
-                  {overdueAccounts.length}
-                </span>
-              </div>
-            )}
-            {totalOverdueAmount > 0 && (
-              <div className="flex items-center justify-between p-2 bg-[var(--color-background)] rounded">
-                <span className="font-medium">Total Overdue Amount:</span>
-                <span className="text-[var(--color-error)] font-bold">
-                  ₹{totalOverdueAmount.toLocaleString()}
-                </span>
-              </div>
-            )}
-            {recentInquiries.length > 3 && (
-              <div className="flex items-center justify-between p-2 bg-[var(--color-background)] rounded">
-                <span className="font-medium">Recent Inquiries (30 days):</span>
-                <span className="text-[var(--color-warning)] font-bold">
-                  {recentInquiries.length}
-                </span>
-              </div>
-            )}
+          <div className="bg-[var(--color-error)] bg-opacity-10 p-4 rounded-lg border-2 border-[var(--color-error)] border-opacity-30">
+            <h4 className="font-semibold text-sm mb-3 text-[var(--color-on-error)] flex items-center gap-2">
+              <span>⚠️</span> Risk Indicators
+            </h4>
+            <div className="space-y-3 text-xs">
+              {overdueAccounts.length > 0 && (
+                <div className="flex items-center justify-between p-2 bg-[var(--color-background)] rounded">
+                  <span className="font-medium">Accounts with Overdue:</span>
+                  <span className="text-[var(--color-error)] font-bold">
+                    {overdueAccounts.length}
+                  </span>
+                </div>
+              )}
+              {totalOverdueAmount > 0 && (
+                <div className="flex items-center justify-between p-2 bg-[var(--color-background)] rounded">
+                  <span className="font-medium">Total Overdue Amount:</span>
+                  <span className="text-[var(--color-error)] font-bold">
+                    {Conversion.formatCurrency(totalOverdueAmount)}
+                  </span>
+                </div>
+              )}
+              {recentInquiries.length > 3 && (
+                <div className="flex items-center justify-between p-2 bg-[var(--color-background)] rounded">
+                  <span className="font-medium">Recent Inquiries (30 days):</span>
+                  <span className="text-[var(--color-warning)] font-bold">
+                    {recentInquiries.length}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       {/* Additional Summary Attributes */}
       {additionalSummary.length > 0 && (
         <div className="bg-[var(--color-surface)] p-4 rounded-lg border border-[var(--color-muted)] border-opacity-30">
@@ -6686,64 +6266,64 @@ const BureauLoanSummary = ({
             >
               {/* Category Column - with rowSpan */}
               {row.category && row.categoryRowSpan && (
-                <td 
-                  rowSpan={row.categoryRowSpan} 
+                <td
+                  rowSpan={row.categoryRowSpan}
                   className={`px-2 py-2 font-semibold text-xs border-r border-[var(--color-muted)] border-opacity-20 align-top ${getCategoryBgColor(row.category)}`}
                 >
                   {row.category}
                 </td>
               )}
-              
+
               {/* Parameters Column */}
               <td className="px-2 py-2 text-xs border-r border-[var(--color-muted)] border-opacity-20">
                 {row.parameter}
               </td>
-              
+
               {/* Closed TL # */}
               <td className="px-1 py-2 text-center font-medium">
                 {row.data.closed.tlCount}
               </td>
               {/* Closed Value */}
               <td className="px-1 py-2 text-center text-[var(--color-success)] font-medium border-r border-[var(--color-muted)] border-opacity-20">
-                {row.data.closed.tlValue.toFixed(2)}
+                {Conversion.formatCurrency(row.data.closed.tlValue)}
               </td>
-              
+
               {/* Live TL # */}
               <td className="px-1 py-2 text-center font-medium">
                 {row.data.live.tlCount}
               </td>
               {/* Live Value */}
               <td className="px-1 py-2 text-center text-[var(--color-primary)] font-medium border-r border-[var(--color-muted)] border-opacity-20">
-                {row.data.live.tlValue.toFixed(2)}
+                {Conversion.formatCurrency(row.data.live.tlValue)}
               </td>
-              
+
               {/* Secured Live TL # */}
               <td className="px-1 py-2 text-center font-medium">
                 {row.data.securedLive.tlCount}
               </td>
               {/* Secured Live Value */}
               <td className="px-1 py-2 text-center text-[var(--color-info)] font-medium border-r border-[var(--color-muted)] border-opacity-20">
-                {row.data.securedLive.tlValue.toFixed(2)}
+                {Conversion.formatCurrency(row.data.securedLive.tlValue)}
               </td>
-              
+
               {/* Unsecured Live TL # */}
               <td className="px-1 py-2 text-center font-medium">
                 {row.data.unsecuredLive.tlCount}
               </td>
               {/* Unsecured Live Value */}
               <td className="px-1 py-2 text-center text-[var(--color-warning)] font-medium border-r border-[var(--color-muted)] border-opacity-20">
-                {row.data.unsecuredLive.tlValue.toFixed(2)}
+                {Conversion.formatCurrency(row.data.unsecuredLive.tlValue)}
               </td>
-              
+
               {/* Payday TL # */}
               <td className="px-1 py-2 text-center font-medium">
                 {row.data.payday.tlCount}
               </td>
               {/* Payday Value */}
               <td className="px-1 py-2 text-center text-[var(--color-error)] font-medium border-r border-[var(--color-muted)] border-opacity-20">
-                {row.data.payday.tlValue.toFixed(2)}
+                {Conversion.formatCurrency(row.data.payday.tlValue)}
               </td>
-              
+
               {/* Score */}
               <td className="px-1 py-2 text-center border-r border-[var(--color-muted)] border-opacity-20">
                 {row.showScoreAndLeverage && row.data.score ? (
@@ -6754,7 +6334,7 @@ const BureauLoanSummary = ({
                   <span className="opacity-30">-</span>
                 )}
               </td>
-              
+
               {/* Leverage Payday */}
               <td className="px-1 py-2 text-center font-medium border-r border-[var(--color-muted)] border-opacity-20">
                 {row.showScoreAndLeverage && row.data.leverageVsPaydayLiability !== undefined ? (
@@ -6763,7 +6343,7 @@ const BureauLoanSummary = ({
                   <span className="opacity-30">-</span>
                 )}
               </td>
-              
+
               {/* Leverage Monthly */}
               <td className="px-1 py-2 text-center font-medium">
                 {row.showScoreAndLeverage && row.data.leverageVsMonthlyLiability !== undefined ? (
@@ -6781,7 +6361,7 @@ const BureauLoanSummary = ({
         <p className="font-semibold mb-2">Legend:</p>
         <ul className="space-y-1 ml-4 list-disc">
           <li><strong>TL #:</strong> Number of Trade Lines</li>
-          <li><strong>Value:</strong> Total Value in Lakhs (₹)</li>
+          <li><strong>Value:</strong> Total Value in BHD</li>
           <li><strong>Score:</strong> Credit Score (shown only for Debt row)</li>
           <li><strong>Leverage Payday:</strong> Total Live Liability / Payday Liability ratio</li>
           <li><strong>Leverage Monthly:</strong> Total Live Liability / Monthly Liability ratio</li>

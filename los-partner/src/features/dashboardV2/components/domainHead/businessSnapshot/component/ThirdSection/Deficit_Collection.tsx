@@ -1,19 +1,20 @@
 import React from 'react';
+import { Conversion } from "../../../../../../../utils/conversion";
 
 export interface DeficitCollectionData {
     deficitPercentage: number; // e.g., 2
-    totalObligation: string;   // e.g., "₹'XX,XXX'"
+    totalObligation: number | string;   // e.g., 78600000
     targetDeficit: {
         percentage: string;    // e.g., "85 %"
-        value: string;         // e.g., "₹7.86 Cr"
+        value: number | string;         // e.g., 78600000
     };
     actualCollection: {
         percentage: string;    // e.g., "83 %"
-        value: string;         // e.g., "₹7.67 Cr"
+        value: number | string;         // e.g., 76700000
     };
     deficit: {
         percentage: string;    // e.g., "83 %"
-        value: string;         // e.g., "₹18.5 L"
+        value: number | string;         // e.g., 1850000
     };
 }
 
@@ -29,10 +30,10 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
     // Fallback Mock Data
     const currentData = data ?? {
         deficitPercentage: 2, // 2% 
-        totalObligation: "₹'XX,XXX'",
-        targetDeficit: { percentage: "85 %", value: "₹7.86 Cr" },
-        actualCollection: { percentage: "83 %", value: "₹7.67 Cr" },
-        deficit: { percentage: "83 %", value: "₹18.5 L" },
+        totalObligation: 78600000,
+        targetDeficit: { percentage: "85 %", value: 78600000 },
+        actualCollection: { percentage: "83 %", value: 76700000 },
+        deficit: { percentage: "83 %", value: 1850000 },
     };
 
     // Gauge Configuration
@@ -66,10 +67,6 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
     };
 
     // Calculate Gauge Angles based on percentage (max 100%).
-    // Note: The UI screenshot shows a huge red bar even for 2%. 
-    // It's possible the logic maps Target vs Actual. A 2% deficit mapped visually to a near 80% circle is odd,
-    // usually indicating that the RED is the Actual Collection (83%) and the unfilled blue is the Deficit (2%? Math: 85-83=2).
-    // Let's assume the red bar is representing Actual Collection (83% of Target) and the tooltip/pin is on the 83% mark.
     const actualCollectionPercentage = parseInt(currentData.actualCollection.percentage.replace('%', '').trim()) || 83;
     const percentageAngle = (actualCollectionPercentage / 100) * 180;
 
@@ -79,8 +76,6 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
     const foregroundArc = describeArc(cx, cy, radius, 0, percentageAngle);
 
     // Marker position calculation
-    // Left edge is angle 0, right edge is 180.
-    // If percentage is 0%, marker is at 0. If 100%, marker is at 180.
     const markerAngle = percentageAngle;
     const angleInRadians = (markerAngle - 180) * Math.PI / 180.0;
     const markerPos = {
@@ -160,7 +155,7 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
                     {/* Bottom label under gauge inside the grey card */}
                     <div className="mt-3 2xl:mt-5 text-center text-[10px] 2xl:text-[12px] font-medium text-[#475569] tracking-wide w-4/5 2xl:w-3/4 mx-auto leading-relaxed">
                         Against Total Obligation of : <br />
-                        <span className="text-[#334155] font-bold">{currentData.totalObligation}</span>
+                        <span className="text-[#334155] font-bold">{Conversion.formatCurrency(currentData.totalObligation)}</span>
                     </div>
 
                 </div>
@@ -176,7 +171,7 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
                         <span className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Target Deficit</span>
                         <div className="flex flex-col text-[10px] 2xl:text-[12px] font-bold text-gray-900 tracking-tight leading-snug">
                             <span>{currentData.targetDeficit.percentage}</span>
-                            <span className="text-gray-500 font-semibold">{currentData.targetDeficit.value}</span>
+                            <span className="text-gray-500 font-semibold">{Conversion.formatCurrency(currentData.targetDeficit.value)}</span>
                         </div>
                     </div>
 
@@ -185,7 +180,7 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
                         <span className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Actual Collection</span>
                         <div className="flex flex-col text-[10px] 2xl:text-[12px] font-bold text-gray-900 tracking-tight leading-snug">
                             <span>{currentData.actualCollection.percentage}</span>
-                            <span className="text-gray-500 font-semibold">{currentData.actualCollection.value}</span>
+                            <span className="text-gray-500 font-semibold">{Conversion.formatCurrency(currentData.actualCollection.value)}</span>
                         </div>
                     </div>
 
@@ -194,7 +189,7 @@ const Deficit_Collection: React.FC<DeficitCollectionProps> = ({
                         <span className="text-[#64748b] text-[9px] 2xl:text-[11px] font-medium mb-0.5 truncate">Deficit</span>
                         <div className="flex flex-col text-[10px] 2xl:text-[12px] font-bold text-gray-900 tracking-tight leading-snug">
                             <span>{currentData.deficit.percentage}</span>
-                            <span className="text-gray-500 font-semibold">{currentData.deficit.value}</span>
+                            <span className="text-gray-500 font-semibold">{Conversion.formatCurrency(currentData.deficit.value)}</span>
                         </div>
                     </div>
 

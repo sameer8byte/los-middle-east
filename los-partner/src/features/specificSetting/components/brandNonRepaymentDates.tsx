@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useParams } from "react-router-dom";
 import {
   HiOutlineCalendar,
@@ -110,11 +111,9 @@ const MONTHS = [
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// Helper function to format currency in Indian format
-const formatIndianCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-IN', {
-    maximumFractionDigits: 0,
-  }).format(amount);
+// Helper function to format currency
+const formatCurrency = (amount: number): string => {
+  return Conversion.formatCurrency(amount);
 };
 
 // Enum for data view type
@@ -176,7 +175,7 @@ export default function BrandNonRepaymentDates() {
 
   const fetchBrandConfig = async () => {
     if (!brandId) return;
-    
+
     setConfigLoading(true);
     try {
       const config = await getBrandConfig(brandId);
@@ -238,14 +237,14 @@ export default function BrandNonRepaymentDates() {
       loans.forEach((loan: any) => {
         if (loan.loanDetails?.dueDate) {
           const dateKey = dayjs(loan.loanDetails.dueDate).format("YYYY-MM-DD");
-          
+
           if (!groupedData[dateKey]) {
             groupedData[dateKey] = {
               totalCases: 0,
               totalAmount: 0,
             };
           }
-          
+
           groupedData[dateKey].totalCases += 1;
           groupedData[dateKey].totalAmount += loan.amount || 0;
         }
@@ -296,8 +295,8 @@ export default function BrandNonRepaymentDates() {
       2,
       "0"
     )}-${String(day).padStart(2, "0")}`;
-    
-    return nonRepaymentDates.some((d) => 
+
+    return nonRepaymentDates.some((d) =>
       formatDateForComparison(d.date) === dateStr && d.isActive
     );
   };
@@ -307,8 +306,8 @@ export default function BrandNonRepaymentDates() {
       2,
       "0"
     )}-${String(day).padStart(2, "0")}`;
-    
-    return nonRepaymentDates.find((d) => 
+
+    return nonRepaymentDates.find((d) =>
       formatDateForComparison(d.date) === dateStr && d.isActive
     );
   };
@@ -318,7 +317,7 @@ export default function BrandNonRepaymentDates() {
       2,
       "0"
     )}-${String(day).padStart(2, "0")}`;
-    
+
     return loanData.find((data) => data.date === dateStr);
   };
 
@@ -327,7 +326,7 @@ export default function BrandNonRepaymentDates() {
       2,
       "0"
     )}-${String(day).padStart(2, "0")}`;
-    
+
     return disbursementData.find((data) => data.date === dateStr);
   };
 
@@ -338,42 +337,42 @@ export default function BrandNonRepaymentDates() {
   const handlePreviousMonth = () => {
     let newYear = Number.parseInt(selectedYear);
     let newMonth = selectedMonth - 1;
-    
+
     if (newMonth < 0) {
       newMonth = 11; // December
       newYear = newYear - 1;
-      
+
       // Check if new year exists in year options
-      const yearExists = yearOptions.some(option => 
+      const yearExists = yearOptions.some(option =>
         Number.parseInt(option.value) === newYear
       );
-      
+
       if (yearExists) {
         setSelectedYear(newYear.toString());
       }
     }
-    
+
     setSelectedMonth(newMonth);
   };
 
   const handleNextMonth = () => {
     let newYear = Number.parseInt(selectedYear);
     let newMonth = selectedMonth + 1;
-    
+
     if (newMonth > 11) {
       newMonth = 0; // January
       newYear = newYear + 1;
-      
+
       // Check if new year exists in year options
-      const yearExists = yearOptions.some(option => 
+      const yearExists = yearOptions.some(option =>
         Number.parseInt(option.value) === newYear
       );
-      
+
       if (yearExists) {
         setSelectedYear(newYear.toString());
       }
     }
-    
+
     setSelectedMonth(newMonth);
   };
 
@@ -541,9 +540,9 @@ export default function BrandNonRepaymentDates() {
   // Calculate totals based on current view type
   const currentData = dataViewType === DataViewType.DUE_AMOUNT ? loanData : disbursementData;
   const totalCases = currentData.reduce((sum, data) => sum + data.totalCases, 0);
-  const totalAmount = currentData.reduce((sum, data) => 
-    sum + (dataViewType === DataViewType.DUE_AMOUNT ? 
-      (data as LoanData).totalAmount : 
+  const totalAmount = currentData.reduce((sum, data) =>
+    sum + (dataViewType === DataViewType.DUE_AMOUNT ?
+      (data as LoanData).totalAmount :
       (data as DisbursementData).totalDisbursedAmount
     ), 0
   );
@@ -679,7 +678,7 @@ export default function BrandNonRepaymentDates() {
               const nonRepaymentDate = getNonRepaymentDate(day);
               const isSunday = dayOfWeek === 0;
               const isSundayBlocked = isSunday && isSundayOff;
-              
+
               // Get data based on current view type
               let dataForDate: LoanData | DisbursementData | undefined;
               let hasData = false;
@@ -696,21 +695,21 @@ export default function BrandNonRepaymentDates() {
                 if (isSundayBlocked) {
                   return "Sundays are automatically blocked for repayments (Sunday Off is enabled)";
                 }
-                
+
                 if (isNonRepayment) {
                   return `Non-repayment date: ${nonRepaymentDate?.reason} (${nonRepaymentDate?.state}) - Click to update`;
                 }
-                
+
                 if (hasData) {
                   if (dataViewType === DataViewType.DUE_AMOUNT) {
                     const loanData = dataForDate as LoanData;
-                    return `Due loans: ${loanData.totalCases} cases, ₹${formatIndianCurrency(loanData.totalAmount)} - Click to add non-repayment date`;
+                    return `Due loans: ${loanData.totalCases} cases, ₹${formatCurrency(loanData.totalAmount)} - Click to add non-repayment date`;
                   } else {
                     const disbursementData = dataForDate as DisbursementData;
-                    return `Disbursed loans: ${disbursementData.totalCases} cases, ₹${formatIndianCurrency(disbursementData.totalDisbursedAmount)} - Click to add non-repayment date`;
+                    return `Disbursed loans: ${disbursementData.totalCases} cases, ₹${formatCurrency(disbursementData.totalDisbursedAmount)} - Click to add non-repayment date`;
                   }
                 }
-                
+
                 return "Click to add non-repayment date";
               };
 
@@ -725,8 +724,8 @@ export default function BrandNonRepaymentDates() {
                     isSundayBlocked
                       ? "bg-gradient-to-br from-gray-300 to-gray-400 border-2 border-gray-500 cursor-not-allowed opacity-60"
                       : isNonRepayment
-                      ? "bg-gradient-to-br from-red-200 to-red-300 border-2 border-red-500 shadow-lg hover:from-red-300 hover:to-red-400 hover:shadow-xl transform hover:scale-105 ring-2 ring-red-400 ring-opacity-50"
-                      : "bg-white text-[var(--color-on-surface)] opacity-80 border border-[var(--color-muted)] border-opacity-30 hover:bg-[var(--color-primary)] bg-opacity-10 hover:border-blue-300 hover:text-[var(--color-on-primary)] hover:shadow-md transform hover:scale-105"
+                        ? "bg-gradient-to-br from-red-200 to-red-300 border-2 border-red-500 shadow-lg hover:from-red-300 hover:to-red-400 hover:shadow-xl transform hover:scale-105 ring-2 ring-red-400 ring-opacity-50"
+                        : "bg-white text-[var(--color-on-surface)] opacity-80 border border-[var(--color-muted)] border-opacity-30 hover:bg-[var(--color-primary)] bg-opacity-10 hover:border-blue-300 hover:text-[var(--color-on-primary)] hover:shadow-md transform hover:scale-105"
                   )}
                   title={getTooltipText()}
                 >
@@ -737,10 +736,10 @@ export default function BrandNonRepaymentDates() {
                       isNonRepayment
                         ? "text-red-950 font-bold"
                         : isSundayBlocked
-                        ? "text-gray-700 font-bold"
-                        : hasData
-                        ? "text-[var(--color-on-surface)] font-bold"
-                        : "text-[var(--color-on-surface)] opacity-80"
+                          ? "text-gray-700 font-bold"
+                          : hasData
+                            ? "text-[var(--color-on-surface)] font-bold"
+                            : "text-[var(--color-on-surface)] opacity-80"
                     )}
                   >
                     {day}
@@ -748,22 +747,22 @@ export default function BrandNonRepaymentDates() {
 
                   {/* Data summary based on view type */}
                   {hasData && dataForDate && (
-  <div className="text-[10px] font-medium mt-0.5 z-10">
-    <div className="leading-tight">
-      <span className={dataViewType === DataViewType.DUE_AMOUNT ? "text-[var(--color-primary)]" : "text-blue-600"}>
-        {dataForDate.totalCases} case{dataForDate.totalCases !== 1 ? 's' : ''}
-      </span>
-    </div>
-    <div className="leading-tight">
-      <span className={dataViewType === DataViewType.DUE_AMOUNT ? "text-green-600" : "text-purple-600"}>
-        ₹{dataViewType === DataViewType.DUE_AMOUNT 
-          ? formatIndianCurrency((dataForDate as LoanData).totalAmount)
-          : formatIndianCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
-        }
-      </span>
-    </div>
-  </div>
-)}
+                    <div className="text-[10px] font-medium mt-0.5 z-10">
+                      <div className="leading-tight">
+                        <span className={dataViewType === DataViewType.DUE_AMOUNT ? "text-[var(--color-primary)]" : "text-blue-600"}>
+                          {dataForDate.totalCases} case{dataForDate.totalCases !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className="leading-tight">
+                        <span className={dataViewType === DataViewType.DUE_AMOUNT ? "text-green-600" : "text-purple-600"}>
+                          ₹{dataViewType === DataViewType.DUE_AMOUNT
+                            ? formatCurrency((dataForDate as LoanData).totalAmount)
+                            : formatCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* No data indicator */}
                   {!hasData && !isSundayBlocked && !isNonRepayment && (
@@ -847,8 +846,8 @@ export default function BrandNonRepaymentDates() {
             </span>
           </div>
           <div className="ml-auto text-xs text-[var(--color-on-surface)] opacity-70">
-            {isSundayOff 
-              ? "Click on any non-Sunday date to add or edit non-repayment settings" 
+            {isSundayOff
+              ? "Click on any non-Sunday date to add or edit non-repayment settings"
               : "Click on any date to add or edit non-repayment settings"}
           </div>
         </div>
@@ -857,15 +856,15 @@ export default function BrandNonRepaymentDates() {
       {/* Data View Summary */}
       <div className="bg-white rounded-lg border border-[var(--color-muted)] border-opacity-30 p-6">
         <h3 className="text-lg font-semibold text-[var(--color-on-background)] mb-4">
-          {dataViewType === DataViewType.DUE_AMOUNT 
+          {dataViewType === DataViewType.DUE_AMOUNT
             ? `Due Loan Summary for ${MONTHS[selectedMonth]} ${selectedYear}`
             : `Disbursement Summary for ${MONTHS[selectedMonth]} ${selectedYear}`
           }
         </h3>
-        
+
         {currentData.length === 0 ? (
           <p className="text-[var(--color-on-surface)] opacity-70 text-center py-8">
-            {dataViewType === DataViewType.DUE_AMOUNT 
+            {dataViewType === DataViewType.DUE_AMOUNT
               ? `No due loans found for ${MONTHS[selectedMonth]} ${selectedYear}`
               : `No disbursements found for ${MONTHS[selectedMonth]} ${selectedYear}`
             }
@@ -885,7 +884,7 @@ export default function BrandNonRepaymentDates() {
                 Total {dataViewType === DataViewType.DUE_AMOUNT ? 'Due' : 'Disbursed'} Cases
               </p>
               <p className={`text-2xl font-bold ${dataViewType === DataViewType.DUE_AMOUNT ? 'text-green-900' : 'text-indigo-900'} mt-1`}>
-                {formatIndianCurrency(totalCases)}
+                {formatCurrency(totalCases)}
               </p>
             </div>
             <div className={`${dataViewType === DataViewType.DUE_AMOUNT ? 'bg-purple-50 border-purple-200' : 'bg-blue-50 border-blue-200'} border rounded-lg p-4`}>
@@ -893,7 +892,7 @@ export default function BrandNonRepaymentDates() {
                 Total {dataViewType === DataViewType.DUE_AMOUNT ? 'Due' : 'Disbursed'} Amount
               </p>
               <p className={`text-2xl font-bold ${dataViewType === DataViewType.DUE_AMOUNT ? 'text-purple-900' : 'text-blue-900'} mt-1`}>
-                ₹{formatIndianCurrency(totalAmount)}
+                ₹{formatCurrency(totalAmount)}
               </p>
             </div>
           </div>
@@ -908,7 +907,7 @@ export default function BrandNonRepaymentDates() {
 
         {filteredNonRepaymentDates.length === 0 ? (
           <p className="text-[var(--color-on-surface)] opacity-70 text-center py-8">
-            {isSundayOff 
+            {isSundayOff
               ? `No non-repayment dates configured for ${selectedYear}. Click on calendar dates (except Sundays) to add them.`
               : `No non-repayment dates configured for ${selectedYear}. Click on calendar dates to add them.`}
           </p>
@@ -917,7 +916,7 @@ export default function BrandNonRepaymentDates() {
             {sortedNonRepaymentDates.map((date) => {
               const isSunday = dayjs(date.date).day() === 0;
               const dateKey = dayjs(date.date).format("YYYY-MM-DD");
-              
+
               // Get data based on current view type
               let dataForDate;
               if (dataViewType === DataViewType.DUE_AMOUNT) {
@@ -925,7 +924,7 @@ export default function BrandNonRepaymentDates() {
               } else {
                 dataForDate = disbursementData.find(d => d.date === dateKey);
               }
-              
+
               return (
                 <div
                   key={date.id}
@@ -945,8 +944,8 @@ export default function BrandNonRepaymentDates() {
                       </p>
                       <p className="text-sm text-[var(--color-on-surface)] opacity-70">
                         {date.reason} •{" "}
-                        {date.state === "all" 
-                          ? "All States" 
+                        {date.state === "all"
+                          ? "All States"
                           : indianStatesWithCapitals.find((s) => s.value === date.state)?.label || date.state
                         }
                         {dataForDate && (
@@ -955,9 +954,9 @@ export default function BrandNonRepaymentDates() {
                               {dataForDate.totalCases} {dataViewType === DataViewType.DUE_AMOUNT ? 'due' : 'disbursed'}
                             </span>
                             {" "}• <span className={`${dataViewType === DataViewType.DUE_AMOUNT ? 'text-green-600' : 'text-purple-600'} font-medium`}>
-                              ₹{dataViewType === DataViewType.DUE_AMOUNT 
-                                ? formatIndianCurrency((dataForDate as LoanData).totalAmount)
-                                : formatIndianCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
+                              ₹{dataViewType === DataViewType.DUE_AMOUNT
+                                ? formatCurrency((dataForDate as LoanData).totalAmount)
+                                : formatCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
                               }
                             </span>
                           </span>

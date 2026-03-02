@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { FiChevronDown, FiAward } from 'react-icons/fi';
+import { Conversion } from '../../../../../../utils/conversion';
 
 interface Executive {
   name: string;
   initials: string;
   rank: number;
   score: number;
-  collection: string;
+  collection: number;
   target?: string;
   achieved?: string;
-  avgLoan?: string;
+  avgLoan?: number;
   gap?: string;
 }
 
@@ -37,22 +38,22 @@ const TopExecutives: React.FC = () => {
 
   // 🔴 REMOVE MOCK DATA BELOW WHEN API IS READY
   const executives: Executive[] = [
-    { name: 'Kiran T', initials: 'KT', rank: 1, score: 7.60, collection: '₹7.2 L', target: 'XX %', achieved: '95 %', avgLoan: 'XX,XXX', gap: 'Y/Y' },
-    { name: 'Maya S', initials: 'MS', rank: 2, score: 7.45, collection: '₹6.8 L', target: 'XX %', achieved: '90 %', avgLoan: 'XX,XXX', gap: 'Y/Y' },
-    { name: 'Amit N', initials: 'AN', rank: 3, score: 7.30, collection: '₹5.5 L', target: 'XX %', achieved: '85 %', avgLoan: 'XX,XXX', gap: 'Y/Y' },
-    { name: 'Raj A', initials: 'RA', rank: 4, score: 7.25, collection: '₹4.2 L', target: 'XX %', achieved: '80 %', avgLoan: 'XX,XXX', gap: 'Y/Y' },
-    { name: 'Lina I', initials: 'LI', rank: 5, score: 7.20, collection: '₹3.9 L', target: 'XX %', achieved: '78 %', avgLoan: 'XX,XXX', gap: 'Y/Y' },
+    { name: 'Kiran T', initials: 'KT', rank: 1, score: 7.60, collection: 720000, target: 'XX %', achieved: '95 %', avgLoan: 45000, gap: 'Y/Y' },
+    { name: 'Maya S', initials: 'MS', rank: 2, score: 7.45, collection: 680000, target: 'XX %', achieved: '90 %', avgLoan: 42000, gap: 'Y/Y' },
+    { name: 'Amit N', initials: 'AN', rank: 3, score: 7.30, collection: 550000, target: 'XX %', achieved: '85 %', avgLoan: 38000, gap: 'Y/Y' },
+    { name: 'Raj A', initials: 'RA', rank: 4, score: 7.25, collection: 420000, target: 'XX %', achieved: '80 %', avgLoan: 35000, gap: 'Y/Y' },
+    { name: 'Lina I', initials: 'LI', rank: 5, score: 7.20, collection: 390000, target: 'XX %', achieved: '78 %', avgLoan: 32000, gap: 'Y/Y' },
   ];
 
   return (
-    <div 
+    <div
       className="bg-white border border-[#E5E7EB]"
       style={{ width: '544px', height: '384px', borderRadius: '20px', overflow: 'hidden' }}
     >
       <div className="bg-[#F5F5F5] px-4 py-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-900">Top 5 Performers (Executives)</h3>
         <div className="relative">
-          <select 
+          <select
             value={selectedTeam}
             onChange={(e) => setSelectedTeam(e.target.value)}
             className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -75,7 +76,7 @@ const TopExecutives: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{exec.name}</p>
-                  <p className="text-xs text-gray-500">Collection : {exec.collection}</p>
+                  <p className="text-xs text-gray-500">Collection : {Conversion.formatCurrency(exec.collection)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -83,10 +84,10 @@ const TopExecutives: React.FC = () => {
                   <FiAward size={14} className="text-orange-500" />
                   <span className="text-xs font-semibold text-orange-700">Rank #{exec.rank}</span>
                 </div>
-                <div 
-                  style={{ 
-                    width: '70px', 
-                    height: '24px', 
+                <div
+                  style={{
+                    width: '70px',
+                    height: '24px',
                     borderRadius: '6px',
                     background: 'linear-gradient(270deg, #2388FF 0%, #155299 100%)',
                     display: 'flex',
@@ -97,11 +98,11 @@ const TopExecutives: React.FC = () => {
                   <span className="text-xs font-semibold text-white">{exec.score}</span>
                 </div>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={`transform transition-transform ${expandedIndex === index ? 'rotate-180' : ''}`}>
-                  <path d="M4 6L8 10L12 6" stroke="#374151" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M4 6L8 10L12 6" stroke="#374151" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
             </div>
-            
+
             {expandedIndex === index && (
               <div className="px-4 pb-3 flex gap-6 text-sm" style={{ background: '#F8FBFF' }}>
                 <div>
@@ -111,7 +112,7 @@ const TopExecutives: React.FC = () => {
                   <p className="text-gray-600">Achieved : <span className="font-semibold text-gray-900">{exec.achieved}</span></p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Avg Loan Collected : <span className="font-semibold text-gray-900">{exec.avgLoan}</span></p>
+                  <p className="text-gray-600">Avg Loan Collected : <span className="font-semibold text-gray-900">{exec.avgLoan ? Conversion.formatCurrency(exec.avgLoan) : 'XX,XXX'}</span></p>
                 </div>
                 <div>
                   <p className="text-gray-600">Gap : <span className="font-semibold text-gray-900">{exec.gap}</span></p>

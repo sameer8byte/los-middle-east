@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import {  FiMail, FiCopy } from "react-icons/fi";
+import { FiMail, FiCopy } from "react-icons/fi";
 import { HiChevronDown, HiOutlineUser } from "react-icons/hi2";
 import { AddRemarksButton } from "../../../common/ui/AddRemarksButton";
 import { RemarksCommentModal } from "../../../common/ui/RemarksCommentModal";
@@ -39,6 +39,7 @@ import {
   getCollectionSupervisorUsers,
 } from "../../../shared/services/api/partner-user.api";
 import { AcefoneClickToDialButton } from "../../acefone";
+import { Conversion } from "../../../utils/conversion";
 
 export default function LoanList() {
   const auth = useAppSelector((state) => state.auth.data);
@@ -89,7 +90,7 @@ export default function LoanList() {
   }>({});
 
   // Check if current domain is crm.zeptofinance.com
-  const isCrmZeptofinanceDomain = typeof globalThis !== "undefined" && 
+  const isCrmZeptofinanceDomain = typeof globalThis !== "undefined" &&
     globalThis.window?.location?.hostname === "crm.zeptofinance.com";
 
   // Check if user is a COLLECTION_EXECUTIVE (only for crm.zeptofinance.com domain)
@@ -107,7 +108,7 @@ export default function LoanList() {
     isLoadingCollectionExecutiveUsers,
     setIsLoadingCollectionExecutiveUsers,
   ] = useState(false);
-  const { searchTerm: selectedCollectionExecutives, setSearchTerm: setSelectedCollectionExecutives } = 
+  const { searchTerm: selectedCollectionExecutives, setSearchTerm: setSelectedCollectionExecutives } =
     usePersistedSearch<string[]>(
       "loanPreCollectionList_collectionExecutive",
       isCollectionExecutive && auth?.id ? [auth.id] : []
@@ -126,7 +127,7 @@ export default function LoanList() {
     isLoadingCollectionSupervisorUsers,
     setIsLoadingCollectionSupervisorUsers,
   ] = useState(false);
-  const { searchTerm: selectedCollectionSupervisors, setSearchTerm: setSelectedCollectionSupervisors } = 
+  const { searchTerm: selectedCollectionSupervisors, setSearchTerm: setSelectedCollectionSupervisors } =
     usePersistedSearch<string[]>("loanPreCollectionList_collectionSupervisor", []);
   const collectionSupervisorDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -458,12 +459,12 @@ export default function LoanList() {
 
       const formattedName = fullName
         ? fullName
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(" ")
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(" ")
         : "N/A";
 
       const copyText = `
@@ -485,18 +486,16 @@ Phone: ${loan.user.phoneNumber || "N/A"}
 
 💰 Loan Details
 ━━━━━━━━━━━━━━━━━━━━
-Amount: ₹${loan.amount?.toLocaleString("en-IN") || "N/A"}
+Amount: ${loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
 Status: ${loan.status}
-Agreement: ${
-        loan?.agreement?.status
+Agreement: ${loan?.agreement?.status
           ? loan.agreement.status.toLowerCase().replace(/_/g, " ")
           : "N/A"
-      }
+        }
 
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- LOAN COMPLETED ----
 
 
@@ -552,13 +551,13 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <span className="text-[var(--color-on-background)] font-semibold text-sm truncate max-w-[180px]">
                     {fullName
                       ? fullName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(" ")
                       : "N/A"}
                   </span>
                   {isForceBypass && (
@@ -579,11 +578,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   {/* Loan Type Badge */}
                   {loan.loanType && (
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
-                        !loan?.is_repeat_loan
+                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
                           ? "bg-green-100 text-green-800"
                           : "bg-blue-100 text-blue-800"
-                      }`}
+                        }`}
                     >
                       {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
                     </span>
@@ -655,11 +653,11 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   {/* Phone with toggle */}
                   <div className="flex items-center justify-between group/phone">
                     <div className="flex items-center gap-1 flex-1">
- {loan.id && (
-                                         <AcefoneClickToDialButton userId={loan.userId}
-                                         loanId={loan.id}  
-                                         />
-                                       )}{" "}                      <span className="truncate max-w-[180px]">
+                      {loan.id && (
+                        <AcefoneClickToDialButton userId={loan.userId}
+                          loanId={loan.id}
+                        />
+                      )}{" "}                      <span className="truncate max-w-[180px]">
                         {loan.user.phoneNumber
                           ? isPhoneVisible
                             ? loan.user.phoneNumber
@@ -720,11 +718,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {/* Copy Button */}
               <button
                 onClick={(e) => copyCustomerInfo(loan, e)}
-                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${
-                  copiedLoanId === loan.id
+                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
                     ? "bg-green-500 scale-110 opacity-100"
                     : "bg-[var(--color-surface)]"
-                }`}
+                  }`}
                 title={
                   copiedLoanId === loan.id ? "Copied!" : "Copy customer info"
                 }
@@ -890,7 +887,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 setNonGetwayPaymentUserId(loan.user.id);
               }}
             >
-Payments            </Button>
+              Payments            </Button>
 
             {/* View Button with text-width only */}
             <Button
@@ -1013,16 +1010,14 @@ Payments            </Button>
                 <Button
                   onClick={handleCollectionExecutiveDropdownToggle}
                   variant="surface"
-                  className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                    selectedCollectionExecutives.length > 0
+                  className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedCollectionExecutives.length > 0
                       ? "bg-green-50 border-green-300 hover:bg-green-100"
                       : "bg-white border-gray-300 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   <HiChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      collectionExecutiveDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform ${collectionExecutiveDropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                   <span>
                     {selectedCollectionExecutives.length > 0
@@ -1104,16 +1099,14 @@ Payments            </Button>
                 <Button
                   onClick={handleCollectionSupervisorDropdownToggle}
                   variant="surface"
-                  className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                    selectedCollectionSupervisors.length > 0
+                  className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedCollectionSupervisors.length > 0
                       ? "bg-teal-50 border-teal-300 hover:bg-teal-100"
                       : "bg-white border-gray-300 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   <HiChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      collectionSupervisorDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform ${collectionSupervisorDropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                   <span>
                     {selectedCollectionSupervisors.length > 0
