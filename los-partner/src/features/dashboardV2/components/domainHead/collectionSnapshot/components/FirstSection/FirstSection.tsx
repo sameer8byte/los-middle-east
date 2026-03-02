@@ -155,7 +155,7 @@ export default function FirstSection({ data }: { data?: AUMData }) {
         <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm mt-2 2xl:mt-4 w-full">
             {/* Header */}
             <div className="bg-gray-100/70 px-4 2xl:px-6 py-2 2xl:py-3 border-b border-gray-100">
-                <h2 className="text-[11px] 2xl:text-[13px] font-bold text-gray-800 tracking-wide uppercase">AUM Snapshot</h2>
+                <h2 className="text-[11px] 2xl:text-[13px] font-bold text-gray-800 tracking-wide uppercase">Loan Collection & Repayment Overview</h2>
             </div>
 
             <div className="p-3 2xl:p-6">
