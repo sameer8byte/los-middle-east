@@ -1210,7 +1210,7 @@ export function CamCalculator({
   if (!isOpen) {
     return (
       <Button onClick={() => setIsOpen(true)}>
-        CAM Calculator
+        Credit Risk
         {loan && (
           <span
             className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"
@@ -1454,23 +1454,23 @@ export function CamCalculator({
       <Dialog
         onClose={() => setIsOpen(false)}
         isOpen={isOpen && !showLoadDialog}
-        title="CAM Calculator"
+        title="Credit Risk Assessment"
         size="xl"
       >
         <div className="flex flex-col h-full max-h-[75vh]">
           {/* Scrollable Content (Reduced gap and padding) */}
           <div className="overflow-y-auto flex-1 pr-2">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {/* Column 1 - Salary Information */}
-              <div>
+              {/* <div>
                 <h3 className="text-sm font-bold text-gray-900 mb-3 pb-1 border-b-2 border-blue-300 flex items-center gap-1">
                   <span className="text-blue-600">💰</span>
                   Last 3 Months Salary
                 </h3>
 
-                {/* Salary Date and Amount Grid (Reduced spacing) */}
+                Salary Date and Amount Grid (Reduced spacing)
                 <div className="space-y-2">
-                  {/* Latest Salary */}
+                  Latest Salary
                   <div className="bg-white p-2 rounded-lg border border-blue-200">
                     <h4 className="text-xs font-semibold text-blue-800 mb-2">
                       Latest Salary
@@ -1502,7 +1502,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* 2nd Month Salary */}
+                  2nd Month Salary
                   <div className="bg-white p-2 rounded-lg border border-blue-100">
                     <h4 className="text-xs font-semibold text-blue-700 mb-2">
                       2nd Month
@@ -1532,7 +1532,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* 3rd Month Salary */}
+                  3rd Month Salary
                   <div className="bg-white p-2 rounded-lg border border-blue-100">
                     <h4 className="text-xs font-semibold text-blue-700 mb-2">
                       3rd Month
@@ -1563,7 +1563,7 @@ export function CamCalculator({
                   </div>
                 </div>
 
-                {/* Summary Box (Reduced padding and font sizes) */}
+                Summary Box (Reduced padding and font sizes)
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-2 mt-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -1589,7 +1589,7 @@ export function CamCalculator({
                   </div>
                 </div>
 
-                {/* Next Pay Date and Other Info (Reduced spacing) */}
+                Next Pay Date and Other Info (Reduced spacing)
                 <div className="space-y-2 mt-3">
                   <CompactInputField
                     id="nextPayDate"
@@ -1621,17 +1621,17 @@ export function CamCalculator({
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Column 2 - Loan Details */}
-              <div>
+              {/* <div>
                 <h3 className="text-sm font-bold text-gray-900 mb-3 pb-1 border-b-2 border-purple-300 flex items-center gap-1">
                   <span className="text-purple-600">💳</span>
                   Loan Details
                 </h3>
 
                 <div className="space-y-3">
-                  {/* FOIR and Eligible Loan */}
+                  FOIR and Eligible Loan
                   <div className="bg-white p-2 rounded-lg border border-purple-100">
                     <h4 className="text-xs font-semibold text-purple-800 mb-2">
                       FOIR & Eligibility
@@ -1659,7 +1659,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* Loan Applied and Recommended */}
+                  Loan Applied and Recommended
                   <div className="space-y-2">
                     <CompactInputField
                       id="loanApplied"
@@ -1682,14 +1682,14 @@ export function CamCalculator({
                   </div>
                 </div>
 
-                {/* Repayment Section */}
+                Repayment Section
                 <h3 className="text-sm font-bold text-gray-900 mb-3 mt-4 pb-1 border-b-2 border-purple-300 flex items-center gap-1">
                   <span className="text-purple-600">📅</span>
                   Repayment
                 </h3>
 
                 <div className="space-y-3">
-                  {/* Dates */}
+                  Dates
                   <div className="bg-white p-2 rounded-lg border border-purple-100">
                     <h4 className="text-xs font-semibold text-purple-800 mb-2">
                       Dates
@@ -1716,7 +1716,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* Tenure Selection */}
+                  Tenure Selection
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Select Tenure *
@@ -1726,12 +1726,12 @@ export function CamCalculator({
                       value={formData.tenureId}
                       onChange={(e) => {
                         const selectedId = e.target.value;
-                        // Update form data first
+                        Update form data first
                         setFormData((prev) => ({
                           ...prev,
                           tenureId: selectedId,
                         }));
-                        // Call calculateRepayment with the selected ID
+                        Call calculateRepayment with the selected ID
                         if (selectedId) {
                           calculateRepayment(selectedId);
                         }
@@ -1769,12 +1769,12 @@ export function CamCalculator({
                           let processingFee = "0%";
                           let interestRate = "0%";
 
-                          // Extract processing fee and interest rate from loan_charge_config
+                          Extract processing fee and interest rate from loan_charge_config
                           if (
                             tenure.loan_charge_config &&
                             tenure.loan_charge_config.length > 0
                           ) {
-                            // Find processing fee (type: "processing")
+                            Find processing fee (type: "processing")
                             const processingConfig =
                               tenure.loan_charge_config.find(
                                 (config) => config.type === "processing"
@@ -1783,7 +1783,7 @@ export function CamCalculator({
                               processingFee = `${processingConfig.chargeValue}%`;
                             }
 
-                            // Find interest rate (type: "interest")
+                            Find interest rate (type: "interest")
                             const interestConfig =
                               tenure.loan_charge_config.find(
                                 (config) => config.type === "interest"
@@ -1803,26 +1803,24 @@ export function CamCalculator({
                     </select>
                   </div>
 
-                  {/* Tenure Charges Configuration */}
+                  Tenure Charges Configuration
                   {renderTenureChargesSection()}
                 </div>
-              </div>
+              </div> */}
 
               {/* Column 3 - Status & Summary */}
               <div>
                 {renderRepaymentDetailsSection()}
                 
                 {/* Credit Risk Assessment Section */}
-                <div className="mt-4">
-                  <div className="flex items-center gap-1 mb-2">
-                    <h4 className="text-xs font-bold text-gray-900">Credit Risk Assessment</h4>
-                  </div>
+                <div>
+                  
                   
                   <Button
                     onClick={checkCreditRisk}
                     disabled={loadingCreditRisk}
                     loading={loadingCreditRisk}
-                    className="w-full mb-2"
+                    className="w-[20%] mb-2 mx-auto"
                   >
                     {loadingCreditRisk ? "Assessing..." : "Check Credit Risk"}
                   </Button>
@@ -1950,8 +1948,8 @@ export function CamCalculator({
           </div>
 
           {/* Sticky Action Buttons (Reduced padding and button size) */}
-          <div className="sticky bottom-0 mt-3 pt-3 bg-white border-t border-gray-200 flex gap-2 justify-end">
-            {/* ONLY show Reset if NOT read-only */}
+          {/* <div className="sticky bottom-0 mt-3 pt-3 bg-white border-t border-gray-200 flex gap-2 justify-end">
+            ONLY show Reset if NOT read-only
             {!isReadOnly && (
               <button
                 onClick={handleReset}
@@ -1961,7 +1959,7 @@ export function CamCalculator({
               </button>
             )}
 
-            {/* Always show this button, but change text based on mode */}
+            Always show this button, but change text based on mode
             <button
               onClick={() => setIsOpen(false)}
               className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
@@ -1969,7 +1967,7 @@ export function CamCalculator({
               {isReadOnly ? "Close" : "Cancel"}
             </button>
 
-            {/* ONLY show Save if NOT read-only */}
+            ONLY show Save if NOT read-only
             {!isReadOnly && (
               <button
                 onClick={handleSave}
@@ -1982,7 +1980,7 @@ export function CamCalculator({
                 {isSaving ? "Saving..." : "Save Calculation"}
               </button>
             )}
-          </div>
+          </div> */}
         </div>
       </Dialog>
     </>

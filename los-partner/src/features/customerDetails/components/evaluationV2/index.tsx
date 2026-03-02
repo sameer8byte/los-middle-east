@@ -29,6 +29,7 @@ import Sidebar from "../../../../common/sidebar";
 import debounce from "lodash.debounce";
 import { Loan } from "../../../../shared/types/loan";
 import { useAppSelector } from "../../../../shared/redux/store";
+import { Conversion } from "../../../../utils/conversion";
 
 // --- TYPE DEFINITIONS (Unchanged) ---
 interface EvaluationV2ComponentProps {
@@ -482,6 +483,9 @@ export function EvaluationV2Component({
 
   const filteredItems = getFilteredItems();
 
+  console.log("filteredItems Data:", filteredItems);
+
+
   const allStagesComplete =
     evaluation && globalStats.eligible === globalStats.total;
 
@@ -525,7 +529,7 @@ export function EvaluationV2Component({
       isOpen={!!loanId}
       width="w-full max-full" // Full width sidebar for max space
       onClose={() => setLoanId(null)}
-      title={`Loan Evaluation${
+      title={`Risk Evaluation${
         loan?.formattedLoanId ? ` (${loan.formattedLoanId})` : ""
       }`}
     >
@@ -706,7 +710,7 @@ export function EvaluationV2Component({
                   )}
                 </div>
                 <div className="flex gap-2 text-sm">
-                  {/* Filter Buttons */}
+                  {/* Filter Buttons
                   <button
                     onClick={() => setStatusFilter("ALL")}
                     className={`px-3 py-1.5 rounded-lg transition-all text-xs font-medium ${
@@ -749,7 +753,8 @@ export function EvaluationV2Component({
                   >
                     <FaBolt className="inline w-3 h-3 mr-1" /> Override (
                     {stats.overridden})
-                  </button>
+                  </button> */}
+                  <span>{(stats.eligible/stats.total * 100).toFixed(2)}%</span>
                 </div>
               </div>
             </div>
@@ -820,7 +825,7 @@ export function EvaluationV2Component({
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={item.actualValue}
+                                  value={item.actualValue.startsWith("₹") ? Conversion.formatCurrency(item.actualValue.replace(/₹\s?/, "")) : item.actualValue} 
                                   onChange={(e) =>
                                     handleActualValueChange(
                                       item.id,
@@ -834,7 +839,7 @@ export function EvaluationV2Component({
                                 {/* Tooltip that shows only on input hover */}
                                 <div className="absolute invisible opacity-0 peer-hover:visible peer-hover:opacity-100 transition-all duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
                                   <div className="bg-gray-900 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap max-w-xs break-words">
-                                    {item.actualValue || "No value"}
+                                    {item.actualValue.startsWith("₹") ? Conversion.formatCurrency(item.actualValue.replace(/₹\s?/, "")) : item.actualValue || "No value"}
                                     {/* Tooltip arrow */}
                                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                                   </div>
