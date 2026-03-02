@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useParams } from "react-router-dom";
 import {
   HiXCircle,
@@ -46,10 +47,10 @@ interface PaymentTransaction {
         phoneNumber: string;
         email: string;
         formattedUserId: string;
-        userDetails:{
-           firstName:string;
-                      lastName:string;
-                      middleName: string;
+        userDetails: {
+          firstName: string;
+          lastName: string;
+          middleName: string;
         }
       };
       brand: {
@@ -127,16 +128,14 @@ const TypeBadge = ({ type }: { type: string }) => {
   const isFull = type === "COLLECTION";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide rounded-full border ${
-        isFull
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide rounded-full border ${isFull
           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
           : "bg-amber-50 text-amber-700 border-amber-200"
-      }`}
+        }`}
     >
       <span
-        className={`w-1.5 h-1.5 rounded-full ${
-          isFull ? "bg-emerald-500" : "bg-amber-500"
-        }`}
+        className={`w-1.5 h-1.5 rounded-full ${isFull ? "bg-emerald-500" : "bg-amber-500"
+          }`}
       />
       {isFull ? "Full" : "Partial"}
     </span>
@@ -202,10 +201,9 @@ const FilterTab = ({
     onClick={onClick}
     className={`
       relative px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200
-      ${
-        isActive
-          ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25"
-          : "text-[var(--on-surface)]/60 hover:text-[var(--on-surface)] hover:bg-[var(--muted)]/15"
+      ${isActive
+        ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25"
+        : "text-[var(--on-surface)]/60 hover:text-[var(--on-surface)] hover:bg-[var(--muted)]/15"
       }
     `}
   >
@@ -213,10 +211,9 @@ const FilterTab = ({
     <span
       className={`
         ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold
-        ${
-          isActive
-            ? "bg-white/20 text-white"
-            : "bg-[var(--muted)]/20 text-[var(--on-surface)]/50"
+        ${isActive
+          ? "bg-white/20 text-white"
+          : "bg-[var(--muted)]/20 text-[var(--on-surface)]/50"
         }
       `}
     >
@@ -438,12 +435,6 @@ export function PaymentRejectedPageComponent() {
     sortDirection,
   ]);
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(amount);
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -573,10 +564,9 @@ export function PaymentRejectedPageComponent() {
                     text-[var(--on-surface)]
                     placeholder-[var(--on-surface)]/40
                     focus:outline-none
-                    ${
-                      isSearchFocused || searchTerm
-                        ? "border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10"
-                        : "border-[var(--muted)]/30 hover:border-[var(--muted)]/50"
+                    ${isSearchFocused || searchTerm
+                      ? "border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10"
+                      : "border-[var(--muted)]/30 hover:border-[var(--muted)]/50"
                     }
                   `}
                 />
@@ -603,10 +593,9 @@ export function PaymentRejectedPageComponent() {
                 disabled={loading}
                 className={`
                   p-2.5 rounded-xl border-2 transition-all duration-200
-                  ${
-                    loading
-                      ? "border-[var(--muted)]/20 bg-[var(--muted)]/10 text-[var(--on-surface)]/30"
-                      : "border-[var(--muted)]/30 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 text-[var(--on-surface)]/60 hover:text-[var(--primary)]"
+                  ${loading
+                    ? "border-[var(--muted)]/20 bg-[var(--muted)]/10 text-[var(--on-surface)]/30"
+                    : "border-[var(--muted)]/30 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 text-[var(--on-surface)]/60 hover:text-[var(--primary)]"
                   }
                 `}
                 title="Refresh data"
@@ -771,11 +760,11 @@ export function PaymentRejectedPageComponent() {
                     </td>
                     <td className="px-3 py-3 text-right">
                       <span className="font-bold text-emerald-600 tabular-nums text-sm">
-                        {formatCurrency(tx.amount)}
+                        {Conversion.formatCurrency(tx.amount)}
                       </span>
                     </td>
                     <td className="px-3 py-3 text-right text-[var(--on-surface)]/50 tabular-nums text-sm">
-                      {formatCurrency(tx.paymentRequest?.loan?.amount)}
+                      {Conversion.formatCurrency(tx.paymentRequest?.loan?.amount)}
                     </td>
                     <td className="px-3 py-3 ">
                       <MethodBadge method={tx.method} />
@@ -898,10 +887,9 @@ export function PaymentRejectedPageComponent() {
                     }
                     className={`
                       min-w-[32px] h-8 text-xs font-semibold rounded-lg transition-all duration-200
-                      ${
-                        pagination.page === pageNum
-                          ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/30"
-                          : "text-[var(--on-surface)]/50 hover:bg-[var(--muted)]/15 hover:text-[var(--on-surface)]/80"
+                      ${pagination.page === pageNum
+                        ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/30"
+                        : "text-[var(--on-surface)]/50 hover:bg-[var(--muted)]/15 hover:text-[var(--on-surface)]/80"
                       }
                     `}
                   >

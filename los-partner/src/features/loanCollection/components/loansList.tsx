@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useLocation, useParams } from "react-router-dom";
 import { FiPhone, FiMail, FiCopy, FiMoreVertical, FiFileText } from "react-icons/fi";
 import { HiChevronDown, HiOutlineUser } from "react-icons/hi2";
@@ -89,11 +90,10 @@ const ActionMenu = ({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`px-2 transition-colors ${
-          isOpen
+        className={`px-2 transition-colors ${isOpen
             ? "bg-blue-50 border-blue-200 text-blue-600"
             : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-        }`}
+          }`}
       >
         <FiMoreVertical size={16} />
       </Button>
@@ -123,9 +123,8 @@ const ActionMenu = ({
                 className="flex items-center w-full text-left px-3 py-2 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-transparent rounded-md transition-all"
               >
                 <FaMapMarkerAlt
-                  className={`mr-2 h-3.5 w-3.5 ${
-                    requiresFieldVisit ? "text-red-600" : "text-blue-600"
-                  }`}
+                  className={`mr-2 h-3.5 w-3.5 ${requiresFieldVisit ? "text-red-600" : "text-blue-600"
+                    }`}
                 />
                 {requiresFieldVisit ? "Remove Field Visit" : "Add Field Visit"}
               </button>
@@ -291,9 +290,9 @@ export default function LoanList() {
           prevLoans.map((loan) =>
             loan.id === loanId
               ? {
-                  ...loan,
-                  fieldVisits: [updatedFieldVisit],
-                }
+                ...loan,
+                fieldVisits: [updatedFieldVisit],
+              }
               : loan
           )
         );
@@ -637,12 +636,12 @@ export default function LoanList() {
 
       const formattedName = fullName
         ? fullName
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(" ")
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(" ")
         : "N/A";
 
       const copyText = `
@@ -664,18 +663,16 @@ Phone: ${loan.user.phoneNumber || "N/A"}
 
 💰 Loan Details
 ━━━━━━━━━━━━━━━━━━━━
-Amount: ₹${loan.amount?.toLocaleString("en-IN") || "N/A"}
+Amount: ${loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
 Status: ${loan.status}
-Agreement: ${
-        loan?.agreement?.status
+Agreement: ${loan?.agreement?.status
           ? loan.agreement.status.toLowerCase().replace(/_/g, " ")
           : "N/A"
-      }
+        }
 
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- LOAN COMPLETED ----
 ═══════════════════════════════
 
@@ -845,13 +842,13 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <span className="text-[var(--color-on-background)] font-semibold text-sm truncate max-w-[180px]">
                     {fullName
                       ? fullName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(" ")
                       : "N/A"}
                   </span>
                   {isForceBypass && (
@@ -872,11 +869,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   {/* Loan Type Badge */}
                   {loan.loanType && (
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
-                        !loan?.is_repeat_loan
+                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
                           ? "bg-green-100 text-green-800"
                           : "bg-blue-100 text-blue-800"
-                      }`}
+                        }`}
                     >
                       {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
                     </span>
@@ -899,9 +895,9 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                         ? isEmailVisible
                           ? loan.user.email
                           : loan.user.email.replace(
-                              /(?<=^.{1}).*?(?=@)/g,
-                              (match) => "X".repeat(match.length)
-                            )
+                            /(?<=^.{1}).*?(?=@)/g,
+                            (match) => "X".repeat(match.length)
+                          )
                         : "N/A"}
                     </span>
                   </div>
@@ -1025,11 +1021,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {/* Copy Button */}
               <button
                 onClick={(e) => copyCustomerInfo(loan, e)}
-                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${
-                  copiedLoanId === loan.id
+                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
                     ? "bg-green-500 scale-110 opacity-100"
                     : "bg-[var(--color-surface)]"
-                }`}
+                  }`}
                 title={
                   copiedLoanId === loan.id ? "Copied!" : "Copy customer info"
                 }
@@ -1388,16 +1383,14 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               <Button
                 onClick={handleCollectionExecutiveDropdownToggle}
                 variant="surface"
-                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                  selectedCollectionExecutives.length > 0
+                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedCollectionExecutives.length > 0
                     ? "bg-green-50 border-green-300 hover:bg-green-100"
                     : "bg-white border-gray-300 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <HiChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    collectionExecutiveDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${collectionExecutiveDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
                 <span>
                   {selectedCollectionExecutives.length > 0
@@ -1477,16 +1470,14 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               <Button
                 onClick={handleCollectionSupervisorDropdownToggle}
                 variant="surface"
-                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                  selectedCollectionSupervisors.length > 0
+                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedCollectionSupervisors.length > 0
                     ? "bg-teal-50 border-teal-300 hover:bg-teal-100"
                     : "bg-white border-gray-300 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <HiChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    collectionSupervisorDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${collectionSupervisorDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
                 <span>
                   {selectedCollectionSupervisors.length > 0
@@ -1687,11 +1678,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                       {/* Message */}
                       {history.message && (
                         <div
-                          className={`text-sm p-3 rounded ${
-                            history.message.startsWith("COMMENT:")
+                          className={`text-sm p-3 rounded ${history.message.startsWith("COMMENT:")
                               ? "bg-blue-50 border-l-4 border-blue-400 text-blue-800"
                               : "bg-gray-50 border-l-4 border-gray-400 text-gray-700"
-                          }`}
+                            }`}
                         >
                           {history.message.startsWith("COMMENT:")
                             ? `💬 ${history.message.replace("COMMENT: ", "")}`
@@ -1717,7 +1707,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                                     {idx <
                                       history.loan_status_brand_reasons!
                                         .length -
-                                        1 && <br />}
+                                      1 && <br />}
                                   </span>
                                 )
                               )}

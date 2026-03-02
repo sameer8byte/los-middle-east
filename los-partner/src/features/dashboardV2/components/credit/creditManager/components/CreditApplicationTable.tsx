@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FiChevronDown, FiChevronLeft, FiChevronRight, FiFilter, FiMoreVertical } from "react-icons/fi";
 import { MdOutlineSort } from "react-icons/md";
+import { Conversion } from "../../../../../../utils/conversion";
 
 export interface CreditApplicationData {
   srNo: number;
@@ -142,7 +143,7 @@ const CreditApplicationTable: React.FC<PerformanceTableProps> = ({
                     <td className="px-5 py-4 text-gray-600 font-normal border-r border-gray-100">{row.phNo}</td>
                     <td className="px-5 py-4 text-gray-400 font-normal text-[11px] border-r border-gray-100">{row.email}</td>
                     <td className="px-5 py-4 text-gray-600 font-medium border-r border-gray-100">{row.leadType}</td>
-                    <td className="px-5 py-4 text-gray-800 font-bold tracking-tight border-r border-gray-100">₹{row.loanAmount}</td>
+                    <td className="px-5 py-4 text-gray-800 font-bold tracking-tight border-r border-gray-100">{Conversion.formatCurrency(row.loanAmount)}</td>
                     <td className="px-5 py-4 border-r border-gray-100">
                       <div className="flex items-center gap-1.5 font-semibold text-gray-700 whitespace-nowrap">
                         {row.assignedTo}

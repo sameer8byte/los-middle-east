@@ -1,4 +1,5 @@
 import React from 'react';
+import { Conversion } from "../../../../../../../utils/conversion";
 
 // -------------- Icons -------------- //
 const FileUserIcon = () => (
@@ -141,10 +142,10 @@ export interface AUMData {
 export default function FirstSection({ data }: { data?: AUMData }) {
     // Mock Dynamic Data fallback
     const currentData = data ?? {
-        totalLoansDueAmount: "₹14.8 Cr",
-        totalAmountCollected: "₹3.24 Cr",
+        totalLoansDueAmount: 148000000,
+        totalAmountCollected: 32400000,
         totalAmountOutstanding: "82%",
-        postDueAmount: "₹1.2 Cr",
+        postDueAmount: 12000000,
         totalLoansIssued: 300,
         ongoingLoans: 224,
         closedLoans: 76,
@@ -165,21 +166,21 @@ export default function FirstSection({ data }: { data?: AUMData }) {
                         variant="large"
                         largeTheme="solid-blue"
                         title="Asset Under Management"
-                        value={currentData.totalLoansDueAmount}
+                        value={Conversion.formatCurrency(currentData.totalLoansDueAmount)}
                         icon={<FileUserIcon />}
                     />
                     <CommonCard
                         variant="large"
                         largeTheme="light-green"
                         title="Disbursed Amount"
-                        value={currentData.totalAmountCollected}
+                        value={Conversion.formatCurrency(currentData.totalAmountCollected)}
                         icon={<SplitArrowSVG />}
                     />
                     <CommonCard
                         variant="large"
                         largeTheme="light-red"
                         title="Bank Balance"
-                        value={currentData.postDueAmount}
+                        value={Conversion.formatCurrency(currentData.postDueAmount)}
                         icon={<CheckDocIcon />}
                     />
                     <CommonCard

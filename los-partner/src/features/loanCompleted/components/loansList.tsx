@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useLocation, useParams } from "react-router-dom";
 import { IoIosDocument } from "react-icons/io";
-import {  FiMail, FiCopy } from "react-icons/fi";
+import { FiMail, FiCopy } from "react-icons/fi";
 import Avatar from "../../../common/ui/avatar";
 import { useToast } from "../../../context/toastContext";
 import { useQueryParams } from "../../../hooks/useQueryParams";
@@ -35,6 +36,7 @@ import { useAppSelector } from "../../../shared/redux/store";
 import dayjs from "dayjs";
 import { LoanStatusBadge } from "../../../common/ui/LoanStatusBadge";
 import { AcefoneClickToDialButton } from "../../acefone";
+
 
 export default function LoanList() {
   const { search } = useLocation();
@@ -100,9 +102,9 @@ export default function LoanList() {
       setLoans(response.loans);
       setTotalCount(response.meta.total);
     } catch (err) {
-  setError(
-          err instanceof Error ? err.message :
-          "Failed to fetch loans");      console.error(err);
+      setError(
+        err instanceof Error ? err.message :
+          "Failed to fetch loans"); console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -174,12 +176,12 @@ export default function LoanList() {
 
       const formattedName = fullName
         ? fullName
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(" ")
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(" ")
         : "N/A";
 
       const copyText = `
@@ -201,18 +203,16 @@ Phone: ${loan.user.phoneNumber || "N/A"}
 
 💰 Loan Details
 ━━━━━━━━━━━━━━━━━━━━
-Amount: ₹${loan.amount?.toLocaleString("en-IN") || "N/A"}
+Amount: ${loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
 Status: ${loan.status}
-Agreement: ${
-        loan?.agreement?.status
+Agreement: ${loan?.agreement?.status
           ? loan.agreement.status.toLowerCase().replace(/_/g, " ")
           : "N/A"
-      }
+        }
 
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- LOAN COMPLETED ----
 ═══════════════════════════════
 
@@ -236,7 +236,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
   // Define table columns
   const columns = useMemo(
     () => [
-         {
+      {
         key: "customer",
         label: "Customer Info", // Updated label
         render: (_: any, loan: Loan) => {
@@ -267,13 +267,13 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <span className="text-[var(--color-on-background)] font-semibold text-sm truncate max-w-[180px]">
                     {fullName
                       ? fullName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(" ")
                       : "N/A"}
                   </span>
                   {isForceBypass && (
@@ -287,18 +287,17 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 <div className="flex items-center gap-2 text-xs text-[var(--color-on-surface)] opacity-70">
                   <span>{loan.formattedLoanId}</span>
                   {loan?.isMigratedloan && (
-                      <span className=" inline-flex items-center bg-[var(--color-secondary)] bg-opacity-10 px-2 py-0.5 text-xs font-medium text-[var(--color-on-secondary)]">
+                    <span className=" inline-flex items-center bg-[var(--color-secondary)] bg-opacity-10 px-2 py-0.5 text-xs font-medium text-[var(--color-on-secondary)]">
                       Migrated ({loan.oldLoanId})
                     </span>
                   )}
                   {/* Loan Type Badge */}
                   {loan.loanType && (
-                    <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
-                      !loan?.is_repeat_loan
-                        ? "bg-green-100 text-green-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}>
-                      {!loan?.is_repeat_loan? "Fresh" : "Repeat"}
+                    <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
+                      ? "bg-green-100 text-green-800"
+                      : "bg-blue-100 text-blue-800"
+                      }`}>
+                      {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
                     </span>
                   )}
                 </div>
@@ -310,11 +309,11 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <span className="truncate">{loan.user.email || "N/A"}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                   {loan.id && (
-                                         <AcefoneClickToDialButton userId={loan.userId}
-                                         loanId={loan.id}  
-                                         />
-                                       )}{" "}
+                    {loan.id && (
+                      <AcefoneClickToDialButton userId={loan.userId}
+                        loanId={loan.id}
+                      />
+                    )}{" "}
                     <span>{loan.user.phoneNumber || "N/A"}</span>
                   </div>
                 </div>
@@ -323,11 +322,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {/* Copy Button */}
               <button
                 onClick={(e) => copyCustomerInfo(loan, e)}
-                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${
-                  copiedLoanId === loan.id
-                    ? "bg-green-500 scale-110 opacity-100"
-                    : "bg-[var(--color-surface)]"
-                }`}
+                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
+                  ? "bg-green-500 scale-110 opacity-100"
+                  : "bg-[var(--color-surface)]"
+                  }`}
                 title={
                   copiedLoanId === loan.id ? "Copied!" : "Copy customer info"
                 }
@@ -354,7 +352,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           );
         },
       },
-   
+
       {
         key: "status",
         label: "Status",
@@ -503,277 +501,275 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                       </div>
 
                       {/* Collection Transactions */}
-{request.collectionTransactions?.map((transaction) => (
-  <div
-    key={transaction.id}
-    className="bg-white rounded-xl border border-[var(--color-muted)] border-opacity-20 shadow-sm overflow-hidden"
-  >
-    {/* Transaction Header */}
-    <div className="bg-[var(--color-surface)] bg-opacity-30 p-4 border-b border-[var(--color-muted)] border-opacity-20">
-      <div className="flex justify-between items-center">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-1 h-4 bg-[#EA5E18] rounded-full"></div>
-            <h3 className="text-sm font-semibold text-[var(--color-on-background)]">
-              Collection Transaction
-            </h3>
-          </div>
-          <div className="text-xs text-[var(--color-on-surface)] opacity-70 font-mono">
-            ID: {transaction.id}
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span
-            className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-              transaction.status
-            )}`}
-          >
-            {transaction.status}
-          </span>
-          {transaction.opsApprovalStatus && (
-            <span
-              className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                transaction.opsApprovalStatus === "APPROVED"
-                  ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)] border border-[var(--color-success)] border-opacity-30"
-                  : transaction.opsApprovalStatus === "REJECTED"
-                  ? "bg-[var(--color-error)] bg-opacity-10 text-[var(--color-on-error)] border border-[var(--color-error)] border-opacity-30"
-                  : "bg-[var(--color-secondary)] bg-opacity-10 text-[var(--color-warning)] border border-[var(--color-warning)] border-opacity-30"
-              }`}
-            >
-              Ops: {transaction.opsApprovalStatus}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
+                      {request.collectionTransactions?.map((transaction) => (
+                        <div
+                          key={transaction.id}
+                          className="bg-white rounded-xl border border-[var(--color-muted)] border-opacity-20 shadow-sm overflow-hidden"
+                        >
+                          {/* Transaction Header */}
+                          <div className="bg-[var(--color-surface)] bg-opacity-30 p-4 border-b border-[var(--color-muted)] border-opacity-20">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="w-1 h-4 bg-[#EA5E18] rounded-full"></div>
+                                  <h3 className="text-sm font-semibold text-[var(--color-on-background)]">
+                                    Collection Transaction
+                                  </h3>
+                                </div>
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70 font-mono">
+                                  ID: {transaction.id}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span
+                                  className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                    transaction.status
+                                  )}`}
+                                >
+                                  {transaction.status}
+                                </span>
+                                {transaction.opsApprovalStatus && (
+                                  <span
+                                    className={`px-2 py-1 text-xs font-semibold rounded-full ${transaction.opsApprovalStatus === "APPROVED"
+                                      ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)] border border-[var(--color-success)] border-opacity-30"
+                                      : transaction.opsApprovalStatus === "REJECTED"
+                                        ? "bg-[var(--color-error)] bg-opacity-10 text-[var(--color-on-error)] border border-[var(--color-error)] border-opacity-30"
+                                        : "bg-[var(--color-secondary)] bg-opacity-10 text-[var(--color-warning)] border border-[var(--color-warning)] border-opacity-30"
+                                      }`}
+                                  >
+                                    Ops: {transaction.opsApprovalStatus}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
 
-    {/* Amount Breakdown Table */}
-    <div className="p-4">
-      <table className="w-full border-collapse border border-[var(--color-muted)] border-opacity-20 text-xs mb-4">
-        <thead>
-          <tr className="bg-[var(--color-muted)] bg-opacity-10">
-            <th className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-left text-xs font-semibold text-[var(--color-on-background)]">
-              Component
-            </th>
-            <th className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-xs font-semibold text-[var(--color-on-background)]">
-              Amount (₹)
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Principal Amount */}
-          <tr className="bg-white hover:bg-[var(--color-muted)] hover:bg-opacity-5">
-            <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
-              Principal
-            </td>
-            <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
-              {Number(transaction.principalAmount || 0).toLocaleString("en-IN")}
-            </td>
-          </tr>
+                          {/* Amount Breakdown Table */}
+                          <div className="p-4">
+                            <table className="w-full border-collapse border border-[var(--color-muted)] border-opacity-20 text-xs mb-4">
+                              <thead>
+                                <tr className="bg-[var(--color-muted)] bg-opacity-10">
+                                  <th className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-left text-xs font-semibold text-[var(--color-on-background)]">
+                                    Component
+                                  </th>
+                                  <th className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-xs font-semibold text-[var(--color-on-background)]">
+                                    Amount (BHD)
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {/* Principal Amount */}
+                                <tr className="bg-white hover:bg-[var(--color-muted)] hover:bg-opacity-5">
+                                  <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
+                                    Principal
+                                  </td>
+                                  <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
+                                    {Conversion.formatCurrency(transaction.principalAmount || 0)}
+                                  </td>
+                                </tr>
 
-          {/* Interest/Fees */}
-          <tr className="bg-[var(--color-surface)] bg-opacity-20 hover:bg-[var(--color-muted)] hover:bg-opacity-5">
-            <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
-              Interest
-            </td>
-            <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
-              {Number(transaction.totalFees || 0).toLocaleString("en-IN")}
-            </td>
-          </tr>
+                                {/* Interest/Fees */}
+                                <tr className="bg-[var(--color-surface)] bg-opacity-20 hover:bg-[var(--color-muted)] hover:bg-opacity-5">
+                                  <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
+                                    Interest
+                                  </td>
+                                  <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
+                                    {Conversion.formatCurrency(transaction.totalFees || 0)}
+                                  </td>
+                                </tr>
 
-          {/* Taxes */}
-          {Number(transaction.totalTaxes || 0) > 0 && (
-            <tr className="bg-white hover:bg-[var(--color-muted)] hover:bg-opacity-5">
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
-                Taxes
-              </td>
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
-                {Number(transaction.totalTaxes || 0).toLocaleString("en-IN")}
-              </td>
-            </tr>
-          )}
+                                {/* Taxes */}
+                                {Number(transaction.totalTaxes || 0) > 0 && (
+                                  <tr className="bg-white hover:bg-[var(--color-muted)] hover:bg-opacity-5">
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
+                                      Taxes
+                                    </td>
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
+                                      {Conversion.formatCurrency(transaction.totalTaxes || 0)}
+                                    </td>
+                                  </tr>
+                                )}
 
-          {/* Penalties */}
-          {Number(transaction.totalPenalties || 0) > 0 && (
-            <tr className="bg-white hover:bg-[var(--color-muted)] hover:bg-opacity-5">
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
-                Penalties
-              </td>
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
-                {Number(transaction.totalPenalties || 0).toLocaleString("en-IN")}
-              </td>
-            </tr>
-          )}
+                                {/* Penalties */}
+                                {Number(transaction.totalPenalties || 0) > 0 && (
+                                  <tr className="bg-white hover:bg-[var(--color-muted)] hover:bg-opacity-5">
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
+                                      Penalties
+                                    </td>
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
+                                      {Conversion.formatCurrency(transaction.totalPenalties || 0)}
+                                    </td>
+                                  </tr>
+                                )}
 
-          {/* Penalty Discount */}
-          {Number(transaction.penaltyDiscount || 0) > 0 && (
-            <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium text-blue-900">
-                Penalty Discount
-              </td>
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-blue-600 font-bold">
-                -{Number(transaction.penaltyDiscount || 0).toLocaleString("en-IN")}
-              </td>
-            </tr>
-          )}
+                                {/* Penalty Discount */}
+                                {Number(transaction.penaltyDiscount || 0) > 0 && (
+                                  <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium text-blue-900">
+                                      Penalty Discount
+                                    </td>
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-blue-600 font-bold">
+                                      -{Conversion.formatCurrency(transaction.penaltyDiscount || 0)}
+                                    </td>
+                                  </tr>
+                                )}
 
-          {/* Round Off Discount */}
-          {Number(transaction.roundOffDiscount || 0) > 0 && (
-            <tr className="bg-gradient-to-r from-purple-50 to-pink-50">
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)]">
-                <div className="font-medium text-purple-900">Round Off Discount</div>
-                <div className="text-[10px] text-purple-700 italic">(on Interest + Principal)</div>
-              </td>
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-purple-700 font-bold">
-                -{Number(transaction.roundOffDiscount || 0).toLocaleString("en-IN")}
-              </td>
-            </tr>
-          )}
+                                {/* Round Off Discount */}
+                                {Number(transaction.roundOffDiscount || 0) > 0 && (
+                                  <tr className="bg-gradient-to-r from-purple-50 to-pink-50">
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)]">
+                                      <div className="font-medium text-purple-900">Round Off Discount</div>
+                                      <div className="text-[10px] text-purple-700 italic">(on Interest + Principal)</div>
+                                    </td>
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-purple-700 font-bold">
+                                      -{Conversion.formatCurrency(transaction.roundOffDiscount || 0)}
+                                    </td>
+                                  </tr>
+                                )}
 
-          {/* Excess Amount */}
-          {Number(transaction.excessAmount || 0) > 0 && (
-            <tr className="bg-gradient-to-r from-green-50 to-emerald-50">
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium text-green-900">
-                Excess Amount
-              </td>
-              <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-green-700 font-bold">
-                +{Number(transaction.excessAmount || 0).toLocaleString("en-IN")}
-              </td>
-            </tr>
-          )}
+                                {/* Excess Amount */}
+                                {Number(transaction.excessAmount || 0) > 0 && (
+                                  <tr className="bg-gradient-to-r from-green-50 to-emerald-50">
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium text-green-900">
+                                      Excess Amount
+                                    </td>
+                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-green-700 font-bold">
+                                      +{Conversion.formatCurrency(transaction.excessAmount || 0)}
+                                    </td>
+                                  </tr>
+                                )}
 
-          {/* Total Amount */}
-          <tr className="bg-gradient-to-r from-slate-100 to-slate-200 border-t-2 border-slate-300 font-bold">
-            <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-3 text-[var(--color-on-background)]">
-              <div className="text-sm">Total Amount</div>
-            </td>
-            <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-3 text-right text-red-700 text-sm">
-              {Number(transaction.amount || 0).toLocaleString("en-IN")}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                                {/* Total Amount */}
+                                <tr className="bg-gradient-to-r from-slate-100 to-slate-200 border-t-2 border-slate-300 font-bold">
+                                  <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-3 text-[var(--color-on-background)]">
+                                    <div className="text-sm">Total Amount</div>
+                                  </td>
+                                  <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-3 text-right text-red-700 text-sm">
+                                    {Conversion.formatCurrency(transaction.amount || 0)}
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
 
-      {/* Transaction Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-        {/* Left Column */}
-        <div className="space-y-3">
-          {/* Method */}
-          {transaction.method && (
-            <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-              <span className="text-[var(--color-on-surface)] opacity-70">Method:</span>
-              <span className="text-[var(--color-on-background)] font-medium">{transaction.method}</span>
-            </div>
-          )}
+                            {/* Transaction Details Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              {/* Left Column */}
+                              <div className="space-y-3">
+                                {/* Method */}
+                                {transaction.method && (
+                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                    <span className="text-[var(--color-on-surface)] opacity-70">Method:</span>
+                                    <span className="text-[var(--color-on-background)] font-medium">{transaction.method}</span>
+                                  </div>
+                                )}
 
-          {/* Closing Type */}
-          {transaction.closingType && (
-            <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-              <span className="text-[var(--color-on-surface)] opacity-70">Closing Type:</span>
-              <span className="text-[var(--color-on-background)] font-medium">{transaction.closingType}</span>
-            </div>
-          )}
-        </div>
+                                {/* Closing Type */}
+                                {transaction.closingType && (
+                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                    <span className="text-[var(--color-on-surface)] opacity-70">Closing Type:</span>
+                                    <span className="text-[var(--color-on-background)] font-medium">{transaction.closingType}</span>
+                                  </div>
+                                )}
+                              </div>
 
-        {/* Right Column */}
-        <div className="space-y-3">
-          {/* Receipt ID */}
-          {transaction.receiptId && (
-            <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-              <span className="text-[var(--color-on-surface)] opacity-70">Receipt ID:</span>
-              <span className="text-[var(--color-on-background)] font-mono text-xs font-medium">
-                {transaction.receiptId}
-              </span>
-            </div>
-          )}
+                              {/* Right Column */}
+                              <div className="space-y-3">
+                                {/* Receipt ID */}
+                                {transaction.receiptId && (
+                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                    <span className="text-[var(--color-on-surface)] opacity-70">Receipt ID:</span>
+                                    <span className="text-[var(--color-on-background)] font-mono text-xs font-medium">
+                                      {transaction.receiptId}
+                                    </span>
+                                  </div>
+                                )}
 
-          {/* External Ref */}
-          {transaction.externalRef && (
-            <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-              <span className="text-[var(--color-on-surface)] opacity-70">External Ref:</span>
-              <span className="text-[var(--color-on-background)] font-medium">{transaction.externalRef}</span>
-            </div>
-          )}
+                                {/* External Ref */}
+                                {transaction.externalRef && (
+                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                    <span className="text-[var(--color-on-surface)] opacity-70">External Ref:</span>
+                                    <span className="text-[var(--color-on-background)] font-medium">{transaction.externalRef}</span>
+                                  </div>
+                                )}
 
-          {/* Completed Date */}
-          {transaction.completedAt && (
-            <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-              <span className="text-[var(--color-on-surface)] opacity-70">Completed:</span>
-              <span className="text-[var(--color-on-background)] font-medium">
-                {formatDateWithTime(transaction.completedAt)}
-              </span>
-            </div>
-          )}
+                                {/* Completed Date */}
+                                {transaction.completedAt && (
+                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                    <span className="text-[var(--color-on-surface)] opacity-70">Completed:</span>
+                                    <span className="text-[var(--color-on-background)] font-medium">
+                                      {formatDateWithTime(transaction.completedAt)}
+                                    </span>
+                                  </div>
+                                )}
 
-          {/* Reloan Applicable */}
-          <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-            <span className="text-[var(--color-on-surface)] opacity-70">Reloan Applicable:</span>
-            <span
-              className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                transaction.isReloanApplicable
-                  ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)] border border-[var(--color-success)] border-opacity-30"
-                  : "bg-[var(--color-surface)] text-[var(--color-on-surface)] border border-[var(--color-muted)] border-opacity-30"
-              }`}
-            >
-              {transaction.isReloanApplicable ? "Yes" : "No"}
-            </span>
-          </div>
-        </div>
-      </div>
+                                {/* Reloan Applicable */}
+                                <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                  <span className="text-[var(--color-on-surface)] opacity-70">Reloan Applicable:</span>
+                                  <span
+                                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${transaction.isReloanApplicable
+                                      ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)] border border-[var(--color-success)] border-opacity-30"
+                                      : "bg-[var(--color-surface)] text-[var(--color-on-surface)] border border-[var(--color-muted)] border-opacity-30"
+                                      }`}
+                                  >
+                                    {transaction.isReloanApplicable ? "Yes" : "No"}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
 
-      {/* Additional Information */}
-      <div className="mt-4 pt-4 border-t border-[var(--color-muted)] border-opacity-30">
-        {/* Note */}
-        {transaction.note && (
-          <div className="text-sm mb-3 p-2 bg-blue-50 rounded border border-blue-200">
-            <span className="font-medium text-blue-900">Note: </span>
-            <span className="text-blue-800">{transaction.note}</span>
-          </div>
-        )}
+                            {/* Additional Information */}
+                            <div className="mt-4 pt-4 border-t border-[var(--color-muted)] border-opacity-30">
+                              {/* Note */}
+                              {transaction.note && (
+                                <div className="text-sm mb-3 p-2 bg-blue-50 rounded border border-blue-200">
+                                  <span className="font-medium text-blue-900">Note: </span>
+                                  <span className="text-blue-800">{transaction.note}</span>
+                                </div>
+                              )}
 
-        {/* Ops Remark */}
-        {transaction.opsRemark && (
-          <div className="text-sm mb-3 p-2 bg-amber-50 rounded border border-amber-200">
-            <span className="font-medium text-amber-900">Ops Remark: </span>
-            <span className="text-amber-800">{transaction.opsRemark}</span>
-          </div>
-        )}
+                              {/* Ops Remark */}
+                              {transaction.opsRemark && (
+                                <div className="text-sm mb-3 p-2 bg-amber-50 rounded border border-amber-200">
+                                  <span className="font-medium text-amber-900">Ops Remark: </span>
+                                  <span className="text-amber-800">{transaction.opsRemark}</span>
+                                </div>
+                              )}
 
-        {/* Reloan Remark */}
-        {transaction.reloanRemark && (
-          <div className="text-sm mb-3 p-2 bg-green-50 rounded border border-green-200">
-            <span className="font-medium text-green-900">Reloan Remark: </span>
-            <span className="text-green-800">{transaction.reloanRemark}</span>
-          </div>
-        )}
+                              {/* Reloan Remark */}
+                              {transaction.reloanRemark && (
+                                <div className="text-sm mb-3 p-2 bg-green-50 rounded border border-green-200">
+                                  <span className="font-medium text-green-900">Reloan Remark: </span>
+                                  <span className="text-green-800">{transaction.reloanRemark}</span>
+                                </div>
+                              )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {/* Receipts */}
-          {transaction?.receipt?.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-[var(--color-on-surface)] opacity-70">
-                Receipts:
-              </span>
-              <div className="flex flex-wrap gap-1">
-                {transaction.receipt.map((receipt) => (
-                  <button
-                    key={receipt.id}
-                    onClick={() => fetchSignedUrl(receipt.receiptKey)}
-                    className="flex items-center gap-1 px-2 py-1 bg-[var(--color-surface)] hover:bg-[var(--color-muted)] border border-[var(--color-muted)] border-opacity-30 rounded text-xs text-[var(--color-on-background)] transition-colors"
-                  >
-                    <IoIosDocument className="h-3 w-3" />
-                    {receipt.receiptKey.split("/").pop()}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-))}
+                              {/* Action Buttons */}
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                {/* Receipts */}
+                                {transaction?.receipt?.length > 0 && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-[var(--color-on-surface)] opacity-70">
+                                      Receipts:
+                                    </span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {transaction.receipt.map((receipt) => (
+                                        <button
+                                          key={receipt.id}
+                                          onClick={() => fetchSignedUrl(receipt.receiptKey)}
+                                          className="flex items-center gap-1 px-2 py-1 bg-[var(--color-surface)] hover:bg-[var(--color-muted)] border border-[var(--color-muted)] border-opacity-30 rounded text-xs text-[var(--color-on-background)] transition-colors"
+                                        >
+                                          <IoIosDocument className="h-3 w-3" />
+                                          {receipt.receiptKey.split("/").pop()}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
 
                       {/* Disbursal Transactions */}
                       {request.disbursalTransactions?.map((transaction) => (
@@ -797,7 +793,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                               Amount:
                             </span>
                             <span className="text-[var(--color-on-success)] font-semibold">
-                              ₹{transaction.amount.toLocaleString()}
+                              {Conversion.formatCurrency(transaction.amount)}
                             </span>
                           </div>
 
@@ -904,7 +900,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                                 Amount:
                               </span>
                               <span className="text-[var(--color-on-success)] font-semibold">
-                                ₹{transaction.amount.toLocaleString()}
+                                {Conversion.formatCurrency(transaction.amount)}
                               </span>
                             </div>
 
@@ -939,14 +935,13 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                                   Ops Status:
                                 </span>
                                 <span
-                                  className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                                    transaction.opsApprovalStatus === "APPROVED"
-                                      ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)]"
-                                      : transaction.opsApprovalStatus ===
-                                        "REJECTED"
+                                  className={`px-2 py-0.5 text-xs font-semibold rounded-full ${transaction.opsApprovalStatus === "APPROVED"
+                                    ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)]"
+                                    : transaction.opsApprovalStatus ===
+                                      "REJECTED"
                                       ? "bg-[var(--color-error)] bg-opacity-10 text-[var(--color-on-error)]"
                                       : "bg-[var(--color-secondary)] bg-opacity-10 text-[var(--color-warning)]"
-                                  }`}
+                                    }`}
                                 >
                                   {transaction.opsApprovalStatus}
                                 </span>
