@@ -462,23 +462,23 @@ export function EvaluationV2Component({
 
   const stats = evaluation
     ? {
-        total: currentStageItems.length,
-        eligible: currentStageItems.filter((i) => i.status === "ELIGIBLE")
-          .length,
-        notEligible: currentStageItems.filter(
-          (i) => i.status === "NOT_ELIGIBLE"
-        ).length,
-        overridden: currentStageItems.filter((i) => i.override).length,
-      }
+      total: currentStageItems.length,
+      eligible: currentStageItems.filter((i) => i.status === "ELIGIBLE")
+        .length,
+      notEligible: currentStageItems.filter(
+        (i) => i.status === "NOT_ELIGIBLE"
+      ).length,
+      overridden: currentStageItems.filter((i) => i.override).length,
+    }
     : { total: 0, eligible: 0, notEligible: 0, overridden: 0 };
 
   const globalStats = evaluation
     ? {
-        total: evaluation.evaluation_item.length,
-        eligible: evaluation.evaluation_item.filter(
-          (i) => i.status === "ELIGIBLE"
-        ).length,
-      }
+      total: evaluation.evaluation_item.length,
+      eligible: evaluation.evaluation_item.filter(
+        (i) => i.status === "ELIGIBLE"
+      ).length,
+    }
     : { total: 0, eligible: 0 };
 
   const filteredItems = getFilteredItems();
@@ -529,9 +529,8 @@ export function EvaluationV2Component({
       isOpen={!!loanId}
       width="w-full max-full" // Full width sidebar for max space
       onClose={() => setLoanId(null)}
-      title={`Risk Evaluation${
-        loan?.formattedLoanId ? ` (${loan.formattedLoanId})` : ""
-      }`}
+      title={`Risk Evaluation${loan?.formattedLoanId ? ` (${loan.formattedLoanId})` : ""
+        }`}
     >
       {loading ? (
         <div className="flex items-center justify-center py-12 text-gray-500">
@@ -560,21 +559,19 @@ export function EvaluationV2Component({
               {/* All Stages Button */}
               <button
                 onClick={() => setSelectedStage("ALL")}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center transition-all duration-150 ${
-                  selectedStage === "ALL"
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center transition-all duration-150 ${selectedStage === "ALL"
                     ? "bg-blue-50 text-blue-700 font-semibold shadow-inner"
                     : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <span>Overview (All Stages)</span>
                 </div>
                 <span
-                  className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    allStagesComplete
+                  className={`text-xs font-medium px-2 py-0.5 rounded-full ${allStagesComplete
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-200 text-gray-600"
-                  }`}
+                    }`}
                 >
                   {globalStats.eligible}/{globalStats.total}
                 </span>
@@ -618,7 +615,7 @@ export function EvaluationV2Component({
                       title={
                         lockedReason ||
                         stageDescriptions[
-                          stage as keyof typeof stageDescriptions
+                        stage as keyof typeof stageDescriptions
                         ]
                       }
                     >
@@ -631,18 +628,17 @@ export function EvaluationV2Component({
                           <span className="text-[10px] text-gray-500 leading-tight truncate">
                             {
                               stageDescriptions[
-                                stage as keyof typeof stageDescriptions
+                              stage as keyof typeof stageDescriptions
                               ]
                             }
                           </span>
                         </div>
                       </div>
                       <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ml-2 ${
-                          isComplete
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ml-2 ${isComplete
                             ? "bg-green-100 text-green-700"
                             : "bg-gray-200 text-gray-600"
-                        }`}
+                          }`}
                       >
                         {stageStats.eligible}/{stageStats.total}
                       </span>
@@ -703,7 +699,7 @@ export function EvaluationV2Component({
                     <p className="text-sm text-gray-500 mt-0.5">
                       {
                         stageDescriptions[
-                          selectedStage as keyof typeof stageDescriptions
+                        selectedStage as keyof typeof stageDescriptions
                         ]
                       }
                     </p>
@@ -755,7 +751,7 @@ export function EvaluationV2Component({
                     {stats.overridden})
                   </button> */}
                   <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-100 text-green-700 font-semibold text-sm">
-                    {(stats.eligible/stats.total * 100).toFixed(2)}% Pass Rate
+                    {(stats.eligible / stats.total * 100).toFixed(2)}% Risk Score
                   </span>
                 </div>
               </div>
@@ -791,17 +787,15 @@ export function EvaluationV2Component({
                         {filteredItems.map((item) => (
                           <tr
                             key={item.id}
-                            className={`transition-all duration-150 group ${
-                              updatingItems[item.id]
+                            className={`transition-all duration-150 group ${updatingItems[item.id]
                                 ? "opacity-60 bg-gray-50"
                                 : "hover:bg-blue-50/50"
-                            } ${
-                              item.override &&
-                              item.status === "ELIGIBLE" &&
-                              (!item.comments || item.comments.trim() === "")
+                              } ${item.override &&
+                                item.status === "ELIGIBLE" &&
+                                (!item.comments || item.comments.trim() === "")
                                 ? "bg-orange-50 border-l-4 border-l-orange-400"
                                 : "bg-white border-l-4 border-l-transparent"
-                            }`}
+                              }`}
                           >
                             {/* Parameter/Source */}
                             <td className="px-4 py-2.5">
@@ -827,7 +821,11 @@ export function EvaluationV2Component({
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={item.actualValue.startsWith("₹") ? Conversion.formatCurrency(item.actualValue.replace(/₹\s?/, "")) : item.actualValue} 
+                                  value={item.actualValue.startsWith("₹")
+                                    ? Conversion.formatCurrency(
+                                      Number(item.actualValue.replace(/₹\s?|,/g, ""))
+                                    )
+                                    : item.actualValue}
                                   onChange={(e) =>
                                     handleActualValueChange(
                                       item.id,
@@ -841,7 +839,11 @@ export function EvaluationV2Component({
                                 {/* Tooltip that shows only on input hover */}
                                 <div className="absolute invisible opacity-0 peer-hover:visible peer-hover:opacity-100 transition-all duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
                                   <div className="bg-gray-900 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap max-w-xs break-words">
-                                    {item.actualValue.startsWith("₹") ? Conversion.formatCurrency(item.actualValue.replace(/₹\s?/, "")) : item.actualValue || "No value"}
+                                    {item.actualValue.startsWith("₹")
+                                      ? Conversion.formatCurrency(
+                                        Number(item.actualValue.replace(/₹\s?|,/g, ""))
+                                      )
+                                      : item.actualValue || "No value"}
                                     {/* Tooltip arrow */}
                                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                                   </div>
@@ -857,11 +859,10 @@ export function EvaluationV2Component({
                                     handleStatusChange(item.id, "ELIGIBLE")
                                   }
                                   disabled={updatingItems[item.id]}
-                                  className={`px-2 py-1 text-xs rounded-full transition-all duration-150 flex items-center gap-1 ${
-                                    item.status === "ELIGIBLE"
+                                  className={`px-2 py-1 text-xs rounded-full transition-all duration-150 flex items-center gap-1 ${item.status === "ELIGIBLE"
                                       ? "bg-green-100 text-green-700 font-semibold border border-green-300"
                                       : "bg-gray-100 text-gray-600 hover:bg-green-50"
-                                  }`}
+                                    }`}
                                 >
                                   <FaCheck className="w-2.5 h-2.5" /> PASS
                                 </button>
@@ -870,11 +871,10 @@ export function EvaluationV2Component({
                                     handleStatusChange(item.id, "NOT_ELIGIBLE")
                                   }
                                   disabled={updatingItems[item.id]}
-                                  className={`px-2 py-1 text-xs rounded-full transition-all duration-150 flex items-center gap-1 ${
-                                    item.status === "NOT_ELIGIBLE"
+                                  className={`px-2 py-1 text-xs rounded-full transition-all duration-150 flex items-center gap-1 ${item.status === "NOT_ELIGIBLE"
                                       ? "bg-red-100 text-red-700 font-semibold border border-red-300"
                                       : "bg-gray-100 text-gray-600 hover:bg-red-50"
-                                  }`}
+                                    }`}
                                 >
                                   <FaTimes className="w-2.5 h-2.5" /> FAIL
                                 </button>
@@ -925,19 +925,17 @@ export function EvaluationV2Component({
                                       ? "Override comment required..."
                                       : "Add optional comment..."
                                   }
-                                  className={`w-full border rounded-md px-3 py-1.5 text-sm transition-shadow focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden ${
-                                    item.override &&
-                                    item.status === "ELIGIBLE" &&
-                                    (!item.comments ||
-                                      item.comments.trim() === "")
+                                  className={`w-full border rounded-md px-3 py-1.5 text-sm transition-shadow focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden ${item.override &&
+                                      item.status === "ELIGIBLE" &&
+                                      (!item.comments ||
+                                        item.comments.trim() === "")
                                       ? "border-red-400 focus:border-red-500 focus:ring-red-500 bg-red-50/50"
                                       : "border-gray-300"
-                                  } ${savingComments[item.id] ? "pr-8" : ""} ${
-                                    pendingComments[item.id] !== undefined &&
-                                    !savingComments[item.id]
+                                    } ${savingComments[item.id] ? "pr-8" : ""} ${pendingComments[item.id] !== undefined &&
+                                      !savingComments[item.id]
                                       ? "pr-8"
                                       : ""
-                                  }`}
+                                    }`}
                                   disabled={
                                     updatingItems[item.id] ||
                                     savingComments[item.id]
@@ -967,7 +965,7 @@ export function EvaluationV2Component({
               ) : (
                 <div className="flex-1 flex items-center justify-center py-16 bg-white rounded-lg shadow-lg border border-gray-200">
                   {selectedStage !== "ALL" &&
-                  !isStageUnlocked(selectedStage) ? (
+                    !isStageUnlocked(selectedStage) ? (
                     <div className="text-center p-6 bg-yellow-50 rounded-lg border border-yellow-200">
                       <FaLock className="w-6 h-6 text-yellow-500 mx-auto mb-3" />
                       <p className="text-base font-semibold text-yellow-800">
@@ -983,8 +981,8 @@ export function EvaluationV2Component({
                       <p className="text-lg">
                         {statusFilter !== "ALL"
                           ? `No ${statusFilter
-                              .toLowerCase()
-                              .replace("_", " ")} items found in this view.`
+                            .toLowerCase()
+                            .replace("_", " ")} items found in this view.`
                           : "No evaluation items matched the current filter."}
                       </p>
                     </div>
@@ -1115,20 +1113,19 @@ export function EvaluationV2Component({
                     className="flex items-center gap-2"
                     title={
                       !canApprove
-                        ? `Cannot approve: ${
-                            isBsaReportRequired
-                              ? "BSA/AA Report Missing."
-                              : isCreditReportRequired
-                              ? "Credit Report Missing."
-                              : isCamCalculationRequired
+                        ? `Cannot approve: ${isBsaReportRequired
+                          ? "BSA/AA Report Missing."
+                          : isCreditReportRequired
+                            ? "Credit Report Missing."
+                            : isCamCalculationRequired
                               ? "CAM Calculation Missing."
                               : !allStagesComplete
-                              ? `Evaluation incomplete (${globalStats.eligible}/${globalStats.total} items completed).`
-                              : overriddenEligibleItemsWithoutComments.length >
-                                0
-                              ? `Comments required for ${overriddenEligibleItemsWithoutComments.length} overrides.`
-                              : ""
-                          }`
+                                ? `Evaluation incomplete (${globalStats.eligible}/${globalStats.total} items completed).`
+                                : overriddenEligibleItemsWithoutComments.length >
+                                  0
+                                  ? `Comments required for ${overriddenEligibleItemsWithoutComments.length} overrides.`
+                                  : ""
+                        }`
                         : "Ready for approval"
                     }
                   >
