@@ -1,6 +1,13 @@
 export class Conversion {
     static formatCurrency(amount: number | string, currency: "BHD" | "INR" = "BHD"): string {
-        const num = typeof amount === "string" ? Number.parseFloat(amount) : amount;
+        let num = typeof amount === "string" ? Number.parseFloat(amount) : amount;
+
+        // If input is in INR and we want to display in BHD, convert it
+        if (currency === "BHD") {
+            // Convert from INR to BHD (1 BHD = ₹242)
+            const INR_TO_BHD_RATE = 242;
+            num = num / INR_TO_BHD_RATE;
+        }
 
         if (currency === "BHD") {
             const absNum = Math.abs(num || 0);
@@ -19,8 +26,8 @@ export class Conversion {
             return new Intl.NumberFormat("en-BH", {
                 style: "currency",
                 currency: "BHD",
-                minimumFractionDigits: absNum >= 1000 ? 0 : 3,
-                maximumFractionDigits: 3,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
             }).format(num || 0);
         }
 
