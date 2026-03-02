@@ -99,7 +99,7 @@ export const CreateAutopayTransactionDialog = ({
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-xs text-blue-800">
             <span className="font-semibold">Note:</span> This will create an
-            autopay transaction and initiate the UPI mandate process. The
+            autopay transaction and initiate the BENEFIT Pay mandate process. The
             customer will receive a confirmation on their registered mobile
             number.
           </p>

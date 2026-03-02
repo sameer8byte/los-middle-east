@@ -1051,7 +1051,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
 
           {customerDetails?.aAdharName && (
             <DetailItem
-              label="Aadhaar Name"
+              label="CPR Card Name"
               value={customerDetails.aAdharName}
             />
           )}
@@ -1155,7 +1155,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
 
           {customerDetails.aAdharDOB && (
             <DetailItem
-              label="Aadhaar DOB"
+              label="CPR Card DOB"
               value={formatDate(customerDetails.aAdharDOB)}
             />
           )}

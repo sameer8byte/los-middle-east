@@ -286,17 +286,17 @@ export const generateLoanStatement = async (
     yPos -= 20;
 
     const summaryData = [
-      ["Sanction date", formatDate(data.loanSummary.sanctionDate), "Loan Type", "Short Term Loan"],
+      ["Sanction date", formatDate(data.loanSummary.sanctionDate), "Loan Type", "Short Term Facility"],
       ["Sanction loan amount", data.loanSummary.sanctionLoanAmount.toLocaleString(), "Current rate of interest", String(data.loanSummary.currentRateOfInterest || "0")],
       ["Disbursed Amount", data.loanSummary.disbursedAmount.toLocaleString(), "Balance loan tenure", `${data.loanSummary.balanceLoanTenureDays} Days`],
       ["Current instalment", data.loanSummary.currentInstallmentAmount.toLocaleString(), "Sanction loan tenure", `${data.loanSummary.sanctionLoanTenureDays} Days`],
       ["Total Deductions", data.loanSummary.totalDeductions.toLocaleString(), "Loan status", data.loanSummary.loanStatus],
       ["Processing Fee", data.loanSummary.processingFee.toLocaleString(), "Principal Due", Number(data.loanSummary.principalDue || 0).toFixed(2)],
-      ["Total Interest Charges", data.loanSummary.totalInterestCharges.toLocaleString(), "Interest Due", Number(data.loanSummary.interestDue || 0).toFixed(2)],
+      ["Total Murabaha Charges", data.loanSummary.totalInterestCharges.toLocaleString(), "Murabaha Due", Number(data.loanSummary.interestDue || 0).toFixed(2)],
       ["Total Taxes", Number(data.loanSummary.totalTaxes || 0).toFixed(2), "Penalty Due", Number(data.loanSummary.penaltyDue || 0).toFixed(2)],
       ["Annual Percentage Rate", Number(data.loanSummary.annualPercentageRate || 0).toFixed(2) + "%", "Total Due", Number(data.loanSummary.totalDue || 0).toFixed(2)],
       ["Total Principal Paid", data.loanSummary.totalPrincipalPaid.toLocaleString(), "Excess Amount", Number(data.loanSummary.excessAmount || 0).toFixed(2)],
-      ["Repayment Mode", "Payment Gateway/Bank Transfer", "Total Interest Paid", data.loanSummary.totalInterestPaid.toLocaleString()],
+      ["Repayment Mode", "Payment Gateway/Bank Transfer", "Total Murabaha Paid", data.loanSummary.totalInterestPaid.toLocaleString()],
     ];
 
     const rowH = 20;

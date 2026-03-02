@@ -141,7 +141,7 @@ export function PaymentTransactionsSummary({
           bg="bg-green-50"
         />
         <SummaryCard
-          label="Interest Earned"
+          label="Murabaha margin Earned"
           amount={summary.interest}
           icon={<FiActivity />}
           color="text-blue-600"

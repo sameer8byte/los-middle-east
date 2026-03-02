@@ -1747,7 +1747,7 @@ export function CamCalculator({
                           return (
                             <option key={tenure.id} value={tenure.id}>
                               {tenure.ruleType?.toUpperCase()} | Processing
-                              Fees: {processingFee} | Interest: {interestRate}
+                              Fees: {processingFee} | Murabaha margin: {interestRate}
                             </option>
                           );
                         })}

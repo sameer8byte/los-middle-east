@@ -149,7 +149,7 @@ export function PennyDropLogsSetting() {
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-on-surface)] opacity-50" />
             <input
               type="text"
-              placeholder="Search by account number, IFSC, name, or email..."
+              placeholder="Search by account number, IBAN, name, or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border rounded-md var(--color-background) border-[var(--color-muted)] border-opacity-50 focus:ring-2 focus:ring-[#EA5E18] focus:border-[#EA5E18] outline-none"
@@ -211,7 +211,7 @@ export function PennyDropLogsSetting() {
                 <tr>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">Date</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">Account Number</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">IFSC</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">IBAN</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">Beneficiary Name</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">Provider</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-on-background)]">Status</th>
@@ -361,7 +361,7 @@ export function PennyDropLogsSetting() {
                     <p className="text-[var(--color-on-surface)] mt-1 font-mono">{selectedLog.accountNumber}</p>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-[var(--color-on-surface)] opacity-70">IFSC Code</div>
+                    <div className="text-sm font-medium text-[var(--color-on-surface)] opacity-70">IBAN Code</div>
                     <p className="text-[var(--color-on-surface)] mt-1 font-mono">{selectedLog.ifsc}</p>
                   </div>
                   <div>

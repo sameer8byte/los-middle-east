@@ -571,7 +571,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 {/* Interest/Fees */}
                                 <tr className="bg-[var(--color-surface)] bg-opacity-20 hover:bg-[var(--color-muted)] hover:bg-opacity-5">
                                   <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium">
-                                    Interest
+                                    Murabaha margin
                                   </td>
                                   <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-amber-600 font-semibold">
                                     {Conversion.formatCurrency(transaction.totalFees || 0)}
@@ -619,7 +619,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                   <tr className="bg-gradient-to-r from-purple-50 to-pink-50">
                                     <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)]">
                                       <div className="font-medium text-purple-900">Round Off Discount</div>
-                                      <div className="text-[10px] text-purple-700 italic">(on Interest + Principal)</div>
+                                      <div className="text-[10px] text-purple-700 italic">(on Murabaha margin + Principal)</div>
                                     </td>
                                     <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-purple-700 font-bold">
                                       -{Conversion.formatCurrency(transaction.roundOffDiscount || 0)}
@@ -628,16 +628,18 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 )}
 
                                 {/* Excess Amount */}
-                                {Number(transaction.excessAmount || 0) > 0 && (
-                                  <tr className="bg-gradient-to-r from-green-50 to-emerald-50">
-                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium text-green-900">
-                                      Excess Amount
-                                    </td>
-                                    <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-green-700 font-bold">
-                                      +{Conversion.formatCurrency(transaction.excessAmount || 0)}
-                                    </td>
-                                  </tr>
-                                )}
+                                {
+                                  Number(transaction.excessAmount || 0) > 0 && (
+                                    <tr className="bg-gradient-to-r from-green-50 to-emerald-50">
+                                      <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-[var(--color-on-background)] font-medium text-green-900">
+                                        Excess Amount
+                                      </td>
+                                      <td className="border border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right text-green-700 font-bold">
+                                        +{Conversion.formatCurrency(transaction.excessAmount || 0)}
+                                      </td>
+                                    </tr>
+                                  )
+                                }
 
                                 {/* Total Amount */}
                                 <tr className="bg-gradient-to-r from-slate-100 to-slate-200 border-t-2 border-slate-300 font-bold">
@@ -648,59 +650,69 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                     {Conversion.formatCurrency(transaction.amount || 0)}
                                   </td>
                                 </tr>
-                              </tbody>
-                            </table>
+                              </tbody >
+                            </table >
 
                             {/* Transaction Details Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            < div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" >
                               {/* Left Column */}
-                              <div className="space-y-3">
+                              < div className="space-y-3" >
                                 {/* Method */}
-                                {transaction.method && (
-                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-                                    <span className="text-[var(--color-on-surface)] opacity-70">Method:</span>
-                                    <span className="text-[var(--color-on-background)] font-medium">{transaction.method}</span>
-                                  </div>
-                                )}
+                                {
+                                  transaction.method && (
+                                    <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                      <span className="text-[var(--color-on-surface)] opacity-70">Method:</span>
+                                      <span className="text-[var(--color-on-background)] font-medium">{transaction.method}</span>
+                                    </div>
+                                  )
+                                }
 
                                 {/* Closing Type */}
-                                {transaction.closingType && (
-                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-                                    <span className="text-[var(--color-on-surface)] opacity-70">Closing Type:</span>
-                                    <span className="text-[var(--color-on-background)] font-medium">{transaction.closingType}</span>
-                                  </div>
-                                )}
-                              </div>
+                                {
+                                  transaction.closingType && (
+                                    <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                      <span className="text-[var(--color-on-surface)] opacity-70">Closing Type:</span>
+                                      <span className="text-[var(--color-on-background)] font-medium">{transaction.closingType}</span>
+                                    </div>
+                                  )
+                                }
+                              </div >
 
                               {/* Right Column */}
-                              <div className="space-y-3">
+                              < div className="space-y-3" >
                                 {/* Receipt ID */}
-                                {transaction.receiptId && (
-                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-                                    <span className="text-[var(--color-on-surface)] opacity-70">Receipt ID:</span>
-                                    <span className="text-[var(--color-on-background)] font-mono text-xs font-medium">
-                                      {transaction.receiptId}
-                                    </span>
-                                  </div>
-                                )}
+                                {
+                                  transaction.receiptId && (
+                                    <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                      <span className="text-[var(--color-on-surface)] opacity-70">Receipt ID:</span>
+                                      <span className="text-[var(--color-on-background)] font-mono text-xs font-medium">
+                                        {transaction.receiptId}
+                                      </span>
+                                    </div>
+                                  )
+                                }
 
                                 {/* External Ref */}
-                                {transaction.externalRef && (
-                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-                                    <span className="text-[var(--color-on-surface)] opacity-70">External Ref:</span>
-                                    <span className="text-[var(--color-on-background)] font-medium">{transaction.externalRef}</span>
-                                  </div>
-                                )}
+                                {
+                                  transaction.externalRef && (
+                                    <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                      <span className="text-[var(--color-on-surface)] opacity-70">External Ref:</span>
+                                      <span className="text-[var(--color-on-background)] font-medium">{transaction.externalRef}</span>
+                                    </div>
+                                  )
+                                }
 
                                 {/* Completed Date */}
-                                {transaction.completedAt && (
-                                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
-                                    <span className="text-[var(--color-on-surface)] opacity-70">Completed:</span>
-                                    <span className="text-[var(--color-on-background)] font-medium">
-                                      {formatDateWithTime(transaction.completedAt)}
-                                    </span>
-                                  </div>
-                                )}
+                                {
+                                  transaction.completedAt && (
+                                    <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
+                                      <span className="text-[var(--color-on-surface)] opacity-70">Completed:</span>
+                                      <span className="text-[var(--color-on-background)] font-medium">
+                                        {formatDateWithTime(transaction.completedAt)}
+                                      </span>
+                                    </div>
+                                  )
+                                }
 
                                 {/* Reloan Applicable */}
                                 <div className="flex justify-between items-center py-1 border-b border-[var(--color-muted)] border-opacity-10">
@@ -714,34 +726,40 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                     {transaction.isReloanApplicable ? "Yes" : "No"}
                                   </span>
                                 </div>
-                              </div>
-                            </div>
+                              </div >
+                            </div >
 
                             {/* Additional Information */}
-                            <div className="mt-4 pt-4 border-t border-[var(--color-muted)] border-opacity-30">
+                            < div className="mt-4 pt-4 border-t border-[var(--color-muted)] border-opacity-30" >
                               {/* Note */}
-                              {transaction.note && (
-                                <div className="text-sm mb-3 p-2 bg-blue-50 rounded border border-blue-200">
-                                  <span className="font-medium text-blue-900">Note: </span>
-                                  <span className="text-blue-800">{transaction.note}</span>
-                                </div>
-                              )}
+                              {
+                                transaction.note && (
+                                  <div className="text-sm mb-3 p-2 bg-blue-50 rounded border border-blue-200">
+                                    <span className="font-medium text-blue-900">Note: </span>
+                                    <span className="text-blue-800">{transaction.note}</span>
+                                  </div>
+                                )
+                              }
 
                               {/* Ops Remark */}
-                              {transaction.opsRemark && (
-                                <div className="text-sm mb-3 p-2 bg-amber-50 rounded border border-amber-200">
-                                  <span className="font-medium text-amber-900">Ops Remark: </span>
-                                  <span className="text-amber-800">{transaction.opsRemark}</span>
-                                </div>
-                              )}
+                              {
+                                transaction.opsRemark && (
+                                  <div className="text-sm mb-3 p-2 bg-amber-50 rounded border border-amber-200">
+                                    <span className="font-medium text-amber-900">Ops Remark: </span>
+                                    <span className="text-amber-800">{transaction.opsRemark}</span>
+                                  </div>
+                                )
+                              }
 
                               {/* Reloan Remark */}
-                              {transaction.reloanRemark && (
-                                <div className="text-sm mb-3 p-2 bg-green-50 rounded border border-green-200">
-                                  <span className="font-medium text-green-900">Reloan Remark: </span>
-                                  <span className="text-green-800">{transaction.reloanRemark}</span>
-                                </div>
-                              )}
+                              {
+                                transaction.reloanRemark && (
+                                  <div className="text-sm mb-3 p-2 bg-green-50 rounded border border-green-200">
+                                    <span className="font-medium text-green-900">Reloan Remark: </span>
+                                    <span className="text-green-800">{transaction.reloanRemark}</span>
+                                  </div>
+                                )
+                              }
 
                               {/* Action Buttons */}
                               <div className="flex flex-wrap gap-2 mt-3">
@@ -766,135 +784,30 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                   </div>
                                 )}
                               </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                            </div >
+                          </div >
+                        </div >
+                      ))
+                      }
 
                       {/* Disbursal Transactions */}
-                      {request.disbursalTransactions?.map((transaction) => (
-                        <div
-                          key={transaction.id}
-                          className="p-4 bg-white rounded-xl border border-[var(--color-muted)] border-opacity-30 shadow-sm space-y-3 text-sm text-[var(--color-on-surface)] opacity-80"
-                        >
-                          {/* Transaction ID */}
-                          <div className="flex justify-between items-center">
-                            <span className="text-[var(--color-on-surface)] opacity-70">
-                              Transaction ID:
-                            </span>
-                            <span className="text-[var(--color-on-background)] font-medium">
-                              {transaction.id}
-                            </span>
-                          </div>
-
-                          {/* Amount */}
-                          <div className="flex justify-between items-center">
-                            <span className="text-[var(--color-on-surface)] opacity-70">
-                              Amount:
-                            </span>
-                            <span className="text-[var(--color-on-success)] font-semibold">
-                              {Conversion.formatCurrency(transaction.amount)}
-                            </span>
-                          </div>
-
-                          {/* Payment Status */}
-                          <div className="flex justify-between items-center">
-                            <span className="text-[var(--color-on-surface)] opacity-70">
-                              Status:
-                            </span>
-                            <span
-                              className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(
-                                transaction.status
-                              )}`}
-                            >
-                              {transaction.status}
-                            </span>
-                          </div>
-
-                          {/* Optional Metadata */}
-                          {transaction.note && (
-                            <div className="text-xs text-[var(--color-on-surface)] opacity-70">
-                              <span className="font-medium text-[var(--color-on-surface)] opacity-70">
-                                Note:
-                              </span>{" "}
-                              {transaction.note}
-                            </div>
-                          )}
-
-                          {transaction.externalRef && (
-                            <div className="text-xs text-[var(--color-on-surface)] opacity-70">
-                              <span className="font-medium text-[var(--color-on-surface)] opacity-70">
-                                External Ref:
-                              </span>{" "}
-                              {transaction.externalRef}
-                            </div>
-                          )}
-
-                          {transaction.receiptId && (
-                            <div className="text-xs text-[var(--color-on-surface)] opacity-70">
-                              <span className="font-medium text-[var(--color-on-surface)] opacity-70">
-                                Receipt ID (Auto-generated):
-                              </span>{" "}
-                              {transaction.receiptId}
-                            </div>
-                          )}
-
-                          {transaction.completedAt && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-[var(--color-on-surface)] opacity-70">
-                                Completed At:
-                              </span>
-                              <span className="text-[var(--color-on-background)]">
-                                {formatDateWithTime(transaction.completedAt)}
-                              </span>
-                            </div>
-                          )}
-
-                          {transaction.method && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-[var(--color-on-surface)] opacity-70">
-                                Method:
-                              </span>
-                              <span className="text-[var(--color-on-background)]">
-                                {transaction.method}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* External URL */}
-                          {transaction.externalUrl && (
-                            <div className="text-xs">
-                              <button
-                                onClick={() =>
-                                  fetchSignedUrl(transaction.externalUrl)
-                                }
-                                rel="noopener noreferrer"
-                                className="text-[var(--color-on-primary)] hover:underline"
-                              >
-                                View External URL
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-
-                      {/* Partial Collection Transactions */}
-                      {request.partialCollectionTransactions?.map(
-                        (transaction) => (
+                      {
+                        request.disbursalTransactions?.map((transaction) => (
                           <div
                             key={transaction.id}
                             className="p-4 bg-white rounded-xl border border-[var(--color-muted)] border-opacity-30 shadow-sm space-y-3 text-sm text-[var(--color-on-surface)] opacity-80"
                           >
-                            {/* Header Info */}
+                            {/* Transaction ID */}
                             <div className="flex justify-between items-center">
                               <span className="text-[var(--color-on-surface)] opacity-70">
                                 Transaction ID:
                               </span>
-                              <span className="font-medium text-[var(--color-on-background)]">
+                              <span className="text-[var(--color-on-background)] font-medium">
                                 {transaction.id}
                               </span>
                             </div>
 
+                            {/* Amount */}
                             <div className="flex justify-between items-center">
                               <span className="text-[var(--color-on-surface)] opacity-70">
                                 Amount:
@@ -904,20 +817,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                               </span>
                             </div>
 
-                            {transaction.closingType && (
-                              <div className="flex justify-between items-center">
-                                <span className="text-[var(--color-on-surface)] opacity-70">
-                                  Closing Type:
-                                </span>
-                                <span className="text-[var(--color-on-background)]">
-                                  {transaction.closingType}
-                                </span>
-                              </div>
-                            )}
-
+                            {/* Payment Status */}
                             <div className="flex justify-between items-center">
                               <span className="text-[var(--color-on-surface)] opacity-70">
-                                Payment Status:
+                                Status:
                               </span>
                               <span
                                 className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(
@@ -928,27 +831,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                               </span>
                             </div>
 
-                            {/* 🔶 Highlighted Ops Approval */}
-                            {transaction.opsApprovalStatus && (
-                              <div className="flex justify-between items-center">
-                                <span className="text-[var(--color-on-surface)] opacity-70">
-                                  Ops Status:
-                                </span>
-                                <span
-                                  className={`px-2 py-0.5 text-xs font-semibold rounded-full ${transaction.opsApprovalStatus === "APPROVED"
-                                    ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)]"
-                                    : transaction.opsApprovalStatus ===
-                                      "REJECTED"
-                                      ? "bg-[var(--color-error)] bg-opacity-10 text-[var(--color-on-error)]"
-                                      : "bg-[var(--color-secondary)] bg-opacity-10 text-[var(--color-warning)]"
-                                    }`}
-                                >
-                                  {transaction.opsApprovalStatus}
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Optional Details */}
+                            {/* Optional Metadata */}
                             {transaction.note && (
                               <div className="text-xs text-[var(--color-on-surface)] opacity-70">
                                 <span className="font-medium text-[var(--color-on-surface)] opacity-70">
@@ -957,6 +840,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 {transaction.note}
                               </div>
                             )}
+
                             {transaction.externalRef && (
                               <div className="text-xs text-[var(--color-on-surface)] opacity-70">
                                 <span className="font-medium text-[var(--color-on-surface)] opacity-70">
@@ -965,6 +849,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 {transaction.externalRef}
                               </div>
                             )}
+
                             {transaction.receiptId && (
                               <div className="text-xs text-[var(--color-on-surface)] opacity-70">
                                 <span className="font-medium text-[var(--color-on-surface)] opacity-70">
@@ -973,28 +858,29 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 {transaction.receiptId}
                               </div>
                             )}
-                            <div className="text-xs text-[var(--color-on-surface)] opacity-70">
-                              <span className="font-medium text-[var(--color-on-surface)] opacity-70">
-                                Ops Remark:
-                              </span>{" "}
-                              {transaction?.opsRemark || "N/A"}
-                            </div>
+
                             {transaction.completedAt && (
-                              <div className="text-xs text-[var(--color-on-surface)] opacity-70">
-                                <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[var(--color-on-surface)] opacity-70">
                                   Completed At:
-                                </span>{" "}
-                                {formatDateWithTime(transaction.completedAt)}
+                                </span>
+                                <span className="text-[var(--color-on-background)]">
+                                  {formatDateWithTime(transaction.completedAt)}
+                                </span>
                               </div>
                             )}
+
                             {transaction.method && (
-                              <div className="text-xs text-[var(--color-on-surface)] opacity-70">
-                                <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[var(--color-on-surface)] opacity-70">
                                   Method:
-                                </span>{" "}
-                                {transaction.method}
+                                </span>
+                                <span className="text-[var(--color-on-background)]">
+                                  {transaction.method}
+                                </span>
                               </div>
                             )}
+
                             {/* External URL */}
                             {transaction.externalUrl && (
                               <div className="text-xs">
@@ -1009,32 +895,169 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 </button>
                               </div>
                             )}
-                            {/* // recipt  */}
-                            {transaction?.receipt?.length > 0 && (
+                          </div>
+                        ))
+                      }
+
+                      {/* Partial Collection Transactions */}
+                      {
+                        request.partialCollectionTransactions?.map(
+                          (transaction) => (
+                            <div
+                              key={transaction.id}
+                              className="p-4 bg-white rounded-xl border border-[var(--color-muted)] border-opacity-30 shadow-sm space-y-3 text-sm text-[var(--color-on-surface)] opacity-80"
+                            >
+                              {/* Header Info */}
+                              <div className="flex justify-between items-center">
+                                <span className="text-[var(--color-on-surface)] opacity-70">
+                                  Transaction ID:
+                                </span>
+                                <span className="font-medium text-[var(--color-on-background)]">
+                                  {transaction.id}
+                                </span>
+                              </div>
+
+                              <div className="flex justify-between items-center">
+                                <span className="text-[var(--color-on-surface)] opacity-70">
+                                  Amount:
+                                </span>
+                                <span className="text-[var(--color-on-success)] font-semibold">
+                                  {Conversion.formatCurrency(transaction.amount)}
+                                </span>
+                              </div>
+
+                              {transaction.closingType && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[var(--color-on-surface)] opacity-70">
+                                    Closing Type:
+                                  </span>
+                                  <span className="text-[var(--color-on-background)]">
+                                    {transaction.closingType}
+                                  </span>
+                                </div>
+                              )}
+
+                              <div className="flex justify-between items-center">
+                                <span className="text-[var(--color-on-surface)] opacity-70">
+                                  Payment Status:
+                                </span>
+                                <span
+                                  className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(
+                                    transaction.status
+                                  )}`}
+                                >
+                                  {transaction.status}
+                                </span>
+                              </div>
+
+                              {/* 🔶 Highlighted Ops Approval */}
+                              {transaction.opsApprovalStatus && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[var(--color-on-surface)] opacity-70">
+                                    Ops Status:
+                                  </span>
+                                  <span
+                                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${transaction.opsApprovalStatus === "APPROVED"
+                                      ? "bg-[var(--color-success)] bg-opacity-10 text-[var(--color-on-success)]"
+                                      : transaction.opsApprovalStatus ===
+                                        "REJECTED"
+                                        ? "bg-[var(--color-error)] bg-opacity-10 text-[var(--color-on-error)]"
+                                        : "bg-[var(--color-secondary)] bg-opacity-10 text-[var(--color-warning)]"
+                                      }`}
+                                  >
+                                    {transaction.opsApprovalStatus}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Optional Details */}
+                              {transaction.note && (
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70">
+                                  <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                                    Note:
+                                  </span>{" "}
+                                  {transaction.note}
+                                </div>
+                              )}
+                              {transaction.externalRef && (
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70">
+                                  <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                                    External Ref:
+                                  </span>{" "}
+                                  {transaction.externalRef}
+                                </div>
+                              )}
+                              {transaction.receiptId && (
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70">
+                                  <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                                    Receipt ID (Auto-generated):
+                                  </span>{" "}
+                                  {transaction.receiptId}
+                                </div>
+                              )}
                               <div className="text-xs text-[var(--color-on-surface)] opacity-70">
                                 <span className="font-medium text-[var(--color-on-surface)] opacity-70">
-                                  Receipt:
+                                  Ops Remark:
                                 </span>{" "}
-                                {transaction.receipt.map((receipt) => (
+                                {transaction?.opsRemark || "N/A"}
+                              </div>
+                              {transaction.completedAt && (
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70">
+                                  <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                                    Completed At:
+                                  </span>{" "}
+                                  {formatDateWithTime(transaction.completedAt)}
+                                </div>
+                              )}
+                              {transaction.method && (
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70">
+                                  <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                                    Method:
+                                  </span>{" "}
+                                  {transaction.method}
+                                </div>
+                              )}
+                              {/* External URL */}
+                              {transaction.externalUrl && (
+                                <div className="text-xs">
                                   <button
                                     onClick={() =>
-                                      fetchSignedUrl(receipt.receiptKey)
+                                      fetchSignedUrl(transaction.externalUrl)
                                     }
-                                    key={receipt.id}
                                     rel="noopener noreferrer"
                                     className="text-[var(--color-on-primary)] hover:underline"
                                   >
-                                    {receipt.receiptKey.split("/").pop()}
+                                    View External URL
                                   </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                                </div>
+                              )}
+                              {/* // recipt  */}
+                              {transaction?.receipt?.length > 0 && (
+                                <div className="text-xs text-[var(--color-on-surface)] opacity-70">
+                                  <span className="font-medium text-[var(--color-on-surface)] opacity-70">
+                                    Receipt:
+                                  </span>{" "}
+                                  {transaction.receipt.map((receipt) => (
+                                    <button
+                                      onClick={() =>
+                                        fetchSignedUrl(receipt.receiptKey)
+                                      }
+                                      key={receipt.id}
+                                      rel="noopener noreferrer"
+                                      className="text-[var(--color-on-primary)] hover:underline"
+                                    >
+                                      {receipt.receiptKey.split("/").pop()}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )
                         )
-                      )}
-                    </div>
+                      }
+                    </div >
                   ))}
-                </div>
+                </div >
               ) : (
                 <div className="text-center py-10">
                   <IoIosDocument className="mx-auto h-12 w-12 text-[var(--color-muted)]" />
@@ -1046,10 +1069,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                   </p>
                 </div>
               )}
-            </div>
-          </div>
+            </div >
+          </div >
         )}
-      </Sidebar>
+      </Sidebar >
 
       <div className="h-[calc(100vh-80px)] flex flex-col">
         {/* Error Message */}

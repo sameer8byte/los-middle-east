@@ -1072,9 +1072,9 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[var(--color-on-surface)] opacity-80">
               <div>00 - Account Review</div>
-              <div>05 - Personal Loan</div>
+              <div>05 - Tawarruq</div>
               <div>10 - Credit Card</div>
-              <div>06 - Home Loan</div>
+              <div>06 - Musharakah Mutanaqisah </div>
             </div>
           </div>
 
@@ -1099,11 +1099,11 @@ const EquifaxReportDisplay = ({ reportData }: { readonly reportData: any }) => {
                 {enquiries.map((enq: any, idx: number) => {
                   const purposeMap: Record<string, string> = {
                     "00": "Account Review",
-                    "05": "Personal Loan",
-                    "06": "Home Loan",
+                    "05": "Personal Finance",
+                    "06": "Housing Finance",
                     "10": "Credit Card",
                     "07": "Auto Loan",
-                    "08": "Business Loan",
+                    "08": "SME Finance",
                   };
 
                   const daysAgo = enq.Date
@@ -1702,17 +1702,17 @@ const CirProV2ReportDisplay = ({
         acctType.includes("TRACTOR") ||
         acctType.includes("COMMERCIAL VEHICLE")
       ) {
-        loanTypeLabel = "Vehicle Loan";
+        loanTypeLabel = "Auto Finance";
         assumedRate = 0.015;
 
         // 🪙 GOLD
       } else if (acctType.includes("GOLD")) {
-        loanTypeLabel = "Gold Loan";
+        loanTypeLabel = "Gold-backed";
         assumedRate = 0.02;
 
         // 🎓 EDUCATION
       } else if (acctType.includes("EDUCATION")) {
-        loanTypeLabel = "Education Loan";
+        loanTypeLabel = "Student Finance";
         assumedRate = 0.01;
 
         // 🏢 BUSINESS SECURED
@@ -1720,12 +1720,12 @@ const CirProV2ReportDisplay = ({
         acctType.includes("BUSINESS") &&
         acctType.includes("SECURED")
       ) {
-        loanTypeLabel = "Business Loan - Secured";
+        loanTypeLabel = "SME Finance - Secured";
         assumedRate = 0.025;
 
         // 🏢 BUSINESS UNSECURED
       } else if (acctType.includes("BUSINESS")) {
-        loanTypeLabel = "Business Loan - Unsecured";
+        loanTypeLabel = "SME Finance - Unsecured";
         assumedRate = 0.04;
 
         // 👨‍💼 PROFESSIONAL
@@ -1737,9 +1737,9 @@ const CirProV2ReportDisplay = ({
         loanTypeLabel = "Professional Loan";
         assumedRate = 0.035;
 
-        // 🧾 PERSONAL
+        // 🧾 PERSONAL 
       } else if (acctType.includes("PERSONAL")) {
-        loanTypeLabel = "Personal Loan";
+        loanTypeLabel = "Personal Finance";
         assumedRate = 0.04;
 
         // 🛒 CONSUMER DURABLE
