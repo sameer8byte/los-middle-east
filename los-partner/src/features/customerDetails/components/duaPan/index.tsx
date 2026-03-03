@@ -80,7 +80,7 @@ export function DuaPan() {
         <div className="flex items-center gap-2 mb-3">
           <TbShieldCheck className="text-[var(--primary)] text-lg" />
           <h3 className="text-base font-semibold text-[var(--on-background)]">
-           Dual PAN Verification
+           Dual eKyc Verification
           </h3>
         </div>
         
