@@ -116,7 +116,7 @@ export default function RightSection({
 
                     {/* Center Text Overlays */}
                     <div className="relative z-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-[18px] 2xl:text-[24px] font-bold text-[#334155] leading-none mb-0.5 2xl:mb-1">
+                        <span className="text-[12px] font-bold text-[#334155] leading-none mb-0.5 2xl:mb-1">
                             {ConversionUtil.formatCurrency(totalAmount)}
                         </span>
                         <span className="text-[11px] 2xl:text-[14px] font-medium text-[#64748b]">
