@@ -142,14 +142,14 @@ export interface AUMData {
 export default function FirstSection({ data }: { data?: AUMData }) {
     // Mock Dynamic Data fallback
     const currentData = data ?? {
-        totalLoansDueAmount: 148000000,
-        totalAmountCollected: 32400000,
-        totalAmountOutstanding: "82%",
+        totalLoansDueAmount: 92000000,
+        totalAmountCollected: 15000000,
+        totalAmountOutstanding: "84%",
         postDueAmount: 12000000,
-        totalLoansIssued: 300,
-        ongoingLoans: 224,
-        closedLoans: 76,
-        overdueLoans: 44,
+        totalLoansIssued: 210,
+        ongoingLoans: 170,
+        closedLoans: 40,
+        overdueLoans: 60,
     };
 
     return (
