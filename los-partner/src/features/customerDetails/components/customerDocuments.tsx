@@ -1339,7 +1339,7 @@ export function CustomerDocuments() {
                 htmlFor="aadhaar-last-four"
                 className="block text-sm font-medium text-[var(--on-background)]"
               >
-                Aadhaar Number
+                CPR Number
               </label>
               <div className="flex items-center gap-2">
                 <span className="text-lg font-mono text-[var(--on-surface)] opacity-60 px-3 py-2 bg-[var(--surface)] rounded-lg border">
@@ -1439,7 +1439,7 @@ export function CustomerDocuments() {
                 htmlFor="pan-number"
                 className="block text-sm font-medium text-[var(--on-background)]"
               >
-                PAN Number
+                eKyc Number
               </label>
               <input
                 id="pan-number"
@@ -1685,7 +1685,7 @@ export function CustomerDocuments() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-red-900 mb-1">
-                    Aadhaar Verification Required
+                    CPR Verification Required
                   </h3>
                   <p className="text-sm text-red-700 mb-3">
                     Complete CPR Card verification to proceed with the loan
@@ -2318,7 +2318,14 @@ function DocumentCard({
           {iconMap[type as keyof typeof iconMap] || iconMap.default}
           <div>
             <h3 className="text-sm font-medium text-[var(--on-background)]">
-              {title}
+              {
+  title?.toLowerCase() === "pan"
+    ? "eKyc"
+    : title?.toLowerCase().includes("aadhar") ||
+      title?.toLowerCase().includes("aadhaar")
+    ? "CPR"
+    : title
+}
             </h3>
             <p className="text-xs text-[var(--on-surface)] opacity-70">
               {renderSubtitle()}
@@ -2682,7 +2689,14 @@ function DocumentCard({
                         .map(([key, value]) => (
                           <div key={key} className="flex flex-col">
                             <dt className="text-xs font-medium text-[var(--on-surface)] opacity-60 uppercase tracking-wider mb-1">
-                              {key.replace(/([A-Z])/g, " $1").trim()}
+                    {
+  key.toLowerCase() === "pan"
+    ? "eKyc"
+    : key.toLowerCase().includes("aadhar") ||
+      key.toLowerCase().includes("aadhaar")
+    ? "cpr"
+    : key.replace(/([A-Z])/g, " $1").trim()
+}
                             </dt>
                             <dd className="text-sm text-[var(--on-background)] font-medium">
                               {key.toLowerCase() === "pan" &&
