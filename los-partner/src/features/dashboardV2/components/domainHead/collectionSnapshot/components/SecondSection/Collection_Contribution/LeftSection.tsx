@@ -98,7 +98,7 @@ export default function LeftSection() {
 
                 </div>
 
-                <div className="mt-8 2xl:mt-6 text-center text-[11px] 2xl:text-[13px] font-medium text-[#64748b] tracking-wide">
+                <div className="mt-8 2xl:mt-10 text-center text-[11px] 2xl:text-[13px] font-medium text-[#64748b] tracking-wide">
                     Avg Collection Loan Amount : <br />
                     <span className="text-[#334155] font-bold">{ConversionUtil.formatCurrency(45000)}</span>
                 </div>
