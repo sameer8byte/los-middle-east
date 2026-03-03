@@ -277,6 +277,21 @@ export function CamCalculator({
     }
   }, [isOpen, brandId, tenures.length]);
 
+  // Restore credit risk data from session storage on component mount
+  useEffect(() => {
+    const storedCreditRiskData = sessionStorage.getItem('creditRiskData');
+    if (storedCreditRiskData) {
+      try {
+        const parsedData = JSON.parse(storedCreditRiskData);
+        setCreditRiskData(parsedData);
+        console.log("✅ Credit Risk Data restored from Session Storage");
+      } catch (error) {
+        console.error("Error parsing credit risk data from session storage:", error);
+        sessionStorage.removeItem('creditRiskData');
+      }
+    }
+  }, []);
+
   const calculateRepayment = async (tenureIdOverride?: string) => {
     // Use the override if provided (for immediate calculation after selection)
     // Otherwise use the state value
@@ -639,6 +654,11 @@ export function CamCalculator({
 
       console.log("Credit Risk API Response:", response.data);
       setCreditRiskData(response.data);
+      
+      // Store credit risk data in session storage
+      sessionStorage.setItem('creditRiskData', JSON.stringify(response.data));
+      console.log("✅ Credit Risk Data stored in Session Storage");
+      
       toast.success("Credit risk assessment completed!");
     } catch (error: any) {
       console.error("Credit Risk API Error:", error);
@@ -1557,7 +1577,7 @@ export function CamCalculator({
                           <span className="font-bold text-blue-700 text-lg">BHD {creditRiskData.credit_limit?.credit_limit_bhd || 0}</span>
                         </div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-600 font-medium">DTI Ratio:</span>
+                          <span className="text-gray-600 font-medium">Debt-To-Income Ratio:</span>
                           <span className="font-bold text-orange-600">{creditRiskData.credit_limit?.dti_ratio_pct?.toFixed(1)}%</span>
                         </div>
                         <p className="text-sm text-gray-600 mt-2 italic">{creditRiskData.credit_limit?.justification}</p>
