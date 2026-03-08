@@ -89,7 +89,7 @@ export const CreateAutopayTransactionDialog = ({
                 Loan Amount
               </span>
               <span className="text-sm font-semibold text-[var(--color-primary)]">
-                ₹{loanDetails.amount?.toLocaleString("en-IN") || "0"}
+                BHD{loanDetails.amount?.toLocaleString("en-IN") || "0"} 
               </span>
             </div>
           </div>

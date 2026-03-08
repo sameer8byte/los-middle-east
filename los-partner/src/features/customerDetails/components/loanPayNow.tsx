@@ -14,7 +14,7 @@ import { LoanStatusEnum } from "../../../constant/enum";
 
 const formatCurrency = (value: string | number): string => {
   const numericValue = typeof value === "string" ? parseFloat(value) : value;
-  return `₹${numericValue.toLocaleString("en-IN", {
+  return `BHD${numericValue.toLocaleString("en-IN", {
     minimumFractionDigits: 2,
   })}`;
 };
@@ -185,7 +185,7 @@ export function LoanPayNow() {
                     <span>Rate:</span>
                     <span>
                       {penalty.penaltyRate}{" "}
-                      {penalty.penaltyValueType === "percentage" ? "%" : "₹"} /
+                      {penalty.penaltyValueType === "percentage" ? "%" : "BHD"} /
                       day
                     </span>
                   </div>

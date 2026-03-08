@@ -265,7 +265,7 @@ export function LoanAgreements({
                             Loan Amount
                           </div>
                           <div className="font-semibold text-[var(--color-on-surface)]">
-                            ₹
+                            BHD
                             {agreement.loanAgreement.loan.amount?.toLocaleString(
                               "en-IN"
                             )}
@@ -276,7 +276,7 @@ export function LoanAgreements({
                             Principal
                           </div>
                           <div className="font-semibold text-[var(--color-on-surface)]">
-                            ₹
+                            BHD
                             {agreement.loanAgreement.loan?.amount?.toLocaleString(
                               "en-IN"
                             ) || "N/A"}
@@ -338,7 +338,7 @@ export function LoanAgreements({
                             <div className="flex justify-between px-1">
                               <span className="opacity-70">Gross Amount</span>
                               <span className="font-medium">
-                                ₹
+                                BHD
                                 {agreement.loanAgreement.loan.disbursement.grossAmount?.toLocaleString(
                                   "en-IN"
                                 )}
@@ -373,7 +373,7 @@ export function LoanAgreements({
                                               " • Daily"}
                                             {deduction.calculationTaxAmount >
                                               0 &&
-                                              ` • Tax: ₹${deduction.calculationTaxAmount?.toLocaleString(
+                                              ` • Tax: BHD${deduction.calculationTaxAmount?.toLocaleString(
                                                 "en-IN"
                                               )}`}
                                           </div>
@@ -388,7 +388,7 @@ export function LoanAgreements({
                                                     className="text-[10px] text-[var(--color-on-surface)] opacity-40"
                                                   >
                                                     ↳ {tax.type} (
-                                                    {tax.chargeValue}%): ₹
+                                                    {tax.chargeValue}%): BHD
                                                     {tax.amount?.toLocaleString(
                                                       "en-IN"
                                                     )}
@@ -398,7 +398,7 @@ export function LoanAgreements({
                                             )}
                                         </div>
                                         <span className="text-[var(--color-error)] font-medium whitespace-nowrap">
-                                          -₹
+                                          -BHD
                                           {deduction.total?.toLocaleString(
                                             "en-IN"
                                           )}
@@ -416,7 +416,7 @@ export function LoanAgreements({
                                       Processing Fee
                                     </div>
                                     <span className="text-[var(--color-error)] font-medium">
-                                      -₹
+                                      -BHD
                                       {agreement.loanAgreement.loan.disbursement.processing_fee?.toLocaleString(
                                         "en-IN"
                                       )}
@@ -429,7 +429,7 @@ export function LoanAgreements({
                                     Total Deductions
                                   </span>
                                   <span className="text-[var(--color-error)] text-xs">
-                                    -₹
+                                    -BHD
                                     {agreement.loanAgreement.loan.disbursement.totalDeductions?.toLocaleString(
                                       "en-IN"
                                     )}
@@ -444,7 +444,7 @@ export function LoanAgreements({
                                 Net Disbursement
                               </span>
                               <span className="font-bold text-[var(--color-success)]">
-                                ₹
+                                BHD
                                 {agreement.loanAgreement.loan.disbursement.netAmount?.toLocaleString(
                                   "en-IN"
                                 )}
@@ -471,7 +471,7 @@ export function LoanAgreements({
                                 Principal Repayment
                               </span>
                               <span className="font-medium">
-                                ₹
+                                BHD
                                 {agreement.loanAgreement.loan?.amount?.toLocaleString(
                                   "en-IN"
                                 )}
@@ -503,7 +503,7 @@ export function LoanAgreements({
                                             {fee.chargeMode?.toLowerCase()}
                                             {fee.isRecurringDaily && " • Daily"}
                                             {fee.calculationTaxAmount > 0 &&
-                                              ` • Tax: ₹${fee.calculationTaxAmount?.toLocaleString(
+                                              ` • Tax: BHD${fee.calculationTaxAmount?.toLocaleString(
                                                 "en-IN"
                                               )}`}
                                           </div>
@@ -519,7 +519,7 @@ export function LoanAgreements({
                                                   >
                                                     ↳ {tax.type} (
                                                     {tax.chargeValue}
-                                                    %): ₹
+                                                    %): BHD
                                                     {tax.amount?.toLocaleString(
                                                       "en-IN"
                                                     )}
@@ -529,7 +529,7 @@ export function LoanAgreements({
                                             )}
                                         </div>
                                         <span className="text-[var(--color-on-surface)] font-medium whitespace-nowrap">
-                                          +₹{fee.total?.toLocaleString("en-IN")}
+                                          +BHD{fee.total?.toLocaleString("en-IN")}
                                         </span>
                                       </div>
                                     )
@@ -539,7 +539,7 @@ export function LoanAgreements({
                                       Total Fees
                                     </span>
                                     <span className="text-[var(--color-on-surface)] text-xs">
-                                      +₹
+                                      +BHD
                                       {agreement.loanAgreement.loan.repayment.totalFees?.toLocaleString(
                                         "en-IN"
                                       )}
@@ -554,7 +554,7 @@ export function LoanAgreements({
                                 Total Obligation
                               </span>
                               <span className="font-bold text-[var(--color-on-surface)]">
-                                ₹
+                                BHD
                                 {agreement.loanAgreement.loan.repayment.totalObligation?.toLocaleString(
                                   "en-IN"
                                 )}

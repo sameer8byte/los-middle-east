@@ -613,7 +613,7 @@ export function CentralDqueueComponent() {
                   handleSearch();
                 }
               }}
-              placeholder="Enter PAN card (e.g. ABCDE1234F)"
+              placeholder="Enter TaxID (e.g. ABCDE1234F)"
               style={inputStyle}
             />
             <span style={inputIconStyle}>🎫</span>
@@ -688,7 +688,7 @@ export function CentralDqueueComponent() {
                   <th style={thStyle}>Lead ID</th>
                   <th style={thStyle}>Name</th>
                   <th style={thStyle}>Mobile</th>
-                  <th style={thStyle}>PAN</th>
+                  <th style={thStyle}>TaxID</th>
                   <th style={thStyle}>Status</th>
                   <th style={thStyle}>Source (CRM)</th>
                   <th style={thStyle}>Created On</th>
