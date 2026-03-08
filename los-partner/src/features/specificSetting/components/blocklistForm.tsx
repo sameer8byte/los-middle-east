@@ -154,7 +154,7 @@ export function BlocklistForm (){
 
   const getTypeDisplayName = (type: BlocklistType) => {
     switch (type) {
-      case "pan": return "PAN Card";
+      case "pan": return "TaxID";
       case "mobile": return "Mobile Number";
       case "aadhar": return "CPR Card Number";
       case "pincode": return "Pincode";
@@ -191,7 +191,7 @@ export function BlocklistForm (){
                 onChange={(e) => setType(e.target.value as BlocklistType)}
                 className="w-full px-3 py-2 border border-[var(--color-muted)] border-opacity-50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#EA5E18] focus:border-[#EA5E18] transition-colors duration-200 var(--color-background) text-[var(--color-on-background)]"
               >
-                <option value="pan">PAN Card</option>
+                <option value="pan">TaxID</option>
                 <option value="mobile">Mobile Number</option>
                 <option value="aadhar">CPR Card Number</option>
                 <option value="pincode">Pincode</option>

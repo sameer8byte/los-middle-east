@@ -78,10 +78,10 @@ const LoanApplication = () => {
       isActive: true,
     },
     {
-      title: "Aadhaar KYC",
+      title: "CPR Card KYC",
       page: ApplicationPage.LoanApplicationAddressVerification,
       icon: <FiCheck />,
-      description: "Verify your identity using your Aadhaar number",
+      description: "Verify your identity using your CPR (Central Population Register) Card",
       isActive: true,
     },
   ];

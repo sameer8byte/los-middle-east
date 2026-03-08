@@ -266,7 +266,7 @@ export const generateLoanStatement = async (
   rightY -= 18;
   currentPage.drawText(`Loan A/c No.: ${data.formattedLoanId}`, { x: 350, y: rightY, size: 10, font });
   rightY -= 18;
-  currentPage.drawText("Currency: INR", { x: 350, y: rightY, size: 10, font });
+  currentPage.drawText("Currency: BHD", { x: 350, y: rightY, size: 10, font });
 
   yPos = Math.min(leftY, rightY) - 35;
 

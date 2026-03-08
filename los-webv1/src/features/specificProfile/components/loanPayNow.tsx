@@ -22,7 +22,7 @@ export function LoanPayNow({
   const [orderId, setOrderId] = useState<string | null>(null);
   const formatCurrency = (value: string | number): string => {
     const numericValue = typeof value === "string" ? parseFloat(value) : value;
-    return `₹${numericValue.toLocaleString("en-IN", {
+    return `BHD${numericValue.toLocaleString("en-IN", {
       minimumFractionDigits: 2,
     })}`;
   };
@@ -214,7 +214,7 @@ export function LoanPayNow({
                           {penalty.penaltyRate}
                           {penalty.penaltyValueType === "percentage"
                             ? "%"
-                            : "₹"}
+                            : "BHD"}
                           /day
                         </span>
                         <span>
