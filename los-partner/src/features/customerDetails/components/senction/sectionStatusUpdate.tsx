@@ -276,7 +276,7 @@ export function SectionStatusUpdate({
                     return (
                       <option key={rule.id} value={rule.ruleType}>
                         {rule.ruleType +
-                          ` | Processing: ${processingFee ?? "N/A"}% | Interest: ${interestRate ?? "N/A"}%`}
+                          ` | Processing: ${processingFee ?? "N/A"}% | Murabaha margin: ${interestRate ?? "N/A"}%`}
                       </option>
                     );
                   })}

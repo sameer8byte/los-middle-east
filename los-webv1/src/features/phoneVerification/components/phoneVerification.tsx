@@ -159,7 +159,7 @@ export default function PhoneVerification() {
     } catch (err) {
       setError(
         (err as { message: string }).message ||
-          "Failed to send verification code. Please try again."
+        "Failed to send verification code. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -205,7 +205,7 @@ export default function PhoneVerification() {
     } catch (err) {
       setError(
         (err as { message: string }).message ||
-          "Verification failed. Please try again."
+        "Verification failed. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -332,7 +332,7 @@ export default function PhoneVerification() {
               >
                 Mobile Number
                 <span className="block text-xs text-on-surface-muted mt-1">
-                  (Aadhaar linked phone number only)
+                  (CPR Card linked phone number only)
                 </span>
               </label>
 
@@ -366,12 +366,11 @@ export default function PhoneVerification() {
                     }
                   }}
                   placeholder="Enter 10-digit phone number"
-                  className={`flex-1 h-12 px-4 py-3 border rounded-r-lg focus:ring-2 focus:ring-primary-focus focus:border-primary placeholder-on-surface-muted text-on-surface transition-all duration-200 ${
-                    phoneNumber.length === 10 &&
+                  className={`flex-1 h-12 px-4 py-3 border rounded-r-lg focus:ring-2 focus:ring-primary-focus focus:border-primary placeholder-on-surface-muted text-on-surface transition-all duration-200 ${phoneNumber.length === 10 &&
                     /^[6-9]\d{9}$/.test(phoneNumber)
-                      ? "border-success bg-success/5"
-                      : "border-outline"
-                  }`}
+                    ? "border-success bg-success/5"
+                    : "border-outline"
+                    }`}
                   maxLength={10}
                 />
               </div>
@@ -462,14 +461,13 @@ export default function PhoneVerification() {
                 !/^[6-9]\d{9}$/.test(phoneNumber.replace(/\D/g, "")) ||
                 !termsAccepted
               }
-              className={`w-full max-w-md mx-auto mt-6 p-3 h-12 rounded-brand font-medium text-base transition-all duration-200 flex items-center justify-center ${
-                isLoading ||
+              className={`w-full max-w-md mx-auto mt-6 p-3 h-12 rounded-brand font-medium text-base transition-all duration-200 flex items-center justify-center ${isLoading ||
                 phoneNumber.replace(/\D/g, "").length !== 10 ||
                 !/^[6-9]\d{9}$/.test(phoneNumber.replace(/\D/g, "")) ||
                 !termsAccepted
-                  ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                  : "bg-primary hover:bg-primary-hover text-on-primary shadow-lg hover:shadow-xl"
-              }`}
+                ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                : "bg-primary hover:bg-primary-hover text-on-primary shadow-lg hover:shadow-xl"
+                }`}
             >
               {isLoading ? (
                 <span className="flex items-center">
@@ -594,11 +592,10 @@ export default function PhoneVerification() {
             <button
               onClick={isLoading ? undefined : handleOtpVerifyClick}
               disabled={isLoading || otp.join("").length !== 6}
-              className={`w-full h-12 md:h-14 rounded-brand font-medium text-base transition-all ${
-                isLoading || otp.join("").length !== 6
-                  ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                  : "bg-primary hover:bg-primary-hover text-on-primary shadow-lg hover:shadow-xl"
-              }`}
+              className={`w-full h-12 md:h-14 rounded-brand font-medium text-base transition-all ${isLoading || otp.join("").length !== 6
+                ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                : "bg-primary hover:bg-primary-hover text-on-primary shadow-lg hover:shadow-xl"
+                }`}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">

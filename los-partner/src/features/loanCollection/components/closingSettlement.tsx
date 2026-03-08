@@ -364,7 +364,7 @@ export function ClosingSettlementType({ loanId }: ClosingTypeProps) {
                 </tr>
                 <tr>
                   <td className="px-4 py-2 text-[var(--color-on-background)]">
-                    Interest Amount
+                    Murabaha margin Amount
                   </td>
                   <td className="px-4 py-2 text-right text-[var(--color-warning)]">
                     {formatCurrency(totalInterestPayable)}
@@ -409,7 +409,7 @@ export function ClosingSettlementType({ loanId }: ClosingTypeProps) {
                     <div>
                       <div className="font-medium">Round Off Discount</div>
                       <div className="text-xs text-[var(--color-on-primary)] opacity-70 italic">
-                        (on Interest + Principal)
+                        (on Murabaha margin + Principal)
                       </div>
                     </div>
                   </td>

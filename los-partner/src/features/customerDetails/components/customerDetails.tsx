@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useParams } from "react-router-dom";
 import { FiCopy, FiMonitor } from "react-icons/fi";
 import {
@@ -124,7 +125,7 @@ export function CustomerDetails() {
     updatedAt: Date;
     subdomain?: string;
     marketingSource?: string;
-   
+
   }>(null);
   const [customer, setCustomer] = useState<null | Customer>(null);
   const [employment, setEmployment] = useState<{ salary?: number } | null>(
@@ -339,15 +340,14 @@ export function CustomerDetails() {
 
     const alternateLoansText =
       alternatePhoneLoans?.loansViaAlternateNumbers?.length > 0
-        ? `🔗 Alternate Phone Loans (${
-            alternatePhoneLoans.loansViaAlternateNumbers?.length
-          }):
+        ? `🔗 Alternate Phone Loans (${alternatePhoneLoans.loansViaAlternateNumbers?.length
+        }):
 ${alternatePhoneLoans.loansViaAlternateNumbers
-  .map(
-    (loan) =>
-      `   • ${loan.formattedLoanId} (${loan.viaAlternatePhone.phone} - ${loan.viaAlternatePhone.relationship}) - ${loan.status}`,
-  )
-  .join("\n")}
+          .map(
+            (loan) =>
+              `   • ${loan.formattedLoanId} (${loan.viaAlternatePhone.phone} - ${loan.viaAlternatePhone.relationship}) - ${loan.status}`,
+          )
+          .join("\n")}
 ━━━━━━━━━━━━━━━━━━━━━━`
         : "";
 
@@ -366,44 +366,39 @@ ${alternatePhoneLoans.loansViaAlternateNumbers
         ? `🔍 IP Address Check:
    IP: ${ipCheckData.ipAddress}
    Associated Accounts: ${ipCheckData.count}
-   ${
-     ipCheckData.associatedUsers.length > 0
-       ? `Linked IDs: ${ipCheckData.associatedUsers.map((user) => user.formattedUserId).join(", ")}`
-       : "No other accounts linked"
-   }
+   ${ipCheckData.associatedUsers.length > 0
+          ? `Linked IDs: ${ipCheckData.associatedUsers.map((user) => user.formattedUserId).join(", ")}`
+          : "No other accounts linked"
+        }
 ━━━━━━━━━━━━━━━━━━━━━━`
         : "";
 
     const copyText = `📋 Customer Profile Information
 ━━━━━━━━━━━━━━━━━━━━━━
 👤 Full Name: ${fullName}
-${
-  customerDetails.aAdharName
-    ? `📄 Aadhaar Name: ${customerDetails.aAdharName}\n`
-    : ""
-}━━━━━━━━━━━━━━━━━━━━━━
+${customerDetails.aAdharName
+        ? `📄 Aadhaar Name: ${customerDetails.aAdharName}\n`
+        : ""
+      }━━━━━━━━━━━━━━━━━━━━━━
 ${alternateLoansText}
 ${deviceInfoText}
 ${ipCheckText}
 👤 Personal Details:
    Gender: ${customerDetails.gender || "N/A"}
    Date of Birth: ${formatDate(customerDetails.dateOfBirth)}
-   ${
-     customerDetails.aAdharDOB
-       ? `Aadhaar DOB: ${formatDate(customerDetails.aAdharDOB)}\n   `
-       : ""
-   }Marital Status: ${customerDetails.maritalStatus || "N/A"}
-   ${
-     customerDetails.maritalStatus === MaritalStatusEnum.MARRIED &&
-     customerDetails.spouseName
-       ? `Spouse: ${customerDetails.spouseName}\n   `
-       : ""
-   }Father's Name: ${customerDetails.fathersName || "N/A"}
-   ${
-     customerDetails.mothersName
-       ? `Mother's Name: ${customerDetails.mothersName}\n   `
-       : ""
-   }Religion: ${customerDetails.religion || "N/A"}
+   ${customerDetails.aAdharDOB
+        ? `Aadhaar DOB: ${formatDate(customerDetails.aAdharDOB)}\n   `
+        : ""
+      }Marital Status: ${customerDetails.maritalStatus || "N/A"}
+   ${customerDetails.maritalStatus === MaritalStatusEnum.MARRIED &&
+        customerDetails.spouseName
+        ? `Spouse: ${customerDetails.spouseName}\n   `
+        : ""
+      }Father's Name: ${customerDetails.fathersName || "N/A"}
+   ${customerDetails.mothersName
+        ? `Mother's Name: ${customerDetails.mothersName}\n   `
+        : ""
+      }Religion: ${customerDetails.religion || "N/A"}
    Residence Type: ${customerDetails.residenceType || "N/A"}
 ━━━━━━━━━━━━━━━━━━━━━━
 📍 Address Details:
@@ -414,21 +409,18 @@ ${ipCheckText}
 ━━━━━━━━━━━━━━━━━━━━━━
 📊 Other Details:
    Credit Score: ${customerDetails.creditScore || "N/A"}
-   ${
-     employment?.salary
-       ? `Employment Salary: ₹${employment.salary.toLocaleString()}\n   `
-       : ""
-   }Status: ${customerDetails.userDataStatus || "N/A"}
-   ${
-     customerDetails.addressProofType
-       ? `Address Proof: ${customerDetails.addressProofType}\n   `
-       : ""
-   }Created: ${formatDate(customerDetails.createdAt)}
+   ${employment?.salary
+        ? `Employment Salary: ${Conversion.formatCurrency(employment.salary, "BHD")}\n   `
+        : ""
+      }Status: ${customerDetails.userDataStatus || "N/A"}
+   ${customerDetails.addressProofType
+        ? `Address Proof: ${customerDetails.addressProofType}\n   `
+        : ""
+      }Created: ${formatDate(customerDetails.createdAt)}
    Updated: ${formatDate(customerDetails.updatedAt)}
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-      auth.name
-    }) -  ${auth?.role || "N/A"}
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+      }) -  ${auth?.role || "N/A"}
 ---- LOAN COMPLETED ----
 ═══════════════════════════════`;
 
@@ -1016,11 +1008,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           transition duration-200
           hover:bg-[var(--color-background)]
            border-opacity-50 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] 
-          ${
-            copied
-              ? "bg-green-500 text- scale-110"
-              : "bg-[var(--color-surface)] "
-          }
+          ${copied
+                  ? "bg-green-500 text- scale-110"
+                  : "bg-[var(--color-surface)] "
+                }
         `}
               title="Copy customer profile information"
             >
@@ -1060,7 +1051,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
 
           {customerDetails?.aAdharName && (
             <DetailItem
-              label="Aadhaar Name"
+              label="CPR Card Name"
               value={customerDetails.aAdharName}
             />
           )}
@@ -1164,7 +1155,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
 
           {customerDetails.aAdharDOB && (
             <DetailItem
-              label="Aadhaar DOB"
+              label="CPR Card DOB"
               value={formatDate(customerDetails.aAdharDOB)}
             />
           )}
@@ -1535,7 +1526,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           {employment?.salary && (
             <DetailItem
               label="Employment Salary"
-              value={`₹${employment.salary.toLocaleString()}`}
+              value={Conversion.formatCurrency(employment.salary, "BHD")}
             />
           )}
 
@@ -1662,7 +1653,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <div>
                       <p className="text-[10px] text-gray-500">Amount</p>
                       <p className="font-medium">
-                        ₹{loan.amount.toLocaleString()}
+                        {Conversion.formatCurrency(loan.amount, "BHD")}
                       </p>
                     </div>
                     <div>

@@ -790,7 +790,7 @@ export const LoanReallocationModal: React.FC<LoanReallocationModalProps> = ({
                       </div>
                       <div className="text-right">
                         <div className="font-semibold">
-                          ₹{loan.amount?.toLocaleString("en-IN")}
+                          BHD{loan.amount?.toLocaleString("en-IN")}
                         </div>
                         <div className="text-xs text-gray-500">
                           Status: {loan.status}
@@ -948,7 +948,7 @@ export const LoanReallocationModal: React.FC<LoanReallocationModalProps> = ({
                           Amount
                         </p>
                         <p className="font-semibold text-blue-900">
-                          ₹{loan.amount?.toLocaleString("en-IN")}
+                          BHD{loan.amount?.toLocaleString("en-IN")}
                         </p>
                       </div>
                       <div>
@@ -1129,7 +1129,7 @@ export const LoanReallocationModal: React.FC<LoanReallocationModalProps> = ({
                                   Amount
                                 </p>
                                 <p className="font-semibold text-gray-900">
-                                  ₹{displayLoan.amount?.toLocaleString("en-IN")}
+                                  BHD{displayLoan.amount?.toLocaleString("en-IN")}
                                 </p>
                               </div>
                               <div>

@@ -39,7 +39,7 @@ export const postBlocklistAadhar = async (payload: BlocklistPayload) => {
     const response = await api.post(`/blocklist/aadhar`, payload);
     return response.data;
   } catch (error) {
-    console.error("Error upserting Aadhaar blocklist:", error);
+    console.error("Error upserting CPR Card blocklist:", error);
     throw error;
   }
 };

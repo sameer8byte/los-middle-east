@@ -669,7 +669,7 @@ export const CollectionReallocationModal: React.FC<
                         </span>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold">₹{loan.amount.toLocaleString("en-IN")}</div>
+                        <div className="font-semibold">BHD{loan.amount.toLocaleString("en-IN")}</div>
                         <div>
                           Due Date: {
                 dayjs(
@@ -813,7 +813,7 @@ export const CollectionReallocationModal: React.FC<
                               <div className="text-xs text-gray-500 truncate" title={customerName}>{customerName}</div>
                             </div>
                             <div className="flex flex-col items-center">
-                              <div className="font-medium">₹{loan.amount?.toLocaleString("en-IN")}</div>
+                              <div className="font-medium">BHD{loan.amount?.toLocaleString("en-IN")}</div>
                               <div className="text-xs text-gray-500">{loan.status}</div>
                             </div>
                           </div>

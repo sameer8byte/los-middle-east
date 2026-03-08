@@ -183,7 +183,7 @@ const CREDIT_BUREAU_REPORTS = [
   {
     id: "transunion-report",
     name: "TransUnion Credit Report",
-    description: "Credit bureau reporting format for TransUnion (CIBIL)",
+    description: "Credit bureau reporting format for TransUnion (Credit Score)",
     icon: <HiOutlineDocumentArrowDown className="w-5 h-5" />,
     color: "bg-[var(--color-surface)] text-[var(--color-on-surface)]",
   },

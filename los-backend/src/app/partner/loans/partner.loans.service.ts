@@ -87,7 +87,7 @@ export class PartnerLoansService {
     private readonly notificationService: NotificationService,
     @Optional() private readonly awsAuditLogsSqsService: AwsAuditLogsSqsService,
     private readonly redis: RedisService,
-  ) {}
+  ) { }
 
   private generateLoansCacheKey(
     brandId: string,
@@ -527,15 +527,15 @@ export class PartnerLoansService {
         AND: [
           ...(tabId !== PartnerTabsEnum.COLLECTIONS
             ? [
-                {
-                  loanDetails: {
-                    postActiveDate:
-                      tabId === PartnerTabsEnum.POST_COLLECTIONS
-                        ? { lt: new Date() }
-                        : { gte: new Date() },
-                  },
+              {
+                loanDetails: {
+                  postActiveDate:
+                    tabId === PartnerTabsEnum.POST_COLLECTIONS
+                      ? { lt: new Date() }
+                      : { gte: new Date() },
                 },
-              ]
+              },
+            ]
             : []),
         ],
       };
@@ -675,13 +675,13 @@ export class PartnerLoansService {
         const autoPay =
           apiProviderIds.length > 0
             ? {
-                paymentRequests: {
-                  some: {
-                    type: TransactionTypeEnum.AUTOPAY_CONSENT,
-                    status: { notIn: [TransactionStatusEnum.SUCCESS] },
-                  },
+              paymentRequests: {
+                some: {
+                  type: TransactionTypeEnum.AUTOPAY_CONSENT,
+                  status: { notIn: [TransactionStatusEnum.SUCCESS] },
                 },
-              }
+              },
+            }
             : null;
 
         loanOpsFilter = {
@@ -893,13 +893,13 @@ export class PartnerLoansService {
       whereConditions.push(
         pOpsStatus.includes("pending_disbursement")
           ? {
-              status: {
-                in: [
-                  loan_status_enum.SANCTION_MANAGER_APPROVED,
-                  loan_status_enum.APPROVED,
-                ],
-              },
-            }
+            status: {
+              in: [
+                loan_status_enum.SANCTION_MANAGER_APPROVED,
+                loan_status_enum.APPROVED,
+              ],
+            },
+          }
           : statusFilter,
       );
     }
@@ -920,21 +920,21 @@ export class PartnerLoansService {
       const autoPayPendingCondition =
         apiProviderIds.length > 0
           ? {
-              agreement: { status: agreement_status_enum.SIGNED },
-              status: {
-                in: [
-                  loan_status_enum.SANCTION_MANAGER_APPROVED,
-                  loan_status_enum.APPROVED,
-                ],
+            agreement: { status: agreement_status_enum.SIGNED },
+            status: {
+              in: [
+                loan_status_enum.SANCTION_MANAGER_APPROVED,
+                loan_status_enum.APPROVED,
+              ],
+            },
+            skip_auto_pay_consent: false,
+            paymentRequests: {
+              some: {
+                type: TransactionTypeEnum.AUTOPAY_CONSENT,
+                status: { notIn: [TransactionStatusEnum.SUCCESS] },
               },
-              skip_auto_pay_consent: false,
-              paymentRequests: {
-                some: {
-                  type: TransactionTypeEnum.AUTOPAY_CONSENT,
-                  status: { notIn: [TransactionStatusEnum.SUCCESS] },
-                },
-              },
-            }
+            },
+          }
           : null;
 
       // Helper to add only valid conditions
@@ -1150,6 +1150,30 @@ export class PartnerLoansService {
       });
     }
 
+    // ─── BHD eligibility filters (DB stores amounts in INR; 1 BHD = 243 INR) ───
+    // salary (INR) / 243 >= 500 BHD  →  salary >= 500 * 243 = 121,500 INR
+    // amount (INR) / 243 >= 50 BHD   →  amount >= 50  * 243 = 12,150  INR
+    // amount (INR) / 243 <= 1000 BHD →  amount <= 1000 * 243 = 243,000 INR
+    const BHD_TO_INR = 243;
+    whereConditions.push({
+      AND: [
+        {
+          user: {
+            employment: {
+              salary: { gte: 500 * BHD_TO_INR }, // >= 500 BHD
+            },
+          },
+        },
+        {
+          amount: {
+            gte: 50 * BHD_TO_INR, // >= 50 BHD
+            lte: 1000 * BHD_TO_INR, // <= 1000 BHD
+          },
+        },
+      ],
+    });
+    // ─────────────────────────────────────────────────────────────────────────────
+
     const where = {
       brandId,
       isActive: true,
@@ -1293,6 +1317,7 @@ export class PartnerLoansService {
         totalLoanAmount: totalLoanAmount,
       },
     };
+
     return result;
   }
 
@@ -1995,9 +2020,8 @@ export class PartnerLoansService {
             "Beneficiary mobile no.": user?.phoneNumber
               ? user?.phoneNumber.replace(/^(\+91|91)/, "").replace(/\D/g, "")
               : "",
-            Remarks: `${loan.formattedLoanId || loan.id.slice(0, 8)} - Loan Disbursement-${
-              loan.disbursement?.netAmount ?? 0
-            }`,
+            Remarks: `${loan.formattedLoanId || loan.id.slice(0, 8)} - Loan Disbursement-${loan.disbursement?.netAmount ?? 0
+              }`,
             "Payment Type": paymentMode,
             "Purpose code": "CMS",
             "Bene a/c type": "11",
@@ -2528,9 +2552,8 @@ export class PartnerLoansService {
               ? user?.phoneNumber.replace(/^(\+91|91)/, "").replace(/\D/g, "")
               : "",
 
-            Remarks: `${loan.formattedLoanId || loan.id.slice(0, 8)} - Loan Disbursement-${
-              loan.disbursement?.netAmount ?? 0
-            }`,
+            Remarks: `${loan.formattedLoanId || loan.id.slice(0, 8)} - Loan Disbursement-${loan.disbursement?.netAmount ?? 0
+              }`,
             "Payment Type": paymentMode,
             "Purpose code": "CMS",
             "Bene a/c type": "11",
@@ -2742,14 +2765,14 @@ export class PartnerLoansService {
     const paymentDate =
       partialPayment?.status === TransactionStatusEnum.SUCCESS
         ? formatDate(
-            successfulPartialTransactions.at(-1)?.completedAt || "",
-            "DD/MM/YYYY",
-          )
+          successfulPartialTransactions.at(-1)?.completedAt || "",
+          "DD/MM/YYYY",
+        )
         : paymentRequests?.status === TransactionStatusEnum.SUCCESS
           ? formatDate(
-              successfulTransactions.at(-1)?.completedAt || "",
-              "DD/MM/YYYY",
-            )
+            successfulTransactions.at(-1)?.completedAt || "",
+            "DD/MM/YYYY",
+          )
           : "#########";
     const paidAmount =
       (successfulTransactions || []).reduce(
@@ -2916,14 +2939,14 @@ export class PartnerLoansService {
     const paymentDate =
       partialPayment?.status === TransactionStatusEnum.SUCCESS
         ? formatDate(
-            successfulPartialTransactions.at(-1)?.completedAt || "",
-            "DD/MM/YYYY",
-          )
+          successfulPartialTransactions.at(-1)?.completedAt || "",
+          "DD/MM/YYYY",
+        )
         : paymentRequests?.status === TransactionStatusEnum.SUCCESS
           ? formatDate(
-              successfulTransactions.at(-1)?.completedAt || "",
-              "DD/MM/YYYY",
-            )
+            successfulTransactions.at(-1)?.completedAt || "",
+            "DD/MM/YYYY",
+          )
           : "#########";
     const paidAmount =
       (successfulTransactions || []).reduce(
@@ -3029,12 +3052,12 @@ export class PartnerLoansService {
     const pdfBase64 = Buffer.from(response.data).toString("base64");
     const attachments = loan.noDueCertificate?.certificateFileUrl
       ? [
-          {
-            filename: `${certificateType.replace(/_/g, "-").toLowerCase()}-${loan.formattedLoanId || loan.id}.pdf`,
-            content: pdfBase64, // binary buffer
-            contentType: "application/pdf",
-          },
-        ]
+        {
+          filename: `${certificateType.replace(/_/g, "-").toLowerCase()}-${loan.formattedLoanId || loan.id}.pdf`,
+          content: pdfBase64, // binary buffer
+          contentType: "application/pdf",
+        },
+      ]
       : [];
 
     if (this.isDev) {
@@ -3091,9 +3114,8 @@ export class PartnerLoansService {
       data: {
         recipientEmail: user.email,
         sentAt: new Date(),
-        remarks: `Sent to ${user.email} by ${
-          isAutoSend ? "System (Auto)" : partnerUserId
-        } on ${new Date().toISOString().split("T")[0]} 
+        remarks: `Sent to ${user.email} by ${isAutoSend ? "System (Auto)" : partnerUserId
+          } on ${new Date().toISOString().split("T")[0]} 
         for loan ${loan.formattedLoanId || loan.id} (type: ${certificateType}).
        current status: ${loan.status}`,
       },
@@ -3193,13 +3215,13 @@ export class PartnerLoansService {
     // get partner user details
     const partnerUser = partnerUserId
       ? await this.prisma.partnerUser.findUnique({
-          where: {
-            id: partnerUserId,
-            reportsToId: {
-              not: null,
-            },
+        where: {
+          id: partnerUserId,
+          reportsToId: {
+            not: null,
           },
-        })
+        },
+      })
       : null;
 
     const newStatus: loan_status_enum = data.status;
@@ -3449,7 +3471,7 @@ export class PartnerLoansService {
                 : undefined,
             loan_sm_sh_approved_amount:
               newStatus === loan_status_enum.SANCTION_MANAGER_APPROVED ||
-              newStatus === loan_status_enum.APPROVED
+                newStatus === loan_status_enum.APPROVED
                 ? data.approvedLoanAmount
                 : undefined,
             loan_cx_approved_by_partner_user_id:
@@ -3548,7 +3570,7 @@ export class PartnerLoansService {
       const userDetails = loan.user;
       const userName =
         userDetails?.userDetails?.firstName &&
-        userDetails?.userDetails?.lastName
+          userDetails?.userDetails?.lastName
           ? `${userDetails.userDetails.firstName} ${userDetails.userDetails.lastName}`
           : userDetails?.formattedUserId || "Unknown User";
 
@@ -3905,15 +3927,14 @@ export class PartnerLoansService {
     const emailResult = await this.emailService.sendEmail({
       to: user.email,
       name: `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim(),
-      subject: `Loan Application  ${
-        loan.status === loan_status_enum.REJECTED
-          ? "Rejection"
-          : loan.status === loan_status_enum.APPROVED
-            ? "Approval"
-            : loan.status === loan_status_enum.CREDIT_EXECUTIVE_APPROVED
-              ? "Credit Executive Approval"
-              : ""
-      }
+      subject: `Loan Application  ${loan.status === loan_status_enum.REJECTED
+        ? "Rejection"
+        : loan.status === loan_status_enum.APPROVED
+          ? "Approval"
+          : loan.status === loan_status_enum.CREDIT_EXECUTIVE_APPROVED
+            ? "Credit Executive Approval"
+            : ""
+        }
        - ${loan.formattedLoanId || ""}`,
       html: htmlContent,
     });

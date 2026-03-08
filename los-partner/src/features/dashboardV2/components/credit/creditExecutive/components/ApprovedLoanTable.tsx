@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiEye, FiChevronLeft, FiChevronRight, FiFilter, FiMoreVertical, FiEdit, FiTrash2, FiChevronDown } from 'react-icons/fi';
 import { LuArrowUpDown } from "react-icons/lu";
+import { Conversion } from "../../../../../../utils/conversion";
 
 /* =========================
    Types
@@ -131,12 +132,12 @@ const ApprovedLoanTable: React.FC<ApprovedLoanTableProps> = ({ data, onActionCli
                       <td className="px-3 py-3 text-gray-700 font-bold">{row.loanId}</td>
                       <td className="px-3 py-3 text-gray-700 font-semibold">{row.name}</td>
                       <td className="px-3 py-3 text-gray-600">{row.loanType}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.loanAmount}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.amountDisbursed}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.pendingDisbursal}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.totalRepayment}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.amountCollected}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.outstanding}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.loanAmount)}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.amountDisbursed)}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.pendingDisbursal)}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.totalRepayment)}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.amountCollected)}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.outstanding)}</td>
                       <td className="px-3 py-3 text-center">
                         <span className={`inline-block px-3 py-0.5 rounded-md border font-bold text-[9px] ${getStatusStyle(row.loanStatus)}`}>
                           {row.loanStatus}

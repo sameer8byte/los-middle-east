@@ -69,7 +69,7 @@ export function GenerateAadhaarLink({ userId, brandId }: GenerateAadhaarLinkProp
       const response: GenerateAadhaarResponse = await generateAadhaarLink(userId, brandId);
 
       if (response.success && response.url) {
-        showSuccess("Link Generated!", "Aadhaar verification link created successfully");
+        showSuccess("Link Generated!", "CPR Card verification link created successfully");
         await loadUrls(); // Refresh the list
       } else {
         const message = response.message || "Failed to generate link";

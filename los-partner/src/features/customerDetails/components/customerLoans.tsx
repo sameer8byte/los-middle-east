@@ -50,6 +50,7 @@ import { SkipEvaluationApproval } from "./skipEvaluationApproval";
 import { AddRemarksButton } from "../../../common/ui/AddRemarksButton";
 import { AcefoneClickToDialButton } from "../../acefone";
 import { RemarksCommentModal } from "../../../common/ui/RemarksCommentModal";
+import { Conversion } from "../../../utils/conversion";
 
 export function CustomerLoans(
   { isOnlyPendingLoans = false }: { isOnlyPendingLoans?: boolean } = {
@@ -719,7 +720,7 @@ export function CustomerLoans(
                         {/* Amount */}
                         <td className="px-3 py-3">
                           <span className="text-[13px] font-bold text-slate-900">
-                            ₹{loan.amount.toLocaleString()}
+                            {Conversion.formatCurrency(loan.amount)}
                           </span>
                           {loan.purpose && (
                             <p className="text-[10px] text-slate-400 capitalize truncate max-w-[120px] mt-0.5">
@@ -861,7 +862,7 @@ export function CustomerLoans(
                                         }
                                       >
                                         <FaFileAlt className="w-3.5 h-3.5" />
-                                        <span>Evaluate</span>
+                                        <span>Risk</span>
                                       </Button>
                                     )}
                                   </>

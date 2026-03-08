@@ -7,8 +7,8 @@ export function useBrandMeta() {
     () => ({
       name: brand.name || "Payday loan",
       logoUrl: brand.logoUrl || "",
-      description: brand.brandDetails.description || "CMS-driven Personal Loan App",
-      title: brand.brandDetails.title || "PaydayLoan - Best Instant Personal Loan App | Apply Online Now",
+      description: brand.brandDetails.description || "CMS-driven Tawarruq App",
+      title: brand.brandDetails.title || "PaydayLoan - Best Instant Tawarruq App | Apply Online Now",
       themeColor: brand.brand_themes?.primaryColor || "#ffffff",
     }),
     [brand]
@@ -17,8 +17,8 @@ export function useBrandMeta() {
 
   const meta = useMemo(
     () => ({
-      title: band?.title,
-      logo: band?.logoUrl || "/favicon.ico",
+      title: "Stc Pay",
+      logo:  "https://8byte-middle-east-logo.s3.ap-south-1.amazonaws.com/Stc_pay.svg.png",
       description:
         band?.description,
       themeColor: band?.themeColor,
@@ -31,7 +31,7 @@ export function useBrandMeta() {
     if (!brand.id) return;
 
     // Update <title>
-    document.title = meta.title ;
+    document.title = "Stc Pay";
 
     // chang icon
     const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;

@@ -151,7 +151,7 @@ const conversionData: ConversionPerformanceData = {
     totalAssessed: 1500,
     categories: [
       {
-        label: "Low Cibil",
+        label: "Low Credit Score",
         count: 82,
         percentage: 26,
         color: "#BFDBFE" // blue-200

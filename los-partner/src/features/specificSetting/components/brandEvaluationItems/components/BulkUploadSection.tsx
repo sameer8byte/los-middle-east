@@ -96,7 +96,7 @@ export function BulkUploadSection({ onUploadSuccess }: BulkUploadSectionProps) {
   const downloadSampleCsv = () => {
     const sampleData = [
       'parameter,requiredValue,sources,stage,isActive,priority,description',
-      'Credit Score,>=650,CIBIL;Experian,ONE,true,1,Minimum credit score requirement',
+      'Credit Score,>=650,Credit Score;Experian,ONE,true,1,Minimum credit score requirement',
       'Monthly Income,>50000,Bank Statement;Salary Slip,ONE,true,2,Monthly income verification',
       'Employment Type,Salaried,HR Verification;Offer Letter,TWO,true,3,Employment type check'
     ];
@@ -323,7 +323,7 @@ export function BulkUploadSection({ onUploadSuccess }: BulkUploadSectionProps) {
           </ul>
           <p className="mt-2"><strong>Example:</strong></p>
           <code className="block bg-blue-100 p-2 rounded text-xs mt-1">
-            Credit Score,&gt;=650,CIBIL;Experian,ONE,true,1,Minimum credit score requirement
+            Credit Score,&gt;=650,Credit Score;Experian,ONE,true,1,Minimum credit score requirement
           </code>
         </div>
       </div>

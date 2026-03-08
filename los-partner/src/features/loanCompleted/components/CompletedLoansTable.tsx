@@ -18,6 +18,7 @@ import { Filters } from "./filters";
 import { FilterButton } from "../../../common/common/filterButton";
 import { useQueryParams } from "../../../hooks/useQueryParams";
 import { AcefoneClickToDialButton } from "../../acefone";
+import { Conversion } from "../../../utils/conversion";
 
 interface CompletedLoan {
   id: string;
@@ -370,7 +371,7 @@ export default function CompletedLoansTable({
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="font-semibold text-gray-900">
-                              ₹{loan.loanAmount.toLocaleString("en-IN")}
+{Conversion.formatCurrency(loan.loanAmount)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">

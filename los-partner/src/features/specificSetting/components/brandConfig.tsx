@@ -359,16 +359,16 @@ export function BrandConfigSetting() {
       description: "Require mandatory employment information verification for all loan applications.",
     },
     {
-      label: "Aadhaar Image Required",
+      label: "CPR Card Image Required",
       name: "isAadharImageRequired",
       type: "checkbox",
-      description: "Require users to upload Aadhaar card images (front and back) for verification.",
+      description: "Require users to upload CPR Card images (front and back) for verification.",
     },
     {
-      label: "Aadhaar Number Required",
+      label: "CPR Card Number Required",
       name: "isAadhaarNumberRequired",
       type: "checkbox",
-      description: "Require users to provide Aadhaar number during registration or verification.",
+      description: "Require users to provide CPR Card number during registration or verification.",
     },
     {
       label: "No Due Certificate Header",

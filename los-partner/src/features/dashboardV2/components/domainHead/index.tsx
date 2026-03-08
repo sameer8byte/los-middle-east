@@ -3,7 +3,7 @@ import BusinessSnapshot from "./businessSnapshot";
 import TeamPerformance from "./TeamPerformance";
 import SalesDashboard from "./Sales";
 import CreditDashboard from "./Credit";
-import CollectionSnapshot from "./CollectionSnapshot";
+import CollectionSnapshot from "./collectionSnapshot";
 
 // Inline SVG icons (no external dependency needed)
 // const CalendarIcon = () => (
@@ -65,7 +65,7 @@ function DomainHeadDashboard() {
     // const [dateRange, setDateRange] = useState("Select Date Range");
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gray-50 p-3">
             {/* Header */}
             <div className="mb-4">
                 <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
