@@ -420,7 +420,7 @@ export function PaymentApproval({
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 font-semibold text-[var(--color-on-background)] whitespace-nowrap">
                                         {Number(tx?.amount) > 0
-                                          ? `₹${tx.amount}`
+                                          ? `BHD ${tx.amount}`
                                           : "N/A"}
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 text-[var(--color-on-surface)]">
@@ -436,27 +436,27 @@ export function PaymentApproval({
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 text-[var(--color-on-background)] text-right">
                                         {tx.totalFees > 0
-                                          ? `₹${tx.totalFees}`
+                                          ? `BHD ${tx.totalFees}`
                                           : "-"}
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 text-[var(--color-on-background)] text-right">
                                         {tx.totalPenalties > 0
-                                          ? `₹${tx.totalPenalties}`
+                                          ? `BHD ${tx.totalPenalties}`
                                           : "-"}
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 text-[var(--color-on-background)] text-right">
                                         {tx.penaltyDiscount > 0
-                                          ? `₹${tx.penaltyDiscount}`
+                                          ? `BHD ${tx.penaltyDiscount}`
                                           : "-"}
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 text-[var(--color-on-background)] text-right">
                                         {tx.roundOffDiscount > 0
-                                          ? `₹${tx.roundOffDiscount}`
+                                          ? `BHD ${tx.roundOffDiscount}`
                                           : "-"}
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2 text-[var(--color-on-background)] text-right">
                                         {tx.excessAmount > 0
-                                          ? `₹${tx.excessAmount}`
+                                          ? `BHD ${tx.excessAmount}`
                                           : "-"}
                                       </td>
                                       <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-2 py-2">
@@ -747,7 +747,7 @@ export function PaymentApproval({
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2 font-semibold text-right">
                                           {Number(tx?.amount) > 0
-                                            ? `₹${tx.amount} `
+                                            ? `BHD ${tx.amount} `
                                             : "N/A"}
                                           {Number(tx?.amount) > 0 && (
                                             <span className="text-[10px] text-[var(--color-on-surface)] opacity-70 font-normal">
@@ -769,27 +769,27 @@ export function PaymentApproval({
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right">
                                           {tx.totalFees > 0
-                                            ? `₹${tx.totalFees}`
+                                            ? `BHD ${tx.totalFees}`
                                             : "-"}
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right">
                                           {tx.totalPenalties > 0
-                                            ? `₹${tx.totalPenalties}`
+                                            ? `BHD ${tx.totalPenalties}`
                                             : "-"}
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right">
                                           {tx.penaltyDiscount > 0
-                                            ? `₹${tx.penaltyDiscount}`
+                                            ? `BHD ${tx.penaltyDiscount}`
                                             : "-"}
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right">
                                           {tx.roundOffDiscount > 0
-                                            ? `₹${tx.roundOffDiscount}`
+                                            ? `BHD ${tx.roundOffDiscount}`
                                             : "-"}
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2 text-right">
                                           {tx.excessAmount > 0
-                                            ? `₹${tx.excessAmount}`
+                                            ? `BHD ${tx.excessAmount}`
                                             : "-"}
                                         </td>
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2">
@@ -1011,7 +1011,7 @@ export function PaymentApproval({
 
                                         {/* Amount */}
                                         <td className="border-l border-r border-[var(--color-muted)] border-opacity-20 px-3 py-2.5 font-semibold text-right whitespace-nowrap">
-                                          ₹{tx.amount}{" "}
+                                          BHD {tx.amount}{" "}
                                           <span className="text-[10px] text-[var(--color-on-surface)] opacity-70 font-normal ml-1">
                                             (Disbursal)
                                           </span>

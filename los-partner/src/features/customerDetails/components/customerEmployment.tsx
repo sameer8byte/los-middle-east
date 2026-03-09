@@ -1183,7 +1183,7 @@ export function CustomerEmployment() {
                 <div>
                   <label className="flex items-center text-sm font-medium text-[var(--color-on-surface)] opacity-80 mb-1">
                     <HiOutlineCurrencyRupee className="w-4 h-4 mr-1 text-[var(--color-on-surface)] opacity-70" />
-                    Monthly Salary (₹)
+                    Monthly Salary (BHD)
                   </label>
                   <input
                     type="number"
@@ -1366,7 +1366,7 @@ export function CustomerEmployment() {
               value={
                 employment.salary && !employment.salaryExceedsBase ? (
                   <span className="font-mono font-medium">
-                    ₹{employment.salary.toLocaleString("en-IN")}
+                    BHD{employment.salary.toLocaleString("en-IN")}
                   </span>
                 ) : (
                   <span className="text-sm text-[var(--color-on-surface)] opacity-70">

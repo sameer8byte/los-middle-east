@@ -201,7 +201,7 @@ export function StatusUpdateModal({
                 <div>
                   <span className="text-gray-600">Amount:</span>
                   <span className="ml-2 font-semibold">
-                    ₹{loan.amount?.toLocaleString("en-IN")}
+                    BHD {loan.amount?.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <div>

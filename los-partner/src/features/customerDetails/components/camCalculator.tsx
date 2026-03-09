@@ -639,9 +639,9 @@ export function CamCalculator({
         joiningDate,
       };
 
-      console.log("💷 Salary Conversion: ₹", salaryInINR.toFixed(2), "→ BHD", salary.toFixed(2));
-      console.log("💷 Loan Amount Conversion: ₹", loanAmountInINR.toFixed(2), "→ BHD", loan_applied_amount.toFixed(2));
-      console.log("Credit Risk API Payload:", payload);
+      // console.log("💷 Salary Conversion: ₹", salaryInINR.toFixed(2), "→ BHD", salary.toFixed(2));
+      // console.log("💷 Loan Amount Conversion: ₹", loanAmountInINR.toFixed(2), "→ BHD", loan_applied_amount.toFixed(2));
+      // console.log("Credit Risk API Payload:", payload);
 
       const response = await axios({
         method: "POST",
@@ -697,20 +697,20 @@ export function CamCalculator({
                 <div className="bg-blue-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Gross</p>
                   <p className="font-bold text-blue-700 text-xs">
-                    ₹
+                    BHD
                     {repaymentData.disbursement?.grossAmount?.toFixed(2) || "0"}
                   </p>
                 </div>
                 <div className="bg-green-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Net</p>
                   <p className="font-bold text-green-700 text-xs">
-                    ₹{repaymentData.disbursement?.netAmount?.toFixed(2) || "0"}
+                    BHD{repaymentData.disbursement?.netAmount?.toFixed(2) || "0"}
                   </p>
                 </div>
                 <div className="bg-red-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Deductions</p>
                   <p className="font-bold text-red-600 text-xs">
-                    ₹
+                    BHD
                     {repaymentData.disbursement?.totalDeductions?.toFixed(2) ||
                       "0"}
                   </p>
@@ -727,7 +727,7 @@ export function CamCalculator({
                 <div className="bg-green-50 p-1.5 rounded-lg col-span-2">
                   <p className="text-gray-500 text-[10px]">Total Obligation</p>
                   <p className="font-bold text-green-700 text-xs">
-                    ₹
+                    BHD
                     {repaymentData.repayment?.totalObligation?.toFixed(2) ||
                       "0"}
                   </p>
@@ -735,7 +735,7 @@ export function CamCalculator({
                 <div className="bg-orange-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Fees</p>
                   <p className="font-bold text-orange-600 text-xs">
-                    ₹{repaymentData.repayment?.totalFees?.toFixed(2) || "0"}
+                    BHD{repaymentData.repayment?.totalFees?.toFixed(2) || "0"}
                   </p>
                 </div>
               </div>
@@ -749,7 +749,7 @@ export function CamCalculator({
               <div className="bg-purple-50 p-1.5 rounded-lg">
                 <p className="text-gray-500 text-[10px]">Total Taxes</p>
                 <p className="font-bold text-purple-700 text-xs">
-                  ₹{repaymentData.costSummary?.totalTaxes?.toFixed(2) || "0"}
+                  BHD{repaymentData.costSummary?.totalTaxes?.toFixed(2) || "0"}
                 </p>
               </div>
             </div>
@@ -773,7 +773,7 @@ export function CamCalculator({
                               {charge.type}
                             </span>
                             <span className="font-bold text-amber-700 text-[10px]">
-                              ₹{charge.total?.toFixed(2) || "0"}
+                              BHD{charge.total?.toFixed(2) || "0"}
                             </span>
                           </div>
                           {charge.taxes && charge.taxes.length > 0 && (
@@ -787,7 +787,7 @@ export function CamCalculator({
                                     {tax.type}: {tax.rate}%
                                   </span>
                                   <span className="text-amber-600">
-                                    ₹{tax.amount?.toFixed(2) || "0"}
+                                    BHD{tax.amount?.toFixed(2) || "0"}
                                   </span>
                                 </div>
                               ))}
@@ -818,7 +818,7 @@ export function CamCalculator({
                             {fee.type}
                           </span>
                           <span className="font-bold text-teal-700 text-[10px]">
-                            ₹{fee.total?.toFixed(2) || "0"}
+                            BHD{fee.total?.toFixed(2) || "0"}
                           </span>
                         </div>
                         {fee.taxes && fee.taxes.length > 0 && (
@@ -832,7 +832,7 @@ export function CamCalculator({
                                   {tax.type}: {tax.rate}%
                                 </span>
                                 <span className="text-teal-600">
-                                  ₹{tax.amount?.toFixed(2) || "0"}
+                                  BHD{tax.amount?.toFixed(2) || "0"}
                                 </span>
                               </div>
                             ))}
@@ -1078,7 +1078,7 @@ export function CamCalculator({
                                     Recommended
                                   </p>
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
-                                    ₹
+                                    BHD
                                     {parseNum(
                                       calc.loanRecommended
                                     ).toLocaleString("en-IN")}
@@ -1090,7 +1090,7 @@ export function CamCalculator({
                                     Avg Salary
                                   </p>
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
-                                    ₹
+                                    BHD
                                     {parseNum(calc.avgSalary).toLocaleString(
                                       "en-IN"
                                     )}

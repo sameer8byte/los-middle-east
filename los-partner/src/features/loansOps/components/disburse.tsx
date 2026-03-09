@@ -581,7 +581,7 @@ export function Disburse({
                               Principal Amount:
                             </span>
                             <span className="font-semibold text-[var(--color-on-background)]">
-                              ₹{loanDetails?.amount?.toLocaleString() || "0"}
+                              BHD {loanDetails?.amount?.toLocaleString() || "0"}
                             </span>
                           </div>
 
@@ -590,7 +590,7 @@ export function Disburse({
                               Disbursement Amount:
                             </span>
                             <span className="font-semibold text-[var(--color-on-background)]">
-                              ₹
+                              BHD 
                               {loanDetails?.disbursement?.netAmount?.toLocaleString() ||
                                 "0"}
                             </span>
@@ -997,7 +997,7 @@ export function Disburse({
                         <div className="flex justify-between">
                           <span className="font-medium">Principal Amount:</span>
                           <span className="font-semibold text-[var(--color-on-background)]">
-                            ₹{loanDetails?.amount?.toLocaleString() || "0"}
+                            BHD {loanDetails?.amount?.toLocaleString() || "0"}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -1005,7 +1005,7 @@ export function Disburse({
                             Disbursement Amount:
                           </span>
                           <span className="font-semibold text-[var(--color-on-background)]">
-                            ₹
+                            BHD 
                             {loanDetails?.disbursement?.netAmount?.toLocaleString() ||
                               "0"}
                           </span>

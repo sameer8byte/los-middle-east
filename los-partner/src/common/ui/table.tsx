@@ -411,7 +411,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   message,
   onRetry,
 }) => (
-  <div className="mb-4 p-4 bg-[var(--color-error)] bg-opacity-10 text-[var(--color-error)] rounded-lg flex items-center gap-2">
+  <div className="mb-4 p-4 border bg-opacity-10 text-[var(--color-error)] rounded-lg flex items-center gap-2">
     <HiOutlineXCircle className="h-5 w-5" />
     {message}
     {onRetry && (

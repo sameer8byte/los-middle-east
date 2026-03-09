@@ -703,10 +703,10 @@ export default function BrandNonRepaymentDates() {
                 if (hasData) {
                   if (dataViewType === DataViewType.DUE_AMOUNT) {
                     const loanData = dataForDate as LoanData;
-                    return `Due loans: ${loanData.totalCases} cases, ₹${formatCurrency(loanData.totalAmount)} - Click to add non-repayment date`;
+                    return `Due loans: ${loanData.totalCases} cases, BHD ${formatCurrency(loanData.totalAmount)} - Click to add non-repayment date`;
                   } else {
                     const disbursementData = dataForDate as DisbursementData;
-                    return `Disbursed loans: ${disbursementData.totalCases} cases, ₹${formatCurrency(disbursementData.totalDisbursedAmount)} - Click to add non-repayment date`;
+                    return `Disbursed loans: ${disbursementData.totalCases} cases, BHD ${formatCurrency(disbursementData.totalDisbursedAmount)} - Click to add non-repayment date`;
                   }
                 }
 
@@ -755,7 +755,7 @@ export default function BrandNonRepaymentDates() {
                       </div>
                       <div className="leading-tight">
                         <span className={dataViewType === DataViewType.DUE_AMOUNT ? "text-green-600" : "text-purple-600"}>
-                          ₹{dataViewType === DataViewType.DUE_AMOUNT
+                          BHD {dataViewType === DataViewType.DUE_AMOUNT
                             ? formatCurrency((dataForDate as LoanData).totalAmount)
                             : formatCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
                           }
@@ -892,7 +892,7 @@ export default function BrandNonRepaymentDates() {
                 Total {dataViewType === DataViewType.DUE_AMOUNT ? 'Due' : 'Disbursed'} Amount
               </p>
               <p className={`text-2xl font-bold ${dataViewType === DataViewType.DUE_AMOUNT ? 'text-purple-900' : 'text-blue-900'} mt-1`}>
-                ₹{formatCurrency(totalAmount)}
+                BHD {formatCurrency(totalAmount)}
               </p>
             </div>
           </div>
@@ -954,7 +954,7 @@ export default function BrandNonRepaymentDates() {
                               {dataForDate.totalCases} {dataViewType === DataViewType.DUE_AMOUNT ? 'due' : 'disbursed'}
                             </span>
                             {" "}• <span className={`${dataViewType === DataViewType.DUE_AMOUNT ? 'text-green-600' : 'text-purple-600'} font-medium`}>
-                              ₹{dataViewType === DataViewType.DUE_AMOUNT
+                              BHD {dataViewType === DataViewType.DUE_AMOUNT
                                 ? formatCurrency((dataForDate as LoanData).totalAmount)
                                 : formatCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
                               }

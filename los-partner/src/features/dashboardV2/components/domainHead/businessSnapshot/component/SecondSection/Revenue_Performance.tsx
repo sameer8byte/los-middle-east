@@ -92,7 +92,7 @@ const CustomCursor = (props: any) => {
 const RevenuePerformance: React.FC<RevenuePerformanceProps> = ({
     title = "Revenue Performance",
     totalRevenueLabel = "Total Revenue Generated",
-    totalRevenueValue = 86000000,  // ₹8.6 Cr
+    totalRevenueValue = 86000000,  // BHD 8.6 Cr
     data = MOCK_DATA,
 }) => {
     // Format total revenue value

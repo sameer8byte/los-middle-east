@@ -50,16 +50,16 @@ export const ExecutivePerformanceTable = () => {
   // Expected Response: { data: [...], total: number }
   const totalPages = Math.ceil(2619 / 50);
   const tableData: ExecutivePerformanceData[] = [
-    { srNo: 1, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 2, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 3, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 4, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 5, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 6, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 7, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 8, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 9, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
-    { srNo: 10, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "₹10,00,000", amountCollected: "₹8,00,000", pendingAmount: "₹2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 1, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 2, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 3, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 4, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 5, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 6, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 7, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 8, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 9, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
+    { srNo: 10, employee: "Akshaya S", casesHolding: 120, closed: 70, underFollowup: 20, postDueCases: 30, totalCollectionAmount: "BHD 10,00,000", amountCollected: "BHD 8,00,000", pendingAmount: "BHD 2,00,000", collection: "97 %", empScore: 8.5 },
   ];
   // 🔴 API INTEGRATION: Replace above with: const tableData = data;
 

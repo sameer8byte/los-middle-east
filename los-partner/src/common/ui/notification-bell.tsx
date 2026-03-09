@@ -826,7 +826,7 @@ export const NotificationBell = memo(({ className }: NotificationBellProps) => {
                                           {notification.loan.formattedLoanId}
                                         </span>
                                         <span className="text-green-600">
-                                          • ₹
+                                          • BHD
                                           {notification.loan.amount.toLocaleString()}
                                         </span>
                                         <span

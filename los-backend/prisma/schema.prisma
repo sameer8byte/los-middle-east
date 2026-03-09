@@ -52,6 +52,7 @@ model PartnerUser {
   is_disabled                        Boolean                               @default(false)
   phone_number                       String?                               @db.VarChar(10)
   loanAllottedPartnerUsers           LoanAllottedPartnerUser[]
+  loan_allotted_partner_user_logs    loan_allotted_partner_user_logs[]
   loan_collection_allocated_partner  loan_collection_allocated_partner[]   @relation("PartnerUserToLoanCollections")
   loanStatusHistories                LoanStatusHistory[]                   @relation("PartnerUserToLoanStatusHistories")
   notification_targets               notification_targets[]
@@ -239,6 +240,7 @@ model PartnerUserBrandRole {
 
   @@id([brandId, partnerUserId, roleId])
   @@index([roleId], map: "idx_partner_brand_role_role_id")
+  @@index([partnerUserId, brandId], map: "idx_partner_brand_role_partner_brand")
   @@map("partner_user_brand_roles")
 }
 
@@ -487,22 +489,22 @@ model UserBankAccount {
 }
 
 model AlternateAddress {
-  id               String            @id @default(uuid())
+  id               String             @id @default(uuid())
   userId           String
-  address          String
-  city             String
-  state            String
-  pincode          String
-  country          String
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @default(now())
-  residenceType    ResidenceTypeEnum @default(OWNED)
+  address          String?
+  city             String?
+  state            String?
+  pincode          String?
+  country          String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now())
+  residenceType    ResidenceTypeEnum? @default(OWNED)
   filePrivateKey   String?
   addressProofType AddressProofEnum?
-  isActive         Boolean           @default(true)
-  isDisabled       Boolean           @default(false)
+  isActive         Boolean            @default(true)
+  isDisabled       Boolean            @default(false)
   remarks          String?
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("alternate_addresses")
 }
@@ -682,6 +684,15 @@ model User {
   alternate_phone_1                                   String?                           @db.VarChar(10)
   alternate_phone_2                                   String?                           @db.VarChar(10)
   rejected_by_id                                      BigInt?
+  aadhaar_number                                      String?                           @db.VarChar(4)
+  aadhaar_verified_at                                 DateTime?                         @db.Timestamp(6)
+  is_aadhaar_pan_linked                               Boolean?
+  is_aadhaar_verified                                 Boolean?                          @default(false)
+  is_pan_aadhaar_linked                               Boolean?
+  is_pan_verified                                     Boolean?                          @default(false)
+  pan_number                                          String?                           @db.VarChar(10)
+  pan_verified_at                                     DateTime?                         @db.Timestamp(6)
+  lendbox_user_id                                     String?                           @db.VarChar(16)
   aa_consent_requests                                 aa_consent_requests[]
   aadhaarDigiLockerLogs                               aadhaar_digi_locker_log[]
   alternateAddresses                                  AlternateAddress[]
@@ -746,12 +757,14 @@ model User {
   @@index([brandId, allocated_partner_user_id], map: "idx_user_brand_allocated_partner")
   @@index([occupation_type_id], map: "idx_users_occupation_type_id")
   @@index([status_id], map: "idx_users_status_id")
-  @@index([rejected_by_id], map: "idx_users_rejected_by_id")
+  @@index([aadhaar_number], map: "idx_users_aadhaar_number")
   @@index([brandId, isActive, createdAt(sort: Desc)], map: "idx_users_brand_active_created")
   @@index([email(ops: raw("gin_trgm_ops"))], map: "idx_users_email_trgm", type: Gin)
   @@index([id, isActive], map: "idx_users_id_active")
   @@index([isActive], map: "idx_users_isactive")
+  @@index([pan_number], map: "idx_users_pan_number")
   @@index([phoneNumber(ops: raw("gin_trgm_ops"))], map: "idx_users_phone_trgm", type: Gin)
+  @@index([rejected_by_id], map: "idx_users_rejected_by_id")
   @@map("users")
 }
 
@@ -1043,6 +1056,7 @@ model OtherDocument {
   providerData      Json?
   backPassword      String?          @db.VarChar(255)
   frontPassword     String?          @db.VarChar(255)
+  document_type_id  Int?
   user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("other_documents")
@@ -1063,6 +1077,7 @@ model Brand {
   partner_version              String?                         @db.VarChar(10)
   force_refresh                Boolean?                        @default(false)
   web_version                  String?                         @db.VarChar(10)
+  is_lendbox_integrated        Boolean                         @default(false)
   aa_consent_requests          aa_consent_requests[]
   aadhaarDigiLockerLogs        aadhaar_digi_locker_log[]
   brand_api_keys               brand_api_keys[]                @relation("BrandToApiKeys")
@@ -1620,6 +1635,13 @@ model UserDetails {
   isServicablePinCodesByCMS       Boolean              @default(false)
   linkedAadhaarNumberByDigiLocker String?              @db.VarChar(16)
   linkedAadhaarNumberByPanPlus    String?              @db.VarChar(16)
+  aadhaar_digilocker_gz_key       String?              @db.VarChar(255)
+  aadhaar_digilocker_pdf_key      String?              @db.VarChar(255)
+  aadhaar_digilocker_photo_key    String?              @db.VarChar(255)
+  aadhaar_digilocker_xml_key      String?              @db.VarChar(255)
+  pan_details_gz_key              String?              @db.VarChar(255)
+  profile_photo_key               String?              @db.VarChar(255)
+  profile_video_key               String?              @db.VarChar(255)
   user                            User                 @relation("UserToUserDetails", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([firstName(ops: raw("gin_trgm_ops"))], map: "idx_userdetails_name_trgm", type: Gin)
@@ -1721,6 +1743,8 @@ model Loan {
   loan_status_id                           Int?
   loan_tenure_days                         Int?
   is_workflow_automated                    Boolean?
+  lendbox_loan_id                          String?                             @db.VarChar(16)
+  loan_cx_allocated_at                     DateTime?
   costSummary                              CostSummary?
   digitap_esign_some_table                 digitap_esign_some_table[]
   disbursement                             Disbursement?
@@ -1729,9 +1753,11 @@ model Loan {
   field_visit                              field_visit[]
   agreement                                LoanAgreement?
   allottedPartners                         LoanAllottedPartnerUser[]
+  loan_allotted_partner_user_logs          loan_allotted_partner_user_logs[]
   loan_collection_allocated_partner        loan_collection_allocated_partner[] @relation("LoanToCollectionPartners")
   loanDetails                              LoanDetails?
   emailLogs                                LoanEmailLog[]
+  loan_ledger                              loan_ledger[]
   noDueCertificate                         LoanNoDueCertificate?
   loanStatusHistory                        LoanStatusHistory[]
   xlsxFiles                                LoanXlsxFile[]
@@ -1773,18 +1799,6 @@ model LoanEmailLog {
   @@index([loanId, emailType])
   @@index([sentAt])
   @@map("loan_email_logs")
-}
-
-model LoanAllottedPartnerUser {
-  id            String      @id @default(uuid())
-  loanId        String
-  partnerUserId String
-  allottedAt    DateTime    @default(now())
-  amount        Float       @default(0)
-  loan          Loan        @relation(fields: [loanId], references: [id], onDelete: Cascade)
-  partnerUser   PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade)
-
-  @@map("loan_allotted_partner_user")
 }
 
 model LoanStatusHistory {
@@ -2423,40 +2437,43 @@ model aa_periodic_data_responses {
 }
 
 model aa_data_sessions {
-  id                           String                 @id
-  consentRequestId             String?
-  clientTransactionId          String?
-  txnId                        String?
-  fipId                        String?
-  fipName                      String?
-  maskedAccountNumber          String?
-  accRefNumber                 String?
-  dataType                     String?
-  encryptionEnabled            Boolean                @default(false)
-  status                       AADataStatus           @default(PENDING)
-  rawData                      Json?
-  pdfData                      String?
-  jsonData                     Json?
-  xmlData                      String?
-  csvData                      String?
-  filePrivateKey               String?
-  accountDetails               Json?
-  transactionSummary           Json?
-  balanceInfo                  Json?
-  createdAt                    DateTime               @default(now())
-  updatedAt                    DateTime
-  receivedAt                   DateTime?
-  processedAt                  DateTime?
-  errorMessage                 String?
-  retryCount                   Int                    @default(0)
-  reportData                   String?
-  aa_pdf_key                   String?                @db.VarChar(255)
-  aa_report_key                String?                @db.VarChar(255)
-  generated_aa_report_html_key String?                @db.VarChar(255)
-  aa_json_gz_key               String?                @db.VarChar(255)
-  metadata                     Json?
-  aa_consent_requests          aa_consent_requests?   @relation(fields: [consentRequestId], references: [id], onDelete: Cascade)
-  aa_financial_insights        aa_financial_insights?
+  id                            String                 @id
+  consentRequestId              String?
+  clientTransactionId           String?
+  txnId                         String?
+  fipId                         String?
+  fipName                       String?
+  maskedAccountNumber           String?
+  accRefNumber                  String?
+  dataType                      String?
+  encryptionEnabled             Boolean                @default(false)
+  status                        AADataStatus           @default(PENDING)
+  rawData                       Json?
+  pdfData                       String?
+  jsonData                      Json?
+  xmlData                       String?
+  csvData                       String?
+  filePrivateKey                String?
+  accountDetails                Json?
+  transactionSummary            Json?
+  balanceInfo                   Json?
+  createdAt                     DateTime               @default(now())
+  updatedAt                     DateTime
+  receivedAt                    DateTime?
+  processedAt                   DateTime?
+  errorMessage                  String?
+  retryCount                    Int                    @default(0)
+  reportData                    String?
+  aa_pdf_key                    String?                @db.VarChar(255)
+  aa_report_key                 String?                @db.VarChar(255)
+  generated_aa_report_html_key  String?                @db.VarChar(255)
+  aa_json_gz_key                String?                @db.VarChar(255)
+  metadata                      Json?
+  bsa_metadata                  Json?
+  far_metadata                  Json?
+  generated_bsa_report_html_key String?                @db.VarChar(255)
+  aa_consent_requests           aa_consent_requests?   @relation(fields: [consentRequestId], references: [id], onDelete: Cascade)
+  aa_financial_insights         aa_financial_insights?
 }
 
 model ServiceRequestLog {
@@ -2666,26 +2683,27 @@ model user_status_brand_reasons {
 }
 
 model penny_drop_log {
-  id                String            @id @default(uuid())
-  userBankAccountId String?
-  userId            String?
-  brandId           String?
-  accountNumber     String
-  ifsc              String
-  beneficiaryName   String?
-  provider          BrandProviderName
-  status            PennyDropStatus
-  request           Json
-  response          Json
-  accountExists     Boolean?
-  accountHolderName String?
-  nameMatch         Boolean?
-  errorMessage      String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  brand             Brand?            @relation(fields: [brandId], references: [id])
-  userBankAccount   UserBankAccount?  @relation(fields: [userBankAccountId], references: [id])
-  user              User?             @relation(fields: [userId], references: [id])
+  id                  String            @id @default(uuid())
+  userBankAccountId   String?
+  userId              String?
+  brandId             String?
+  accountNumber       String
+  ifsc                String
+  beneficiaryName     String?
+  provider            BrandProviderName
+  status              PennyDropStatus
+  request             Json
+  response            Json
+  accountExists       Boolean?
+  accountHolderName   String?
+  nameMatch           Boolean?
+  errorMessage        String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  respone_json_gz_key String?           @db.VarChar(255)
+  brand               Brand?            @relation(fields: [brandId], references: [id])
+  userBankAccount     UserBankAccount?  @relation(fields: [userBankAccountId], references: [id])
+  user                User?             @relation(fields: [userId], references: [id])
 }
 
 model pan_details_log {
@@ -3245,6 +3263,7 @@ model master_pincodes {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @default(now())
   is_blocked       Boolean          @default(false)
+  status           pincode_status?  @default(ACTIVE)
   master_districts master_districts @relation(fields: [cityId], references: [id], onDelete: Cascade)
   master_states    master_states    @relation(fields: [stateId], references: [id], onDelete: Cascade)
 
@@ -3264,6 +3283,72 @@ model master_states {
   master_pincodes  master_pincodes[]
 }
 
+model lendbox_api_logs {
+  id                   String    @id(map: "lendbox_logs_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id              String
+  brand_id             String
+  loan_id              String?
+  request              Json?
+  response             Json?
+  error_message        String?
+  response_json_gz_key String?
+  created_at           DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model lendbox_workflow {
+  id          BigInt    @id @default(autoincrement())
+  user_id     String    @db.Uuid
+  loan_id     String?   @db.Uuid
+  brand_id    String    @db.Uuid
+  step_name   String?   @db.VarChar(100)
+  step_status String?   @db.VarChar(50)
+  retry_count Int?      @default(0)
+  last_error  String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model loan_allotted_partner_user_logs {
+  id            String      @id(map: "loan_allotted_partner_user_pkey")
+  loanId        String
+  partnerUserId String
+  allottedAt    DateTime    @default(now())
+  amount        Float       @default(0)
+  loans         Loan        @relation(fields: [loanId], references: [id], onDelete: Cascade, map: "loan_allotted_partner_user_loanId_fkey")
+  partner_users PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade, map: "loan_allotted_partner_user_partnerUserId_fkey")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model loan_ledger {
+  id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  loan_id             String
+  entry_type_id       Int
+  value_date          DateTime  @db.Date
+  principal_component Decimal   @default(0) @db.Decimal(12, 2)
+  interest_component  Decimal   @default(0) @db.Decimal(12, 2)
+  penalty_component   Decimal   @default(0) @db.Decimal(12, 2)
+  balance_principal   Decimal   @default(0) @db.Decimal(12, 2)
+  balance_interest    Decimal   @default(0) @db.Decimal(12, 2)
+  balance_penalty     Decimal   @default(0) @db.Decimal(12, 2)
+  narration           String?
+  reference_id        String?   @db.VarChar(100)
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+  is_deleted          Boolean   @default(false)
+  deleted_at          DateTime? @db.Timestamp(6)
+  deleted_by          String?
+  delete_reason       String?
+  deleted_batch       String?
+  loans               Loan      @relation(fields: [loan_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "idx_loan_ledger_created_at")
+  @@index([entry_type_id], map: "idx_loan_ledger_entry_type")
+  @@index([loan_id], map: "idx_loan_ledger_loan")
+  @@index([loan_id, value_date], map: "idx_loan_ledger_loan_date")
+  @@index([reference_id], map: "idx_loan_ledger_reference")
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model master_districts {
   id              Int               @id(map: "master_cities_pkey") @default(autoincrement())
@@ -3276,6 +3361,18 @@ model master_districts {
 
   @@unique([name, stateId], map: "master_cities_name_stateId_key")
   @@index([stateId], map: "master_cities_stateId_idx")
+}
+
+model LoanAllottedPartnerUser {
+  id            String      @id(map: "loan_allotted_partner_user_pkey1") @default(uuid()) @db.VarChar(255)
+  loanId        String      @db.VarChar(255)
+  partnerUserId String      @db.VarChar(255)
+  allottedAt    DateTime    @default(now())
+  amount        Float       @default(0)
+  loan          Loan        @relation(fields: [loanId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "loan_allotted_partner_user_loanId_fkey1")
+  partnerUser   PartnerUser @relation(fields: [partnerUserId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "loan_allotted_partner_user_partnerUserId_fkey1")
+
+  @@map("loan_allotted_partner_user")
 }
 
 enum BlogStatus {
@@ -3567,6 +3664,8 @@ enum AddressProofEnum {
   MOBILE_TO_ECOM_ADDRESS
   MOBILE_TO_LPG_ADDRESS
   MOBILE_TO_DL_ADDRESS
+  AADHAAR_DIGILOCKER
+  PAN_DETAILS
 }
 
 enum RelationshipEnum {
@@ -3598,6 +3697,7 @@ enum loan_status_enum {
   SETTLED
   WRITE_OFF
   ONBOARDING
+  AWAITING_DISBURSEMENT
 }
 
 enum EvaluationStatusEnum {
@@ -3657,6 +3757,7 @@ enum PaymentMethodEnum {
   IDFC
   RAZORPAY_AUTOPAY
   ICICI
+  LENDBOX
 }
 
 enum employment_type_enum {
@@ -3897,4 +3998,10 @@ enum AccountStatus {
   HOLD
   PENDING
   REJECTED
+}
+
+enum pincode_status {
+  ACTIVE
+  BLOCKED
+  SUSPECTED
 }

@@ -97,7 +97,7 @@ const Footer = () => {
             {/* RBI License */}
             <div className="flex items-center gap-2  px-3 py-1 rounded-full border border-[var(--text-primary)]">
               <span className="text-sm font-medium text-[var(--text-primary)]">
-                RBI NBFC Registration No:
+                CBB (Central Bank of Bahrain):
                 {brand.brandDetails.rbiRegistrationNo}
               </span>
             </div>{" "}

@@ -470,7 +470,7 @@ export function RelocateLoan({
                             Amount
                           </p>
                           <p className="font-semibold text-[var(--color-on-background)]">
-                            ₹{loan.amount?.toLocaleString()}
+                            BHD{loan.amount?.toLocaleString()}
                           </p>
                         </div>
                         <div>

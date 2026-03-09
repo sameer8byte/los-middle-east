@@ -619,7 +619,7 @@ export function RelocateUser({
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-medium text-[var(--color-on-background)]">
-                                    ₹{loan.amount?.toLocaleString()}
+                                    BHD{loan.amount?.toLocaleString()}
                                   </p>
                                 </div>
                                 <div className="min-w-0">

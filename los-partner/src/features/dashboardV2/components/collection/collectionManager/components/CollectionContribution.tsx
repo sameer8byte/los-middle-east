@@ -106,11 +106,11 @@ export const CollectionContribution = () => {
   // API Endpoint: GET /api/collection-contribution
   // Expected Response: { employees: [{ initials, name, collection, target, achieved, avgLoan, gap, percentage }] }
   const employees = [
-    { initials: "MR", name: "Mahesh R | #1", collection: "₹7.2 L", target: "XX %", achieved: "95 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 85 },
-    { initials: "KT", name: "Kiran T | #2", collection: "₹6.8 L", target: "XX %", achieved: "90 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 75 },
-    { initials: "JL", name: "Jasmine L | #3", collection: "₹5.5 L", target: "XX %", achieved: "85 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 55 },
-    { initials: "TM", name: "Tariq M | #4", collection: "₹4.2 L", target: "XX %", achieved: "80 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 72 },
-    { initials: "AS", name: "Anita S | #5", collection: "₹3.9 L", target: "XX %", achieved: "78 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 68 },
+    { initials: "MR", name: "Mahesh R | #1", collection: "BHD 7.2 L", target: "XX %", achieved: "95 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 85 },
+    { initials: "KT", name: "Kiran T | #2", collection: "BHD 6.8 L", target: "XX %", achieved: "90 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 75 },
+    { initials: "JL", name: "Jasmine L | #3", collection: "BHD 5.5 L", target: "XX %", achieved: "85 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 55 },
+    { initials: "TM", name: "Tariq M | #4", collection: "BHD 4.2 L", target: "XX %", achieved: "80 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 72 },
+    { initials: "AS", name: "Anita S | #5", collection: "BHD 3.9 L", target: "XX %", achieved: "78 %", avgLoan: "XX,XXX", gap: "Y/Y", percentage: 68 },
   ];
   // 🔴 API INTEGRATION: Replace above with: const employees = data;
 

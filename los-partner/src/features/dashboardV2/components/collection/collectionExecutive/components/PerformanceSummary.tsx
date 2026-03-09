@@ -45,16 +45,16 @@ export const PerformanceSummary = () => {
 
   // 🔴 REPLACE MOCK DATA WITH API data
   const tableData = [
-    { srNo: 1, month: "Jan 2025", caseCount: 420, sanctionedAmount: "₹24,00,000", repaymentAmount: "₹20,00,000", closedLoans: 320, closedLoanAmount: "₹21,00,000", closedRepaymentAmount: "₹21,00,000", collection: "86 %" },
-    { srNo: 2, month: "Feb 2025", caseCount: 450, sanctionedAmount: "₹25,50,000", repaymentAmount: "₹21,50,000", closedLoans: 340, closedLoanAmount: "₹22,50,000", closedRepaymentAmount: "₹22,50,000", collection: "88 %" },
-    { srNo: 3, month: "Mar 2025", caseCount: 480, sanctionedAmount: "₹27,00,000", repaymentAmount: "₹23,00,000", closedLoans: 360, closedLoanAmount: "₹23,00,000", closedRepaymentAmount: "₹23,00,000", collection: "80 %" },
-    { srNo: 4, month: "Apr 2025", caseCount: 500, sanctionedAmount: "₹28,50,000", repaymentAmount: "₹24,00,000", closedLoans: 380, closedLoanAmount: "₹24,50,000", closedRepaymentAmount: "₹24,50,000", collection: "92 %" },
-    { srNo: 5, month: "May 2025", caseCount: 520, sanctionedAmount: "₹30,00,000", repaymentAmount: "₹25,00,000", closedLoans: 400, closedLoanAmount: "₹25,00,000", closedRepaymentAmount: "₹25,00,000", collection: "93 %" },
-    { srNo: 6, month: "Jun 2025", caseCount: 550, sanctionedAmount: "₹31,50,000", repaymentAmount: "₹26,00,000", closedLoans: 420, closedLoanAmount: "₹26,00,000", closedRepaymentAmount: "₹26,00,000", collection: "95 %" },
-    { srNo: 7, month: "Jul 2025", caseCount: 570, sanctionedAmount: "₹33,00,000", repaymentAmount: "₹27,00,000", closedLoans: 440, closedLoanAmount: "₹27,00,000", closedRepaymentAmount: "₹27,00,000", collection: "65 %" },
-    { srNo: 8, month: "Aug 2025", caseCount: 600, sanctionedAmount: "₹34,50,000", repaymentAmount: "₹28,00,000", closedLoans: 460, closedLoanAmount: "₹28,00,000", closedRepaymentAmount: "₹28,00,000", collection: "97 %" },
-    { srNo: 9, month: "Sep 2025", caseCount: 620, sanctionedAmount: "₹36,00,000", repaymentAmount: "₹29,00,000", closedLoans: 480, closedLoanAmount: "₹29,00,000", closedRepaymentAmount: "₹29,00,000", collection: "98 %" },
-    { srNo: 10, month: "Oct 2025", caseCount: 640, sanctionedAmount: "₹37,50,000", repaymentAmount: "₹30,00,000", closedLoans: 500, closedLoanAmount: "₹30,00,000", closedRepaymentAmount: "₹30,00,000", collection: "99 %" },
+    { srNo: 1, month: "Jan 2025", caseCount: 420, sanctionedAmount: "BHD 24,00,000", repaymentAmount: "BHD 20,00,000", closedLoans: 320, closedLoanAmount: "BHD 21,00,000", closedRepaymentAmount: "BHD 21,00,000", collection: "86 %" },
+    { srNo: 2, month: "Feb 2025", caseCount: 450, sanctionedAmount: "BHD 25,50,000", repaymentAmount: "BHD 21,50,000", closedLoans: 340, closedLoanAmount: "BHD 22,50,000", closedRepaymentAmount: "BHD 22,50,000", collection: "88 %" },
+    { srNo: 3, month: "Mar 2025", caseCount: 480, sanctionedAmount: "BHD 27,00,000", repaymentAmount: "BHD 23,00,000", closedLoans: 360, closedLoanAmount: "BHD 23,00,000", closedRepaymentAmount: "BHD 23,00,000", collection: "80 %" },
+    { srNo: 4, month: "Apr 2025", caseCount: 500, sanctionedAmount: "BHD 28,50,000", repaymentAmount: "BHD 24,00,000", closedLoans: 380, closedLoanAmount: "BHD 24,50,000", closedRepaymentAmount: "BHD 24,50,000", collection: "92 %" },
+    { srNo: 5, month: "May 2025", caseCount: 520, sanctionedAmount: "BHD 30,00,000", repaymentAmount: "BHD 25,00,000", closedLoans: 400, closedLoanAmount: "BHD 25,00,000", closedRepaymentAmount: "BHD 25,00,000", collection: "93 %" },
+    { srNo: 6, month: "Jun 2025", caseCount: 550, sanctionedAmount: "BHD 31,50,000", repaymentAmount: "BHD 26,00,000", closedLoans: 420, closedLoanAmount: "BHD 26,00,000", closedRepaymentAmount: "BHD 26,00,000", collection: "95 %" },
+    { srNo: 7, month: "Jul 2025", caseCount: 570, sanctionedAmount: "BHD 33,00,000", repaymentAmount: "BHD 27,00,000", closedLoans: 440, closedLoanAmount: "BHD 27,00,000", closedRepaymentAmount: "BHD 27,00,000", collection: "65 %" },
+    { srNo: 8, month: "Aug 2025", caseCount: 600, sanctionedAmount: "BHD 34,50,000", repaymentAmount: "BHD 28,00,000", closedLoans: 460, closedLoanAmount: "BHD 28,00,000", closedRepaymentAmount: "BHD 28,00,000", collection: "97 %" },
+    { srNo: 9, month: "Sep 2025", caseCount: 620, sanctionedAmount: "BHD 36,00,000", repaymentAmount: "BHD 29,00,000", closedLoans: 480, closedLoanAmount: "BHD 29,00,000", closedRepaymentAmount: "BHD 29,00,000", collection: "98 %" },
+    { srNo: 10, month: "Oct 2025", caseCount: 640, sanctionedAmount: "BHD 37,50,000", repaymentAmount: "BHD 30,00,000", closedLoans: 500, closedLoanAmount: "BHD 30,00,000", closedRepaymentAmount: "BHD 30,00,000", collection: "99 %" },
   ];
 
   if (!isOpen) {

@@ -141,7 +141,7 @@ export function SectionStatusUpdate({
               <p>
                 Loan Amount By Credit Executive:{" "}
                 <span className="font-semibold text-[var(--color-on-background)]">
-                  ₹{loan?.amount || "N/A"}
+                  BHD{loan?.amount || "N/A"}
                 </span>
               </p>
               <p>
@@ -206,7 +206,7 @@ export function SectionStatusUpdate({
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[var(--color-on-surface)] opacity-70 text-sm">
-                    ₹
+                    BHD
                   </span>
                   <input
                     type="number"
@@ -415,7 +415,7 @@ export function SectionStatusUpdate({
                 const formattedDate = approvedDueDate
                   ? dayjs(approvedDueDate).format("DD-MM-YY")
                   : "";
-                return `Approve Loan ₹${approvedLoanAmount} - Due Date ${formattedDate} - Rule: ${selectedRuleType || "Default"}`;
+                return `Approve Loan BHD${approvedLoanAmount} - Due Date ${formattedDate} - Rule: ${selectedRuleType || "Default"}`;
               })()
             ) : (
               "Confirm Rejection"

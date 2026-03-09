@@ -755,7 +755,7 @@ export function CustomerLoans(
                             const penaltyAmount = getPenaltyPaid(loan);
                             return penaltyAmount !== null ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-xl text-[13px] font-semibold bg-orange-100 text-orange-700 border-orange-200 whitespace-nowrap">
-                                ₹{penaltyAmount.toLocaleString()}
+                                BHD{penaltyAmount.toLocaleString()}
                               </span>
                             ) : (
                               <span className="text-slate-300">—</span>
@@ -950,7 +950,7 @@ export function CustomerLoans(
                                             Principal
                                           </span>
                                           <span className="font-bold text-[var(--color-on-background)]">
-                                            ₹
+                                            BHD
                                             {loan.amount.toLocaleString()}
                                           </span>
                                         </div>
@@ -961,7 +961,7 @@ export function CustomerLoans(
                                             Obligation
                                           </span>
                                           <span className="font-bold text-[var(--color-on-error)]">
-                                            ₹
+                                            BHD
                                             {loan.repayment.totalObligation.toLocaleString()}
                                           </span>
                                         </div>
@@ -972,7 +972,7 @@ export function CustomerLoans(
                                             Fees
                                           </span>
                                           <span className="font-bold text-[var(--color-on-warning)]">
-                                            ₹
+                                            BHD
                                             {loan.repayment.totalFees.toLocaleString()}
                                           </span>
                                         </div>
@@ -983,7 +983,7 @@ export function CustomerLoans(
                                             Taxes
                                           </span>
                                           <span className="font-bold text-[var(--color-on-secondary)]">
-                                            ₹
+                                            BHD
                                             {loan.costSummary.totalTaxes.toLocaleString()}
                                           </span>
                                         </div>
@@ -1008,7 +1008,7 @@ export function CustomerLoans(
                                               Gross
                                             </span>
                                             <span className="font-bold text-[var(--color-on-background)]">
-                                              ₹
+                                              BHD
                                               {(
                                                 loan.disbursement
                                                   ?.grossAmount ?? 0
@@ -1020,7 +1020,7 @@ export function CustomerLoans(
                                               Net
                                             </span>
                                             <span className="font-bold text-[var(--color-on-success)]">
-                                              ₹
+                                              BHD
                                               {(
                                                 loan.disbursement?.netAmount ??
                                                 0
@@ -1140,17 +1140,17 @@ export function CustomerLoans(
                                                     {fee.type}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-[var(--color-on-surface)] opacity-70">
-                                                    ₹
+                                                    BHD
                                                     {fee.calculationBaseAmount?.toLocaleString() &&
                                                       fee.calculationBaseAmount?.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-[var(--color-on-surface)] opacity-70">
-                                                    ₹
+                                                    BHD
                                                     {fee.calculationTaxAmount &&
                                                       fee.calculationTaxAmount?.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-[var(--color-on-background)]">
-                                                    ₹
+                                                    BHD
                                                     {fee.total &&
                                                       fee.total?.toLocaleString()}
                                                   </td>
@@ -1187,11 +1187,11 @@ export function CustomerLoans(
                                             </div>
                                             <div className="flex justify-between text-[11px]">
                                               <span className="text-red-600">
-                                                ₹
+                                                BHD
                                                 {penalty.chargeValue.toLocaleString()}
                                               </span>
                                               <span className="text-red-500">
-                                                +Tax: ₹
+                                                +Tax: BHD
                                                 {penalty.taxChargeValue.toLocaleString()}
                                               </span>
                                             </div>
@@ -1238,21 +1238,21 @@ export function CustomerLoans(
                                                     {d.type}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
-                                                    ₹
+                                                    BHD
                                                     {(
                                                       d.calculationBaseAmount ??
                                                       0
                                                     ).toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
-                                                    ₹
+                                                    BHD
                                                     {(
                                                       d.calculationTaxAmount ??
                                                       0
                                                     ).toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-slate-800">
-                                                    ₹
+                                                    BHD
                                                     {(
                                                       d.total ?? 0
                                                     ).toLocaleString()}
@@ -1555,7 +1555,7 @@ export function CustomerLoans(
                                                     {partner.partnerUser.email}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-emerald-600">
-                                                    ₹
+                                                    BHD
                                                     {partner.amount.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
