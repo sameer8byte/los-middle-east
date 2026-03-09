@@ -142,10 +142,10 @@ export interface AUMData {
 export default function FirstSection({ data }: { data?: AUMData }) {
     // Mock Dynamic Data fallback (values in numbers for proper formatting)
     const rawData = data ?? {
-        totalLoansDueAmount: 148000000,  // ₹14.8 Cr
-        totalAmountCollected: 32400000,  // ₹3.24 Cr
+        totalLoansDueAmount: 148000000,  // BHD 14.8 Cr
+        totalAmountCollected: 32400000,  // BHD 3.24 Cr
         totalAmountOutstanding: "82%",
-        postDueAmount: 12000000,  // ₹1.2 Cr
+        postDueAmount: 12000000,  // BHD 1.2 Cr
         totalLoansIssued: 300,
         ongoingLoans: 224,
         closedLoans: 76,

@@ -77,7 +77,7 @@ export const ConversionPerformance = () => {
             />
           </svg>
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-            <div className="text-xl font-bold text-gray-900">₹{conversionData.totalDue} Cr</div>
+            <div className="text-xl font-bold text-gray-900">BHD {conversionData.totalDue} Cr</div>
             <div className="text-xs text-gray-600">Total Due</div>
           </div>
         </div>
@@ -90,21 +90,21 @@ export const ConversionPerformance = () => {
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }}></div>
               <span className="text-xs text-gray-600">Collected</span>
             </div>
-            <p className="text-sm font-bold text-gray-900">{conversionData.collected.percentage} % | ₹{conversionData.collected.amount} Cr</p>
+            <p className="text-sm font-bold text-gray-900">{conversionData.collected.percentage} % | BHD {conversionData.collected.amount} Cr</p>
           </div>
           <div>
             <div className="flex items-center justify-center gap-1 mb-1">
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EC4899' }}></div>
               <span className="text-xs text-gray-600">Pending</span>
             </div>
-            <p className="text-sm font-bold text-gray-900">{conversionData.pending.percentage} % | ₹{conversionData.pending.amount} Cr</p>
+            <p className="text-sm font-bold text-gray-900">{conversionData.pending.percentage} % | BHD {conversionData.pending.amount} Cr</p>
           </div>
           <div>
             <div className="flex items-center justify-center gap-1 mb-1">
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EAB308' }}></div>
               <span className="text-xs text-gray-600">Overdue</span>
             </div>
-            <p className="text-sm font-bold text-gray-900">{conversionData.overdue.percentage} % | ₹{conversionData.overdue.amount} Cr</p>
+            <p className="text-sm font-bold text-gray-900">{conversionData.overdue.percentage} % | BHD {conversionData.overdue.amount} Cr</p>
           </div>
         </div>
       </div>

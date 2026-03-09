@@ -83,10 +83,10 @@ const getDefaultTemplates = (reminderType: ReminderType) => {
       subject: "Payment Reminder - 7 days remaining for {{customerName}}",
       body: `Hi {{customerName}},
 
-This is a friendly reminder that your loan payment of ₹{{amountDue}} is due in 7 days on {{dueDate}}.
+This is a friendly reminder that your loan payment of BHD {{amountDue}} is due in 7 days on {{dueDate}}.
 
 Loan ID: {{loanId}}
-Due Amount: ₹{{amountDue}}
+Due Amount: BHD {{amountDue}}
 Due Date: {{dueDate}}
 
 Please ensure timely payment to avoid any late fees.
@@ -97,10 +97,10 @@ Thank you!`
       subject: "Payment Reminder - 3 days remaining for {{customerName}}",
       body: `Hi {{customerName}},
 
-Your loan payment of ₹{{amountDue}} is due in 3 days on {{dueDate}}.
+Your loan payment of BHD {{amountDue}} is due in 3 days on {{dueDate}}.
 
 Loan ID: {{loanId}}
-Due Amount: ₹{{amountDue}}
+Due Amount: BHD {{amountDue}}
 Due Date: {{dueDate}}
 
 Please make the payment soon to avoid late charges.
@@ -111,10 +111,10 @@ Thank you!`
       subject: "Urgent: Payment due tomorrow for {{customerName}}",
       body: `Hi {{customerName}},
 
-This is an urgent reminder that your loan payment of ₹{{amountDue}} is due tomorrow ({{dueDate}}).
+This is an urgent reminder that your loan payment of BHD {{amountDue}} is due tomorrow ({{dueDate}}).
 
 Loan ID: {{loanId}}
-Due Amount: ₹{{amountDue}}
+Due Amount: BHD {{amountDue}}
 Due Date: {{dueDate}}
 
 Please make the payment immediately to avoid late fees.
@@ -125,10 +125,10 @@ Thank you!`
       subject: "URGENT: Payment Due TODAY for {{customerName}}",
       body: `Hi {{customerName}},
 
-This is an urgent reminder that your loan payment of ₹{{amountDue}} is due TODAY ({{dueDate}}).
+This is an urgent reminder that your loan payment of BHD {{amountDue}} is due TODAY ({{dueDate}}).
 
 Loan ID: {{loanId}}
-Due Amount: ₹{{amountDue}}
+Due Amount: BHD {{amountDue}}
 Due Date: {{dueDate}}
 
 Please make the payment immediately to avoid late payment penalties.
@@ -139,10 +139,10 @@ Thank you!`
       subject: "Overdue Payment Notice for {{customerName}}",
       body: `Hi {{customerName}},
 
-Your loan payment of ₹{{amountDue}} was due on {{dueDate}} and is now overdue.
+Your loan payment of BHD {{amountDue}} was due on {{dueDate}} and is now overdue.
 
 Loan ID: {{loanId}}
-Due Amount: ₹{{amountDue}}
+Due Amount: BHD {{amountDue}}
 Due Date: {{dueDate}}
 
 Please make the payment immediately to avoid additional charges and maintain your credit record.
@@ -156,7 +156,7 @@ Thank you!`
 This is a reminder regarding your loan payment.
 
 Loan ID: {{loanId}}
-Due Amount: ₹{{amountDue}}
+Due Amount: BHD {{amountDue}}
 Due Date: {{dueDate}}
 
 Please make the payment as scheduled.

@@ -193,7 +193,7 @@ export function LoanRepaymentDetails() {
                       Loan Amount
                     </p>
                     <h2 className="text-2xl font-bold">
-                      ₹{loanDetails.amount?.toLocaleString()}
+                      BHD{loanDetails.amount?.toLocaleString()}
                     </h2>
                   </div>
                 </div>
@@ -263,7 +263,7 @@ export function LoanRepaymentDetails() {
                     Amount
                   </p>
                   <p className="font-medium text-[var(--color-on-background)] text-xs">
-                    ₹{loanDetails.amount?.toLocaleString()}
+                    BHD{loanDetails.amount?.toLocaleString()}
                   </p>
                 </div>
                 <div className="bg-[var(--color-background)] rounded p-2 border border-[var(--color-muted)]/50">
@@ -322,7 +322,7 @@ export function LoanRepaymentDetails() {
                           Principal
                         </p>
                         <p className="font-semibold text-[var(--color-on-background)] text-sm">
-                          ₹{loanDetails.amount?.toLocaleString()}
+                          BHD{loanDetails.amount?.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-[var(--color-background)] rounded-lg p-2.5 border border-[var(--color-muted)]/30">
@@ -367,7 +367,7 @@ export function LoanRepaymentDetails() {
                             Total Obligation
                           </p>
                           <p className="text-lg font-bold text-[var(--color-primary)]">
-                            ₹
+                            BHD
                             {loanDetails.repayment.totalObligation?.toLocaleString()}
                           </p>
                         </div>
@@ -376,7 +376,7 @@ export function LoanRepaymentDetails() {
                             Total Fees
                           </p>
                           <p className="text-lg font-semibold text-[var(--color-on-background)]">
-                            ₹{loanDetails.repayment.totalFees?.toLocaleString()}
+                            BHD{loanDetails.repayment.totalFees?.toLocaleString()}
                           </p>
                         </div>
                         {loanDetails.costSummary && (
@@ -386,7 +386,7 @@ export function LoanRepaymentDetails() {
                                 Total Taxes
                               </p>
                               <p className="text-lg font-semibold text-[var(--color-on-background)]">
-                                ₹
+                                BHD
                                 {loanDetails.costSummary.totalTaxes?.toLocaleString()}
                               </p>
                             </div>
@@ -461,13 +461,13 @@ export function LoanRepaymentDetails() {
                                           <span>Rate: {fee.chargeValue}%</span>
                                           <span>•</span>
                                           <span>
-                                            Base: ₹
+                                            Base: BHD
                                             {fee.calculationBaseAmount?.toLocaleString()}
                                           </span>
                                         </div>
                                       </div>
                                       <span className="font-bold text-[var(--color-on-background)] text-base">
-                                        ₹{fee.total?.toLocaleString()}
+                                        BHD{fee.total?.toLocaleString()}
                                       </span>
                                     </div>
                                     {fee.taxes && fee.taxes.length > 0 && (
@@ -487,7 +487,7 @@ export function LoanRepaymentDetails() {
                                               )}
                                             </span>
                                             <span className="text-[var(--color-on-background)] font-medium">
-                                              ₹{tax.amount?.toLocaleString()}
+                                              BHD{tax.amount?.toLocaleString()}
                                             </span>
                                           </div>
                                         ))}
@@ -536,7 +536,7 @@ export function LoanRepaymentDetails() {
                           Daily Discount Rate
                         </p>
                         <p className="text-2xl font-bold text-[var(--color-success)]">
-                          ₹
+                          BHD
                           {loanDetails.earlyRepayment.totalAmount?.toLocaleString()}
                         </p>
                         <p className="text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
@@ -648,7 +648,7 @@ export function LoanRepaymentDetails() {
                         Gross Amount
                       </p>
                       <p className="text-lg font-semibold text-[var(--color-on-background)]">
-                        ₹
+                        BHD
                         {loanDetails.disbursement.grossAmount?.toLocaleString()}
                       </p>
                     </div>
@@ -657,7 +657,7 @@ export function LoanRepaymentDetails() {
                         Net Disbursed
                       </p>
                       <p className="text-lg font-bold text-[var(--color-success)]">
-                        ₹{loanDetails.disbursement.netAmount?.toLocaleString()}
+                        BHD{loanDetails.disbursement.netAmount?.toLocaleString()}
                       </p>
                     </div>
                     <div className="bg-[var(--color-error)]/5 rounded-lg p-3 border border-[var(--color-error)]/30 text-center">
@@ -665,7 +665,7 @@ export function LoanRepaymentDetails() {
                         Total Deducted
                       </p>
                       <p className="text-lg font-bold text-[var(--color-error)]">
-                        -₹
+                        -BHD
                         {loanDetails.disbursement.totalDeductions?.toLocaleString()}
                       </p>
                     </div>
@@ -729,13 +729,13 @@ export function LoanRepaymentDetails() {
                                       </span>
                                       <span>•</span>
                                       <span>
-                                        Base: ₹
+                                        Base: BHD
                                         {deduction.calculationBaseAmount?.toLocaleString()}
                                       </span>
                                     </div>
                                   </div>
                                   <span className="font-bold text-[var(--color-error)] text-base">
-                                    -₹{deduction.total?.toLocaleString()}
+                                    -BHD{deduction.total?.toLocaleString()}
                                   </span>
                                 </div>
                                 {deduction.taxes &&
@@ -756,7 +756,7 @@ export function LoanRepaymentDetails() {
                                             )}
                                           </span>
                                           <span className="text-[var(--color-on-background)] font-medium">
-                                            ₹{tax.amount?.toLocaleString()}
+                                            BHD{tax.amount?.toLocaleString()}
                                           </span>
                                         </div>
                                       ))}

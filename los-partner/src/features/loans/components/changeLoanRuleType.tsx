@@ -297,7 +297,7 @@ export function ChangeLoanRuleType({
     if (valueType === "percentage" || valueType === "PERCENTAGE") {
       return `${value}%`;
     }
-    return `₹${value.toLocaleString("en-IN")}`;
+    return `BHD ${value.toLocaleString("en-IN")}`;
   };
 
   return (
@@ -403,7 +403,7 @@ export function ChangeLoanRuleType({
                         Loan Amount
                       </p>
                       <p className="text-gray-900 font-semibold">
-                        ₹{loan.amount?.toLocaleString("en-IN")}
+                        BHD {loan.amount?.toLocaleString("en-IN")}
                       </p>
                     </div>
                     <div className="border-l-2 border-green-400 pl-3">
@@ -560,7 +560,7 @@ export function ChangeLoanRuleType({
                           Total Obligation
                         </p>
                         <p className="text-green-700 font-semibold">
-                          ₹
+                          BHD 
                           {loan.repayment.totalObligation?.toLocaleString(
                             "en-IN"
                           ) || "0"}
@@ -571,7 +571,7 @@ export function ChangeLoanRuleType({
                           Total Fees
                         </p>
                         <p className="text-green-700 font-semibold">
-                          ₹
+                          BHD 
                           {loan.repayment.totalFees?.toLocaleString("en-IN") ||
                             "0"}
                         </p>
@@ -594,7 +594,7 @@ export function ChangeLoanRuleType({
                                   {fee.type}
                                 </span>
                                 <span className="font-semibold text-gray-900">
-                                  ₹{fee.total?.toLocaleString("en-IN") || "0"}
+                                  BHD {fee.total?.toLocaleString("en-IN") || "0"}
                                 </span>
                               </div>
                               {fee.taxes && fee.taxes.length > 0 && (
@@ -606,7 +606,7 @@ export function ChangeLoanRuleType({
                                     >
                                       <span>{tax.type}</span>
                                       <span>
-                                        ₹
+                                        BHD 
                                         {tax.amount?.toLocaleString("en-IN") ||
                                           "0"}
                                       </span>
@@ -643,7 +643,7 @@ export function ChangeLoanRuleType({
                           Gross Amount
                         </p>
                         <p className="text-green-700 font-semibold text-sm">
-                          ₹
+                          BHD 
                           {loan.disbursement.grossAmount?.toLocaleString(
                             "en-IN"
                           ) || "0"}
@@ -654,7 +654,7 @@ export function ChangeLoanRuleType({
                           Net Amount
                         </p>
                         <p className="text-blue-700 font-semibold text-sm">
-                          ₹
+                          BHD 
                           {loan.disbursement.netAmount?.toLocaleString(
                             "en-IN"
                           ) || "0"}
@@ -665,7 +665,7 @@ export function ChangeLoanRuleType({
                           Deductions
                         </p>
                         <p className="text-red-700 font-semibold text-sm">
-                          ₹
+                          BHD 
                           {loan.disbursement.totalDeductions?.toLocaleString(
                             "en-IN"
                           ) || "0"}
@@ -690,7 +690,7 @@ export function ChangeLoanRuleType({
                                     {deduction.type}
                                   </span>
                                   <span className="font-semibold text-red-700">
-                                    -₹
+                                    -BHD 
                                     {deduction.total?.toLocaleString("en-IN") ||
                                       "0"}
                                   </span>
@@ -728,7 +728,7 @@ export function ChangeLoanRuleType({
                           Daily Savings
                         </p>
                         <p className="text-lg font-bold text-green-700">
-                          ₹
+                          BHD 
                           {loan.earlyRepayment.totalAmount?.toLocaleString(
                             "en-IN"
                           ) || "0"}
@@ -927,7 +927,7 @@ export function ChangeLoanRuleType({
                 <div>
                   <span className="text-gray-600">Amount:</span>
                   <span className="ml-2 font-semibold">
-                    ₹{loan.amount?.toLocaleString("en-IN")}
+                    BHD {loan.amount?.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <div>

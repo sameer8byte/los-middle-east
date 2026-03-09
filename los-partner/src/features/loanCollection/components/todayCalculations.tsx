@@ -46,7 +46,7 @@ export interface PartialRepaymentCalculationResponse {
 
 // Currency formatter
 const formatCurrency = (value: number | string) =>
-  `₹${Number(value || 0).toLocaleString("en-IN", {
+  `BHD ${Number(value || 0).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

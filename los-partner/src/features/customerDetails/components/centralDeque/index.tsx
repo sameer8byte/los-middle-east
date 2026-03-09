@@ -307,7 +307,7 @@ const StatusFilter = ({
 // Field Display Component for showing all data in a modal
 const LeadDetailsModal = ({ lead, onClose }: { lead: any, onClose: () => void }) => {
   const formatCurrency = (amount: number) => {
-    if (!amount) return "₹ 0";
+    if (!amount) return "BHD 0";
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
@@ -580,7 +580,7 @@ export function CentralDqueueComponent() {
   };
 
   const formatCurrency = (amount: number) => {
-    if (!amount) return "₹ 0";
+    if (!amount) return "BHD 0";
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',

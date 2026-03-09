@@ -1182,7 +1182,7 @@ export function CustomerBankAccounts() {
                                                 Avg Balance
                                               </p>
                                               <p className="text-base font-bold text-slate-800">
-                                                ₹
+                                                BHD
                                                 {(
                                                   bsaReports[statement.id].data
                                                     ?.accountSummary
@@ -1295,7 +1295,7 @@ export function CustomerBankAccounts() {
                                                   ?.chequeBounce?.inwardBounces
                                                   ?.count || 0}
                                                 <span className="text-xs font-normal ml-1">
-                                                  (₹
+                                                  (BHD
                                                   {(
                                                     bsaReports[statement.id]
                                                       .data?.chequeBounce
@@ -1331,7 +1331,7 @@ export function CustomerBankAccounts() {
                                                   ?.chequeBounce?.outwardBounces
                                                   ?.count || 0}
                                                 <span className="text-xs font-normal ml-1">
-                                                  (₹
+                                                  (BHD
                                                   {(
                                                     bsaReports[statement.id]
                                                       .data?.chequeBounce
@@ -1415,7 +1415,7 @@ export function CustomerBankAccounts() {
                                                   ?.emiDetails?.emiBounces
                                                   ?.count || 0}
                                                 <span className="text-xs font-normal ml-1">
-                                                  (₹
+                                                  (BHD
                                                   {(
                                                     bsaReports[statement.id]
                                                       .data?.emiDetails
@@ -1554,7 +1554,7 @@ export function CustomerBankAccounts() {
                                                     : "text-gray-800"
                                                 }`}
                                               >
-                                                ₹
+                                                BHD
                                                 {(
                                                   bsaReports[statement.id].data
                                                     ?.salaryCredits
@@ -1740,7 +1740,7 @@ export function CustomerBankAccounts() {
                                                     : "text-emerald-900"
                                                 }`}
                                               >
-                                                ₹
+                                                BHD
                                                 {(
                                                   bsaReports[statement.id].data
                                                     ?.penalCharges

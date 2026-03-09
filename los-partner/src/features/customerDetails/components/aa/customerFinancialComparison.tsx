@@ -91,7 +91,7 @@ export const CustomerFinancialComparison: React.FC<
   // Format currency
   const formatCurrency = (amount: number | string) => {
     const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
-    if (isNaN(numAmount)) return "₹0.00";
+    if (isNaN(numAmount)) return "BHD0.00";
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",

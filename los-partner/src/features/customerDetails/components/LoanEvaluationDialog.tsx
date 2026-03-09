@@ -161,7 +161,7 @@ export function LoanEvaluationDialog({ isOpen, onClose }: Readonly<LoanEvaluatio
                   <option value="">Select a loan...</option>
                   {loans.map((loan) => (
                     <option key={loan.id} value={loan.formattedLoanId}>
-                      {loan.formattedLoanId} - ₹{loan.amount?.toLocaleString()} ({loan.status.replace(/_/g, " ")})
+                      {loan.formattedLoanId} - BHD{loan.amount?.toLocaleString()} ({loan.status.replace(/_/g, " ")})
                     </option>
                   ))}
                 </select>
@@ -253,7 +253,7 @@ export function LoanEvaluationDialog({ isOpen, onClose }: Readonly<LoanEvaluatio
                 </div>
                 <div className="bg-gray-50 rounded p-2 border border-gray-100">
                   <p className="text-[10px] text-[var(--color-on-surface)] opacity-60 mb-0.5">Amount</p>
-                  <p className="font-medium text-[var(--color-on-background)] text-xs">₹{loanData.amount?.toLocaleString()}</p>
+                  <p className="font-medium text-[var(--color-on-background)] text-xs">BHD{loanData.amount?.toLocaleString()}</p>
                 </div>
                 <div className="bg-gray-50 rounded p-2 border border-gray-100">
                   <p className="text-[10px] text-[var(--color-on-surface)] opacity-60 mb-0.5">Purpose</p>

@@ -821,9 +821,9 @@ export function EvaluationV2Component({
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={item.actualValue.startsWith("₹")
+                                  value={item.actualValue.startsWith("BHD")
                                     ? Conversion.formatCurrency(
-                                      Number(item.actualValue.replace(/₹\s?|,/g, ""))
+                                      Number(item.actualValue.replace(/BHD\s?|,/g, ""))
                                     )
                                     : item.actualValue}
                                   onChange={(e) =>
@@ -839,9 +839,9 @@ export function EvaluationV2Component({
                                 {/* Tooltip that shows only on input hover */}
                                 <div className="absolute invisible opacity-0 peer-hover:visible peer-hover:opacity-100 transition-all duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
                                   <div className="bg-gray-900 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap max-w-xs break-words">
-                                    {item.actualValue.startsWith("₹")
+                                    {item.actualValue.startsWith("BHD")
                                       ? Conversion.formatCurrency(
-                                        Number(item.actualValue.replace(/₹\s?|,/g, ""))
+                                        Number(item.actualValue.replace(/BHD\s?|,/g, ""))
                                       )
                                       : item.actualValue || "No value"}
                                     {/* Tooltip arrow */}

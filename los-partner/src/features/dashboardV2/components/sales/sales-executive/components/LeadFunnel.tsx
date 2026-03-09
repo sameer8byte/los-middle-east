@@ -122,22 +122,22 @@ const LeadFunnel = ({ data, loading, error }: LeadFunnelProps = {}) => {
             </div>
             <div className="grid grid-cols-4 gap-2 lg:gap-4 mt-4">
                 <DetailsCard 
-                    amount={data?.totalSanctioned ?? "₹3.8 Cr"}
+                    amount={data?.totalSanctioned ?? "BHD 3.8 Cr"}
                     title="Total Amount Sanctioned"
                     borderColor="#6366F1"
                 />
                 <DetailsCard 
-                    amount={data?.amountDisbursed ?? "₹3.1 Cr"}
+                    amount={data?.amountDisbursed ?? "BHD 3.1 Cr"}
                     title="Amount Disbursed"
                     borderColor="#22C55E"
                 />
                 <DetailsCard 
-                    amount={data?.pendingAmount ?? "₹0.52 Cr"}
+                    amount={data?.pendingAmount ?? "BHD 0.52 Cr"}
                     title="Pending For Disbursal"
                     borderColor="#F59E0B"
                 />
                 <DetailsCard 
-                    amount={data?.avgTicketSize ?? "₹46,300"}
+                    amount={data?.avgTicketSize ?? "BHD 46,300"}
                     title="Avg Loan Ticket Size"
                     borderColor="#8B5CF6"
                 />

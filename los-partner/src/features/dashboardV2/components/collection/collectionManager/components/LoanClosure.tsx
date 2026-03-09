@@ -80,9 +80,9 @@ export const LoanClosure = () => {
   // 🔴 API INTEGRATION: Replace above with: const smallCards = [{ value: data.stats.activeLoans, label: "Active Loans" }, ...]
 
   const closureCards = [
-    { amount: "₹9 L", title: "Pre Closure", borderColor: "#8B5CF6" },
-    { amount: "₹15 L", title: "On Time Closure", borderColor: "#10B981" },
-    { amount: "₹8 L", title: "Post Due (Current Due + Penalty)", borderColor: "#EF4444" },
+    { amount: "BHD 9 L", title: "Pre Closure", borderColor: "#8B5CF6" },
+    { amount: "BHD 15 L", title: "On Time Closure", borderColor: "#10B981" },
+    { amount: "BHD 8 L", title: "Post Due (Current Due + Penalty)", borderColor: "#EF4444" },
   ];
   // 🔴 API INTEGRATION: Replace above with: const closureCards = data.closureAmounts.map((item, idx) => ({ ...item, borderColor: colors[idx] }));
 
@@ -119,7 +119,7 @@ export const LoanClosure = () => {
         {/* Total Cases Closed */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">Total Cases Closed : <span className="font-bold text-gray-900">120/300 | ₹32 L</span></span>
+            <span className="text-sm text-gray-600">Total Cases Closed : <span className="font-bold text-gray-900">120/300 | BHD 32 L</span></span>
           </div>
           
           {/* Progress Bar */}

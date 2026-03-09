@@ -99,7 +99,7 @@ export function UsersByCompanyCard({ query, loading: parentLoading }: UsersByCom
                     {percentage}%
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium text-gray-900">
-                    {company.averageSalary > 0 ? formatCurrency(company.averageSalary).replace('₹', '₹').slice(0, -3) + 'K' : '-'}
+                    {company.averageSalary > 0 ? formatCurrency(company.averageSalary).replace('BHD', 'BHD').slice(0, -3) + 'K' : '-'}
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-center text-sm text-gray-900">
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
