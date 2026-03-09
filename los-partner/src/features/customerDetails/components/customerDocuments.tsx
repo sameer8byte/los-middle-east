@@ -56,6 +56,7 @@ import { Button } from "../../../common/ui/button";
 import { GenerateAadhaarLink } from "./generateAddharLink";
 import { FiLink, FiShield } from "react-icons/fi";
 import { ensureS3Url } from "../../../constant/s3Config";
+import { Conversion } from "../../../utils/conversion";
 
 export type DocumentsData = {
   accountStatements: BankStatement[];
@@ -1339,7 +1340,7 @@ export function CustomerDocuments() {
                 htmlFor="aadhaar-last-four"
                 className="block text-sm font-medium text-[var(--on-background)]"
               >
-                Aadhaar Number
+                CPR
               </label>
               <div className="flex items-center gap-2">
                 <span className="text-lg font-mono text-[var(--on-surface)] opacity-60 px-3 py-2 bg-[var(--surface)] rounded-lg border">
@@ -1439,7 +1440,7 @@ export function CustomerDocuments() {
                 htmlFor="pan-number"
                 className="block text-sm font-medium text-[var(--on-background)]"
               >
-                PAN Number
+                CPR Validation
               </label>
               <input
                 id="pan-number"
@@ -1475,7 +1476,7 @@ export function CustomerDocuments() {
               {isVerifyingPan && (
                 <div className="flex items-center gap-2 text-sm text-[var(--primary)] bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
                   <TbLoader2 className="w-4 h-4 animate-spin" />
-                  <span>Verifying PAN with fallback providers...</span>
+                  <span>CPR Validation with fallback providers...</span>
                 </div>
               )}
             </div>
@@ -1583,7 +1584,7 @@ export function CustomerDocuments() {
                     Verifying...
                   </>
                 ) : (
-                  "Verify PAN"
+                  "Verify CPR Validation"
                 )}
               </Button>
             </div>
@@ -1685,7 +1686,7 @@ export function CustomerDocuments() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-red-900 mb-1">
-                    Aadhaar Verification Required
+                    CPR Required
                   </h3>
                   <p className="text-sm text-red-700 mb-3">
                     Complete CPR Card verification to proceed with the loan
@@ -1714,10 +1715,10 @@ export function CustomerDocuments() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-orange-900 mb-1">
-                    PAN Document Required
+                    CPR Validation Required
                   </h3>
                   <p className="text-sm text-orange-700 mb-3">
-                    Upload and verify your PAN document to complete the
+                    Upload and verify your CPR document to complete the
                     verification process.
                   </p>
                   {canEdit ? (
@@ -1731,7 +1732,7 @@ export function CustomerDocuments() {
                       className="border-orange-300 text-orange-700 hover:bg-orange-100"
                     >
                       <TbShieldCheck className="w-3 h-3 mr-1" />
-                      Verify PAN
+                      Verify CPR Validation
                     </Button>
                   ) : (
                     <div className="text-xs text-orange-600 opacity-75">
@@ -2318,7 +2319,7 @@ function DocumentCard({
           {iconMap[type as keyof typeof iconMap] || iconMap.default}
           <div>
             <h3 className="text-sm font-medium text-[var(--on-background)]">
-              {title}
+              {Conversion.isValidAadhaar(title)}
             </h3>
             <p className="text-xs text-[var(--on-surface)] opacity-70">
               {renderSubtitle()}

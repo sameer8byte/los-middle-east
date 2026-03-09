@@ -638,7 +638,7 @@ const Sidebar = memo(
                         <h3
                           className="text-[14px] font-normal capitalize leading-[18px] ml-4 mt-2"
                           style={{
-                            fontFamily: "Open Sans",
+                            fontFamily: "Inter",
                             fontWeight: 400,
                             fontSize: "14px",
                             lineHeight: "18px",

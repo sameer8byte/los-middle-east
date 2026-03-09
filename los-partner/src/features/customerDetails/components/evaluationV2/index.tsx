@@ -801,10 +801,10 @@ export function EvaluationV2Component({
                             <td className="px-4 py-2.5">
                               <div>
                                 <div className="font-medium text-gray-900 leading-snug">
-                                  {item.parameter}
+                                  {Conversion.isValidAadhaar(item.parameter)}
                                 </div>
                                 <div className="text-xs text-gray-500 mt-0.5 italic">
-                                  Source: {item.source}
+                                  Source: {Conversion.isValidAadhaar(item.source)}
                                 </div>
                               </div>
                             </td>
