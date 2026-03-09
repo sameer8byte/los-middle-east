@@ -92,5 +92,16 @@ export class Conversion {
         const num = typeof amount === "string" ? Number.parseFloat(amount) : amount;
         return new Intl.NumberFormat(locale).format(num || 0);
     }
+
+    static isValidAadhaar = (name: string): string => {
+        const upperName = name?.toUpperCase() || "";
+        if (upperName.includes("AADHAAR")) {
+            return "CPR";
+        }
+        if (upperName.includes("PAN")) { 
+            return "CPR Validation";
+        }
+        return name;
+    };
 }
 

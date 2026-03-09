@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Dialog from "../../../common/dialog";
+import { Conversion } from "../../../utils/conversion";
 import {
   AddressProofEnum,
   PartnerUserPermissionType,
@@ -79,14 +80,14 @@ function AddressCard({
         >
           <div className="flex justify-between items-start gap-3 mb-2">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium text-primary border border-primary bg-primary/10">
-              {item.type}
+              {Conversion.isValidAadhaar(item.type)}
             </span>
             {item.createdAt && (
               <span className="text-xs text-gray-500 flex items-center gap-1 flex-shrink-0">
                 <svg
                   className="w-3 h-3"
                   fill="none"
-                  stroke="currentColor"
+                  stroke="currentColor" 
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -119,7 +120,7 @@ function AddressCard({
                 />
               </svg>
               <p className="text-xs text-gray-600 leading-relaxed">
-                {item.remarks}
+                {Conversion.isValidAadhaar(item.remarks)}
               </p>
             </div>
           )}
@@ -893,7 +894,7 @@ const IpCheckResults = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xs font-semibold text-black mb-0.5">
-                    PAN Address
+                    CPR Address
                   </h3>
                   <p className="text-sm text-gray-700 truncate">
                     {address.user}
