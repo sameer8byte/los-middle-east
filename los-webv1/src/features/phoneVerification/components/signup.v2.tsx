@@ -479,7 +479,7 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-on-background font-semibold text-sm">
-                          ₹
+                          BHD
                         </span>
                         <input
                           type="text"

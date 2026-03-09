@@ -109,11 +109,11 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
           </div>
         ))}
         {/* Placeholder dots structure */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 mt-4">
+        {/* <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 mt-4">
           <div className="rounded-full bg-gray-300" style={{ width: 20, height: 7 }} />
           <div className="rounded-full bg-gray-300" style={{ width: 7, height: 7 }} />
           <div className="rounded-full bg-gray-300" style={{ width: 7, height: 7 }} />
-        </div>
+        </div> */}
       </div>
     );
   }

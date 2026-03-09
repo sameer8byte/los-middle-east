@@ -218,7 +218,7 @@ export function NotAllowed() {
             <div className="flex justify-between">
               <span>Amount</span>
               <span className="font-bold">
-                ₹{loan.amount?.toLocaleString()}
+                BHD {loan.amount?.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
