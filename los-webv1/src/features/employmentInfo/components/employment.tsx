@@ -276,7 +276,7 @@ const EmploymentInfo = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <motion.div variants={inputVariants}>
                     <label className="block text-sm font-medium text-label mb-2">
-                      Salary (₹)
+                      Salary (BHD)
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

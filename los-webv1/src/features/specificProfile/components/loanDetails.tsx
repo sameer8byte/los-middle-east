@@ -79,7 +79,7 @@ export function LoanDetails() {
                       Loan Amount
                     </p>
                     <h2 className="text-3xl font-bold">
-                      ₹{loanDetails.amount}
+                      BHD {loanDetails.amount}
                     </h2>
                   </div>
                   <div className="text-right">
@@ -152,12 +152,12 @@ export function LoanDetails() {
                   <div className="grid grid-cols-2 gap-4">
                     <HighlightCard
                       label="Total Obligation"
-                      value={`₹${loanDetails?.repayment?.totalObligation}`}
+                      value={`BHD ${loanDetails?.repayment?.totalObligation}`}
                       variant="primary"
                     />
                     <HighlightCard
                       label="Total Fees"
-                      value={`₹${loanDetails?.repayment?.totalFees}`}
+                      value={`BHD ${loanDetails?.repayment?.totalFees}`}
                       variant="secondary"
                     />
                   </div>
@@ -180,7 +180,7 @@ export function LoanDetails() {
             <div className=" grid grid-cols-2 gap-3">
               <ActionCard
                 title="Early Repayment"
-                subtitle={`₹${loanDetails?.earlyRepayment?.totalAmount}/day`}
+                subtitle={`BHD ${loanDetails?.earlyRepayment?.totalAmount}/day`}
                 icon={<FaCheckCircle className="text-green-600" />}
                 bgColor="bg-green-50"
                 textColor="text-green-700"
@@ -193,7 +193,7 @@ export function LoanDetails() {
                     ${
                       penalty.valueType === "percentage"
                         ? `${penalty.chargeValue}%`
-                        : `₹${penalty.chargeValue}`
+                        : `BHD ${penalty.chargeValue}`
                     }
                     `}
                   icon={<FaExclamationTriangle className="text-red-600" />}
@@ -216,7 +216,7 @@ export function LoanDetails() {
                         Gross Amount
                       </span>
                       <span className="text-lg font-bold text-purple-700">
-                        ₹{loanDetails?.disbursement?.grossAmount}
+                        BHD {loanDetails?.disbursement?.grossAmount}
                       </span>
                     </div>
                
@@ -225,7 +225,7 @@ export function LoanDetails() {
                         Total Deductions
                       </span>
                       <span className="text-lg font-bold text-red-600">
-                        -₹{loanDetails?.disbursement?.totalDeductions}
+                        -BHD {loanDetails?.disbursement?.totalDeductions}
                       </span>
                     </div>
 
@@ -235,7 +235,7 @@ export function LoanDetails() {
                           Net Amount
                         </span>
                         <span className="text-xl font-bold text-green-600">
-                          ₹{loanDetails.disbursement?.netAmount}
+                          BHD {loanDetails.disbursement?.netAmount}
                         </span>
                       </div>
                     </div>
@@ -391,7 +391,7 @@ const FeeCard = ({ fee }: { fee: any }) => (
   <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200 hover:bg-gray-100 transition-colors">
     <div className="flex justify-between items-center mb-2">
       <span className="font-semibold text-gray-800">{fee.type}</span>
-      <span className="font-bold text-gray-900">₹{fee.total}</span>
+      <span className="font-bold text-gray-900">BHD {fee.total}</span>
     </div>
     {fee.taxes.length > 0 && (
       <div className="border-t border-gray-200 pt-2 mt-2">
@@ -404,7 +404,7 @@ const FeeCard = ({ fee }: { fee: any }) => (
             <span>
               {tax.type} ({tax.rate}%)
             </span>
-            <span>₹{tax.amount}</span>
+            <span>BHD {tax.amount}</span>
           </div>
         ))}
       </div>
@@ -440,7 +440,7 @@ const DeductionCard = ({ deduction }: { deduction: any }) => (
   <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
     <div className="flex justify-between items-center mb-2">
       <span className="font-semibold text-gray-800">{deduction.type}</span>
-      <span className="font-bold text-gray-900">₹{deduction.total}</span>
+      <span className="font-bold text-gray-900">BHD {deduction.total}</span>
     </div>
     {deduction.taxes.length > 0 && (
       <div className="border-t border-gray-200 pt-2 mt-2">
@@ -456,7 +456,7 @@ const DeductionCard = ({ deduction }: { deduction: any }) => (
                 {tax.isInclusive ? "(Inc.)" : "(Exc.)"}
               </small>
             </span>
-            <span>₹{tax.amount}</span>
+            <span>BHD {tax.amount}</span>
           </div>
         ))}
       </div>

@@ -196,7 +196,7 @@ export function PartialRepaymentDetails({
                   Total Amount Due:
                 </span>
                 <span className="text-xl font-bold text-blue-900">
-                  ₹{paymentDetails.totalAmountDueAtPayment.toLocaleString()}
+                  BHD {paymentDetails.totalAmountDueAtPayment.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -209,7 +209,7 @@ export function PartialRepaymentDetails({
                   Interest:
                 </span>
                 <span className="font-semibold">
-                  ₹{paymentDetails.interestDueAtPayment.toLocaleString()}
+                  BHD {paymentDetails.interestDueAtPayment.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -218,7 +218,7 @@ export function PartialRepaymentDetails({
                   Principal:
                 </span>
                 <span className="font-semibold">
-                  ₹{paymentDetails.principalDueAtPayment.toLocaleString()}
+                  BHD {paymentDetails.principalDueAtPayment.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
@@ -227,7 +227,7 @@ export function PartialRepaymentDetails({
                   Penalty:
                 </span>
                 <span className="font-semibold text-red-600">
-                  ₹{paymentDetails.penaltyDueAtPayment.toLocaleString()}
+                  BHD {paymentDetails.penaltyDueAtPayment.toLocaleString()}
                 </span>
               </div>
             </div>

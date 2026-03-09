@@ -321,7 +321,7 @@ function CurrentStatus(): JSX.Element {
                   </label>
                   <div className="relative">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                      ₹
+                      BHD
                     </div>
                     <input
                       id="salary-input"
@@ -425,10 +425,10 @@ function CurrentStatus(): JSX.Element {
                     )}
                     <span>
                       {salaryExceedsBase === "yes"
-                        ? `Salary exceeds ₹${brand.brandConfig.salaryThresholdAmount?.toLocaleString(
+                        ? `Salary exceeds BHD${brand.brandConfig.salaryThresholdAmount?.toLocaleString(
                             "en-IN",
                           )}`
-                        : `Salary is below ₹${brand.brandConfig.salaryThresholdAmount?.toLocaleString(
+                        : `Salary is below BHD${brand.brandConfig.salaryThresholdAmount?.toLocaleString(
                             "en-IN",
                           )}`}
                     </span>
