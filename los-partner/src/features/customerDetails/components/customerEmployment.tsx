@@ -6,7 +6,6 @@ import {
   HiOutlineBriefcase,
   HiOutlineCalendar,
   HiOutlineMail,
-  HiOutlineCurrencyRupee,
   HiOutlineLocationMarker,
   HiOutlineIdentification,
   HiOutlineCreditCard,
@@ -61,6 +60,34 @@ interface ApiError {
   statusCode?: number;
   details?: string;
 }
+
+const BhdCoinIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="goldGradient" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#F6D68A" />
+        <stop offset="70%" stopColor="#E9C46A" />
+        <stop offset="100%" stopColor="#D4A73F" />
+      </radialGradient>
+      <radialGradient id="innerGradient" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#F1CD7A" />
+        <stop offset="100%" stopColor="#E1B657" />
+      </radialGradient>
+    </defs>
+    <circle cx="256" cy="256" r="240" fill="url(#goldGradient)" stroke="#C88A2B" strokeWidth="8" />
+    <circle cx="256" cy="256" r="185" fill="url(#innerGradient)" stroke="#D07A1F" strokeWidth="6" />
+    <text
+      x="50%"
+      y="54%"
+      textAnchor="middle"
+      fontSize="120"
+      fontFamily="Arial, sans-serif"
+      fill="#F5F5F5"
+      dominantBaseline="middle">
+      د.ب
+    </text>
+  </svg>
+);
 
 export function CustomerEmployment() {
   const { brandId, customerId } = useParams();
@@ -262,7 +289,7 @@ export function CustomerEmployment() {
       );
       setAlternatePhoneError(
         error?.response?.data?.message ||
-          "Failed to fetch employment history with the provided phone number"
+        "Failed to fetch employment history with the provided phone number"
       );
     } finally {
       setLoadingAlternatePhone(false);
@@ -377,53 +404,53 @@ export function CustomerEmployment() {
 
   // Fetch regular employment history
   const fetchEmploymentHistory = async () => {
-   try {
-    setLoadingHistory(true);
-    setHistoryError(null);
+    try {
+      setLoadingHistory(true);
+      setHistoryError(null);
 
-    if (customerId && brandId) {
-      // Use the new comprehensive endpoint
-      const response = await fetchEmploymentHistoryComprehensiveApi(
-        customerId, 
-        brandId
-      );
+      if (customerId && brandId) {
+        // Use the new comprehensive endpoint
+        const response = await fetchEmploymentHistoryComprehensiveApi(
+          customerId,
+          brandId
+        );
 
-      const normalized = normalizeEmploymentData(response).filter((it) =>
-        Boolean(
-          it && (it.establishment_name || it.name || it.member_id || it.uan)
-        )
-      );
+        const normalized = normalizeEmploymentData(response).filter((it) =>
+          Boolean(
+            it && (it.establishment_name || it.name || it.member_id || it.uan)
+          )
+        );
 
-      if (normalized && normalized.length > 0) {
-        setEmploymentHistory(normalized);
-        setHistoryError(null);
-        setSuccessMessage("Employment history fetched successfully!");
+        if (normalized && normalized.length > 0) {
+          setEmploymentHistory(normalized);
+          setHistoryError(null);
+          setSuccessMessage("Employment history fetched successfully!");
 
-        // Update UAN in employment data if available
-        if (normalized[0]?.uan && employment) {
-          const updatedEmployment = {
-            ...employment,
-            uanNumber: normalized[0].uan,
-          };
-          setEmployment(updatedEmployment);
+          // Update UAN in employment data if available
+          if (normalized[0]?.uan && employment) {
+            const updatedEmployment = {
+              ...employment,
+              uanNumber: normalized[0].uan,
+            };
+            setEmployment(updatedEmployment);
+          }
+        } else {
+          setEmploymentHistory([]);
+          setHistoryError({
+            message: response.message || "No employment data found",
+          });
         }
-      } else {
-        setEmploymentHistory([]);
-        setHistoryError({
-          message: response.message || "No employment data found",
-        });
       }
+    } catch (error: any) {
+      console.error("Error fetching employment history:", error);
+      setHistoryError({
+        message:
+          error?.response?.data?.message ||
+          "Failed to fetch employment history for this user",
+      });
+    } finally {
+      setLoadingHistory(false);
     }
-  } catch (error: any) {
-    console.error("Error fetching employment history:", error);
-    setHistoryError({
-      message:
-        error?.response?.data?.message ||
-        "Failed to fetch employment history for this user",
-    });
-  } finally {
-    setLoadingHistory(false);
-  }
   };
 
   // Normalize backend response to an array of history items the UI expects.
@@ -1034,11 +1061,10 @@ export function CustomerEmployment() {
                   name="companyName"
                   value={editFormData.companyName || ""}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.companyName
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.companyName
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                   placeholder="Enter company name"
                 />
                 {errors.companyName && (
@@ -1058,11 +1084,10 @@ export function CustomerEmployment() {
                   name="designation"
                   value={editFormData.designation || ""}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.designation
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.designation
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                   placeholder="Enter job title"
                 />
                 {errors.designation && (
@@ -1084,11 +1109,10 @@ export function CustomerEmployment() {
                   name="officialEmail"
                   value={editFormData.officialEmail || ""}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.officialEmail
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.officialEmail
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                   placeholder="work@company.com"
                 />
                 {errors.officialEmail && (
@@ -1109,17 +1133,16 @@ export function CustomerEmployment() {
                   value={
                     editFormData.joiningDate
                       ? new Date(editFormData.joiningDate)
-                          .toISOString()
-                          .split("T")[0]
+                        .toISOString()
+                        .split("T")[0]
                       : ""
                   }
                   onChange={handleInputChange}
                   max={new Date().toISOString().split("T")[0]}
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.joiningDate
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.joiningDate
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                 />
                 {errors.joiningDate && (
                   <p className="mt-1 text-xs text-[var(--color-on-error)]">
@@ -1142,11 +1165,10 @@ export function CustomerEmployment() {
                   onChange={handleInputChange}
                   min="1"
                   max="31"
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.expectedDateOfSalary
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.expectedDateOfSalary
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                   placeholder="Day (1-31)"
                 />
                 {errors.expectedDateOfSalary && (
@@ -1158,7 +1180,7 @@ export function CustomerEmployment() {
 
               <div>
                 <label className="flex items-center text-sm font-medium text-[var(--color-on-surface)] opacity-80 mb-1">
-                  <HiOutlineCurrencyRupee className="w-4 h-4 mr-1 text-[var(--color-on-surface)] opacity-70" />
+                  <BhdCoinIcon className="w-4 h-4 mr-1 text-[var(--color-on-surface)] opacity-70" />
                   Salary Exceeds Base
                 </label>
                 <select
@@ -1182,7 +1204,7 @@ export function CustomerEmployment() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="flex items-center text-sm font-medium text-[var(--color-on-surface)] opacity-80 mb-1">
-                    <HiOutlineCurrencyRupee className="w-4 h-4 mr-1 text-[var(--color-on-surface)] opacity-70" />
+                    <BhdCoinIcon className="w-4 h-4 mr-1 text-[var(--color-on-surface)] opacity-70" />
                     Monthly Salary (BHD)
                   </label>
                   <input
@@ -1192,11 +1214,10 @@ export function CustomerEmployment() {
                     onChange={handleInputChange}
                     min="1"
                     max="10000000"
-                    className={`w-full px-3 py-2 border rounded text-sm ${
-                      errors.salary
-                        ? "border-red-300"
-                        : "border-[var(--color-muted)] border-opacity-50"
-                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                    className={`w-full px-3 py-2 border rounded text-sm ${errors.salary
+                      ? "border-red-300"
+                      : "border-[var(--color-muted)] border-opacity-50"
+                      } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                     placeholder="50000"
                   />
                   {errors.salary && (
@@ -1260,11 +1281,10 @@ export function CustomerEmployment() {
                   value={editFormData.pinCode || ""}
                   onChange={handleInputChange}
                   maxLength={6}
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.pinCode
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.pinCode
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                   placeholder="110001"
                 />
                 {errors.pinCode && (
@@ -1285,11 +1305,10 @@ export function CustomerEmployment() {
                   value={editFormData.uanNumber || ""}
                   onChange={handleInputChange}
                   maxLength={12}
-                  className={`w-full px-3 py-2 border rounded text-sm ${
-                    errors.uanNumber
-                      ? "border-red-300"
-                      : "border-[var(--color-muted)] border-opacity-50"
-                  } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
+                  className={`w-full px-3 py-2 border rounded text-sm ${errors.uanNumber
+                    ? "border-red-300"
+                    : "border-[var(--color-muted)] border-opacity-50"
+                    } focus:ring-1 focus:ring-orange-500 focus:border-warning`}
                   placeholder="Enter UAN number"
                 />
                 {errors.uanNumber && (
@@ -1375,7 +1394,7 @@ export function CustomerEmployment() {
                 )
               }
               icon={
-                <HiOutlineCurrencyRupee className="w-4 h-4 text-[var(--color-on-success)]" />
+                <BhdCoinIcon className="w-4 h-4 text-[var(--color-on-success)]" />
               }
             />
 
@@ -1423,7 +1442,7 @@ export function CustomerEmployment() {
         <div className="p-4 border-t border-[var(--color-muted)] border-opacity-30">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <HiOutlineCurrencyRupee className="w-5 h-5 text-green-600" />
+              <BhdCoinIcon className="w-5 h-5 text-green-600" />
               <h3 className="text-lg font-semibold text-[var(--color-on-background)]">
                 Salary History
               </h3>
@@ -1467,7 +1486,7 @@ export function CustomerEmployment() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="flex items-center text-sm font-medium text-[var(--color-on-surface)] opacity-80 mb-1">
-                    <HiOutlineCurrencyRupee className="w-4 h-4 mr-1" />
+                    <BhdCoinIcon className="w-4 h-4 mr-1" />
                     Salary Amount <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
@@ -1477,11 +1496,10 @@ export function CustomerEmployment() {
                     onChange={handleSalaryInputChange}
                     min="1"
                     max="10000000"
-                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-1 focus:ring-orange-500 focus:outline-none ${
-                      salaryFormErrors.salary_amount
-                        ? "border-red-400"
-                        : "border-[var(--color-muted)] border-opacity-50"
-                    }`}
+                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-1 focus:ring-orange-500 focus:outline-none ${salaryFormErrors.salary_amount
+                      ? "border-red-400"
+                      : "border-[var(--color-muted)] border-opacity-50"
+                      }`}
                     placeholder="50000"
                     disabled={isSalarySaving}
                   />
@@ -1503,11 +1521,10 @@ export function CustomerEmployment() {
                     value={salaryFormData.salary_date}
                     onChange={handleSalaryInputChange}
                     max={new Date().toISOString().split("T")[0]}
-                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-1 focus:ring-orange-500 focus:outline-none ${
-                      salaryFormErrors.salary_date
-                        ? "border-red-400"
-                        : "border-[var(--color-muted)] border-opacity-50"
-                    }`}
+                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-1 focus:ring-orange-500 focus:outline-none ${salaryFormErrors.salary_date
+                      ? "border-red-400"
+                      : "border-[var(--color-muted)] border-opacity-50"
+                      }`}
                     disabled={isSalarySaving}
                   />
                   {salaryFormErrors.salary_date && (
@@ -1565,7 +1582,7 @@ export function CustomerEmployment() {
             <div>
               {salaries.length === 0 ? (
                 <div className="text-center py-8">
-                  <HiOutlineCurrencyRupee className="w-12 h-12 text-[var(--color-on-surface)] opacity-30 mx-auto mb-2" />
+                  <BhdCoinIcon className="w-12 h-12 text-[var(--color-on-surface)] opacity-30 mx-auto mb-2" />
                   <p className="text-sm text-[var(--color-on-surface)] opacity-60">
                     No salary records found
                   </p>
@@ -1579,7 +1596,7 @@ export function CustomerEmployment() {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          <HiOutlineCurrencyRupee className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <BhdCoinIcon className="w-5 h-5 text-green-600 flex-shrink-0" />
                           <div>
                             <p className="font-medium text-[var(--color-on-background)]">
                               {formatCurrency(salary.salary_amount)}
@@ -1768,11 +1785,10 @@ export function CustomerEmployment() {
               value={alternatePhoneNumber}
               onChange={handleAlternatePhoneChange}
               placeholder="10-digit mobile number"
-              className={`w-full px-3 py-2 border text-sm rounded-lg focus:ring-2 focus:ring-orange-500 transition-all outline-none ${
-                alternatePhoneError
-                  ? "border-red-400"
-                  : "border-[var(--color-muted)] border-opacity-60"
-              }`}
+              className={`w-full px-3 py-2 border text-sm rounded-lg focus:ring-2 focus:ring-orange-500 transition-all outline-none ${alternatePhoneError
+                ? "border-red-400"
+                : "border-[var(--color-muted)] border-opacity-60"
+                }`}
               disabled={loadingAlternatePhone}
               maxLength={12}
             />
