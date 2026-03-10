@@ -13,7 +13,7 @@ export class CardProvider implements BsaReportInterface {
     private readonly prisma: PrismaService,
     private readonly cardService: CardService,
     private readonly awsS3Service: AwsPublicS3Service,
-  ) {}
+  ) { }
 
   private validateInputs(inputs: Record<string, any>) {
     for (const [key, value] of Object.entries(inputs)) {
@@ -141,7 +141,11 @@ export class CardProvider implements BsaReportInterface {
     const bankStatementJson =
       typeof cart.bsaReportDownloadJson === "string"
         ? JSON.parse(cart.bsaReportDownloadJson)
-        : null;
+        : cart.bsaReportDownloadJson;
+
+    if (!bankStatementJson) {
+      throw new Error("Report data is missing or still being processed.");
+    }
 
     // Example usage:
 
