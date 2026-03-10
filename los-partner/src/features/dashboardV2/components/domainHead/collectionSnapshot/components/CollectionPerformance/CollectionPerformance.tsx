@@ -286,7 +286,7 @@ export default function CollectionPerformance({ data = MOCK_DATA }: { data?: Sal
                         </div>
 
                         {/* Pagination Footer */}
-                        <div className="px-4 2xl:px-6 py-2 2xl:py-4 flex items-center justify-between border-t border-gray-200">
+                        {/* <div className="px-4 2xl:px-6 py-2 2xl:py-4 flex items-center justify-between border-t border-gray-200">
                             <div className="text-[12px] 2xl:text-[13px] text-gray-500 font-medium">
                                 1–50 of 2,619
                             </div>
@@ -298,7 +298,7 @@ export default function CollectionPerformance({ data = MOCK_DATA }: { data?: Sal
                                     <ChevronRightIcon />
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             )}

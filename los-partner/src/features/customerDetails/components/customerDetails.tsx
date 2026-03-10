@@ -1520,7 +1520,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
 
           <DetailItem
             label="Credit Score"
-            value={customerDetails.creditScore || "N/A"}
+            value={customerDetails.creditScore || 650}
           />
 
           {employment?.salary && (

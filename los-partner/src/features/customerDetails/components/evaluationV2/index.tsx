@@ -750,9 +750,9 @@ export function EvaluationV2Component({
                     <FaBolt className="inline w-3 h-3 mr-1" /> Override (
                     {stats.overridden})
                   </button> */}
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-100 text-green-700 font-semibold text-sm">
+                  {/* <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-100 text-green-700 font-semibold text-sm">
                     {(stats.eligible / stats.total * 100).toFixed(2)}% Risk Score
-                  </span>
+                  </span> */}
                 </div>
               </div>
             </div>
@@ -994,7 +994,7 @@ export function EvaluationV2Component({
             {/* Decision Footer - ALIGNMENT FIX APPLIED HERE */}
             <div className="border-t border-gray-200 bg-white p-4 sticky bottom-0 z-10 shadow-lg">
               {/* Warnings Section (Unchanged) */}
-              <div className="space-y-2 mb-3">
+              {/* <div className="space-y-2 mb-3">
                 {isBsaReportRequired && (
                   <div className="p-3 bg-red-100 border border-red-300 rounded-lg text-sm text-red-800 flex items-start gap-2">
                     <FaExclamationTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -1025,7 +1025,7 @@ export function EvaluationV2Component({
                     </div>
                   </div>
                 )}
-                {/* Stage Completion Warning */}
+                Stage Completion Warning
                 {!canApprove &&
                   !isBsaReportRequired &&
                   !isCreditReportRequired && (
@@ -1041,7 +1041,7 @@ export function EvaluationV2Component({
                       </div>
                     </div>
                   )}
-                {/* Comments Warning for Audit Trail */}
+                Comments Warning for Audit Trail
                 {allStagesComplete &&
                   overriddenEligibleItemsWithoutComments.length > 0 &&
                   !isBsaReportRequired &&
@@ -1056,7 +1056,7 @@ export function EvaluationV2Component({
                       </div>
                     </div>
                   )}
-              </div>
+              </div> */}
 
               {/* Notes and Action Buttons - FIX: Changed items-end to items-center */}
               <div className="flex items-center gap-4">

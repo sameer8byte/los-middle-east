@@ -439,8 +439,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                     {loan.loanType && (
                       <span
                         className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-blue-100 text-blue-800"
                           }`}
                       >
                         {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
@@ -476,8 +476,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
               <button
                 onClick={(e) => copyCustomerInfo(loan, e)}
                 className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
-                    ? "bg-green-500 scale-110 opacity-100"
-                    : "bg-[var(--color-surface)]"
+                  ? "bg-green-500 scale-110 opacity-100"
+                  : "bg-[var(--color-surface)]"
                   }`}
                 title={
                   copiedLoanId === loan.id ? "Copied!" : "Copy customer info"
@@ -874,8 +874,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                     key={option.value}
                     onClick={() => handleOpsStatusClick(option.value)}
                     className={`relative px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${isActive
-                        ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-                        : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
+                      ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                      : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
                       }`}
                   >
                     {option.label}
