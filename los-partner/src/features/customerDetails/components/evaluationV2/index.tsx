@@ -560,8 +560,8 @@ export function EvaluationV2Component({
               <button
                 onClick={() => setSelectedStage("ALL")}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center transition-all duration-150 ${selectedStage === "ALL"
-                    ? "bg-blue-50 text-blue-700 font-semibold shadow-inner"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-blue-50 text-blue-700 font-semibold shadow-inner"
+                  : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   }`}
               >
                 <div className="flex items-center gap-2">
@@ -569,8 +569,8 @@ export function EvaluationV2Component({
                 </div>
                 <span
                   className={`text-xs font-medium px-2 py-0.5 rounded-full ${allStagesComplete
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-200 text-gray-600"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-200 text-gray-600"
                     }`}
                 >
                   {globalStats.eligible}/{globalStats.total}
@@ -636,8 +636,8 @@ export function EvaluationV2Component({
                       </div>
                       <span
                         className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ml-2 ${isComplete
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-200 text-gray-600"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-200 text-gray-600"
                           }`}
                       >
                         {stageStats.eligible}/{stageStats.total}
@@ -788,8 +788,8 @@ export function EvaluationV2Component({
                           <tr
                             key={item.id}
                             className={`transition-all duration-150 group ${updatingItems[item.id]
-                                ? "opacity-60 bg-gray-50"
-                                : "hover:bg-blue-50/50"
+                              ? "opacity-60 bg-gray-50"
+                              : "hover:bg-blue-50/50"
                               } ${item.override &&
                                 item.status === "ELIGIBLE" &&
                                 (!item.comments || item.comments.trim() === "")
@@ -821,11 +821,26 @@ export function EvaluationV2Component({
                               <div className="relative">
                                 <input
                                   type="text"
-                                  value={item.actualValue.startsWith("BHD")
-                                    ? Conversion.formatCurrency(
-                                      Number(item.actualValue.replace(/BHD\s?|,/g, ""))
-                                    )
-                                    : item.actualValue}
+                                  value={(() => {
+                                    const val = item.actualValue;
+                                    if (!val) return val;
+                                    // Replace every ₹X,XX,XXX pattern (anywhere in the string) with BHD equivalent
+                                    if (val.includes("₹") || val.startsWith("INR")) {
+                                      return val.replace(/₹([\d,]+(\.\d+)?)/g, (_match, numStr) => {
+                                        const num = Number(numStr.replace(/,/g, ""));
+                                        if (!isNaN(num)) {
+                                          return Conversion.formatCurrency(num);
+                                        }
+                                        return _match;
+                                      });
+                                    }
+                                    if (val.startsWith("BHD")) {
+                                      return Conversion.formatCurrency(
+                                        Number(val.replace(/BHD\s?|,/g, ""))
+                                      );
+                                    }
+                                    return val;
+                                  })()}
                                   onChange={(e) =>
                                     handleActualValueChange(
                                       item.id,
@@ -837,17 +852,13 @@ export function EvaluationV2Component({
                                   disabled={updatingItems[item.id]}
                                 />
                                 {/* Tooltip that shows only on input hover */}
-                                <div className="absolute invisible opacity-0 peer-hover:visible peer-hover:opacity-100 transition-all duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
+                                {/* <div className="absolute invisible opacity-0 peer-hover:visible peer-hover:opacity-100 transition-all duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
                                   <div className="bg-gray-900 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap max-w-xs break-words">
-                                    {item.actualValue.startsWith("BHD")
-                                      ? Conversion.formatCurrency(
-                                        Number(item.actualValue.replace(/BHD\s?|,/g, ""))
-                                      )
-                                      : item.actualValue || "No value"}
-                                    {/* Tooltip arrow */}
+                                    {item.actualValue || "No value"}
+                                    Tooltip arrow
                                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                                   </div>
-                                </div>
+                                </div> */}
                               </div>
                             </td>
 
@@ -860,8 +871,8 @@ export function EvaluationV2Component({
                                   }
                                   disabled={updatingItems[item.id]}
                                   className={`px-2 py-1 text-xs rounded-full transition-all duration-150 flex items-center gap-1 ${item.status === "ELIGIBLE"
-                                      ? "bg-green-100 text-green-700 font-semibold border border-green-300"
-                                      : "bg-gray-100 text-gray-600 hover:bg-green-50"
+                                    ? "bg-green-100 text-green-700 font-semibold border border-green-300"
+                                    : "bg-gray-100 text-gray-600 hover:bg-green-50"
                                     }`}
                                 >
                                   <FaCheck className="w-2.5 h-2.5" /> PASS
@@ -872,8 +883,8 @@ export function EvaluationV2Component({
                                   }
                                   disabled={updatingItems[item.id]}
                                   className={`px-2 py-1 text-xs rounded-full transition-all duration-150 flex items-center gap-1 ${item.status === "NOT_ELIGIBLE"
-                                      ? "bg-red-100 text-red-700 font-semibold border border-red-300"
-                                      : "bg-gray-100 text-gray-600 hover:bg-red-50"
+                                    ? "bg-red-100 text-red-700 font-semibold border border-red-300"
+                                    : "bg-gray-100 text-gray-600 hover:bg-red-50"
                                     }`}
                                 >
                                   <FaTimes className="w-2.5 h-2.5" /> FAIL
@@ -926,11 +937,11 @@ export function EvaluationV2Component({
                                       : "Add optional comment..."
                                   }
                                   className={`w-full border rounded-md px-3 py-1.5 text-sm transition-shadow focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden ${item.override &&
-                                      item.status === "ELIGIBLE" &&
-                                      (!item.comments ||
-                                        item.comments.trim() === "")
-                                      ? "border-red-400 focus:border-red-500 focus:ring-red-500 bg-red-50/50"
-                                      : "border-gray-300"
+                                    item.status === "ELIGIBLE" &&
+                                    (!item.comments ||
+                                      item.comments.trim() === "")
+                                    ? "border-red-400 focus:border-red-500 focus:ring-red-500 bg-red-50/50"
+                                    : "border-gray-300"
                                     } ${savingComments[item.id] ? "pr-8" : ""} ${pendingComments[item.id] !== undefined &&
                                       !savingComments[item.id]
                                       ? "pr-8"
