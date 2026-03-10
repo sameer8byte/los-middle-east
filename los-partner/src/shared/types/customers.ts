@@ -76,13 +76,13 @@ export interface Customer {
     subdomain: string;
   };
   isActive: boolean;
-  leadMatches: number; 
+  leadMatches: number;
   leadMatchesDetails?: LeadMatchDetail[];
-  onboardingJourneys?: OnboardingJourney[]; 
+  onboardingJourneys?: OnboardingJourney[];
   userDetails: UserDetails;
-  userReloans: UserReloan[]; 
-  allocatedPartnerUserId: string | null; 
-  allocatedPartner?: AllocatedPartner | null; 
+  userReloans: UserReloan[];
+  allocatedPartnerUserId: string | null;
+  allocatedPartner?: AllocatedPartner | null;
   loanCount: number;
   loans: Loan[];
   status_id: BigInt | null;
@@ -93,11 +93,11 @@ export interface Customer {
 export interface UserReloan {
   id: string;
   userId: string;
-  previousLoanId: string | null; 
-  status: ReloanStatus; 
-  reason: string | null; 
-  remarks: string | null; 
-  createdAt: Date; 
+  previousLoanId: string | null;
+  status: ReloanStatus;
+  reason: string | null;
+  remarks: string | null;
+  createdAt: Date;
   updatedAt: Date;
   isResolved: boolean;
   previousLoan: Loan;
@@ -175,10 +175,10 @@ export interface AlternatePhoneNumber {
   id: string;
   userId: string;
   phone: string;
-  label: string; 
+  label: string;
   isVerified: boolean;
   verifiedAt: Date | null;
-  name: string; 
+  name: string;
   relationship: RelationshipEnum;
 }
 

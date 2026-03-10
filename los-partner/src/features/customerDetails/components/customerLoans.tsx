@@ -695,7 +695,7 @@ export function CustomerLoans(
                               {getStatusIcon(loan.status)}
                             </div>
                             <span className="text-[13px] font-semibold text-slate-800">
-                              {loan.formattedLoanId || "N/A"}
+                              {loan.formattedLoanId || loan.id.split('-')[0]}
                             </span>
                             {loan.id && (
                               <AcefoneClickToDialButton
@@ -1273,7 +1273,7 @@ export function CustomerLoans(
                                       Customer Details
                                     </h6>
                                     <div className="grid grid-cols-2 gap-2.5 text-xs">
-                                      <div className="bg-white/80 rounded-md p-2">
+                                      {/* <div className="bg-white/80 rounded-md p-2">
                                         <span className="text-blue-500 text-[10px] block">
                                           Name
                                         </span>
@@ -1281,7 +1281,7 @@ export function CustomerLoans(
                                           {loan.user.userDetails?.firstName}{" "}
                                           {loan.user.userDetails?.lastName}
                                         </span>
-                                      </div>
+                                      </div> */}
                                       <div className="bg-white/80 rounded-md p-2">
                                         <span className="text-blue-500 text-[10px] block">
                                           Phone

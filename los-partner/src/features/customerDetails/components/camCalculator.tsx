@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaCheckCircle, FaCoins } from "react-icons/fa";
 import Dialog from "../../../common/dialog";
 import { Button } from "../../../common/ui/button";
+import { Spinner } from "../../../common/ui/spinner";
 import { useParams } from "react-router-dom";
 import {
   getLoanRuleTenures,
@@ -277,20 +278,25 @@ export function CamCalculator({
     }
   }, [isOpen, brandId, tenures.length]);
 
-  // Restore credit risk data from session storage on component mount
+  // Restore credit risk data from session storage on component mount or user change
   useEffect(() => {
-    const storedCreditRiskData = sessionStorage.getItem('creditRiskData');
-    if (storedCreditRiskData) {
-      try {
-        const parsedData = JSON.parse(storedCreditRiskData);
-        setCreditRiskData(parsedData);
-        console.log("✅ Credit Risk Data restored from Session Storage");
-      } catch (error) {
-        console.error("Error parsing credit risk data from session storage:", error);
-        sessionStorage.removeItem('creditRiskData');
+    if (loan?.userId) {
+      const storageKey = `creditRiskData_${loan.userId}`;
+      const storedCreditRiskData = sessionStorage.getItem(storageKey);
+      if (storedCreditRiskData) {
+        try {
+          const parsedData = JSON.parse(storedCreditRiskData);
+          setCreditRiskData(parsedData);
+          console.log(`✅ Credit Risk Data for user ${loan.userId} restored from Session Storage`);
+        } catch (error) {
+          console.error("Error parsing credit risk data from session storage:", error);
+          sessionStorage.removeItem(storageKey);
+        }
+      } else {
+        setCreditRiskData(null); // Clear data if no cache for new user
       }
     }
-  }, []);
+  }, [loan?.userId]);
 
   const calculateRepayment = async (tenureIdOverride?: string) => {
     // Use the override if provided (for immediate calculation after selection)
@@ -585,7 +591,8 @@ export function CamCalculator({
       ]);
 
       // Extract fields from user-details
-      const creditScore: number = userDetails?.creditScore ?? 650;
+      const score = userDetails?.creditScore ?? 650;
+      const creditScore: number = score === 0 ? 650 : score;
       const rawGender: string = userDetails?.gender ?? "MALE";
       const state: string = userDetails?.state ?? "Lagos";
 
@@ -654,11 +661,14 @@ export function CamCalculator({
 
       console.log("Credit Risk API Response:", response.data);
       setCreditRiskData(response.data);
-      
-      // Store credit risk data in session storage
-      sessionStorage.setItem('creditRiskData', JSON.stringify(response.data));
-      console.log("✅ Credit Risk Data stored in Session Storage");
-      
+
+      // Store credit risk data in session storage with user-specific key
+      if (loan?.userId) {
+        const storageKey = `creditRiskData_${loan.userId}`;
+        sessionStorage.setItem(storageKey, JSON.stringify(response.data));
+        console.log(`✅ Credit Risk Data for user ${loan.userId} stored in Session Storage`);
+      }
+
       toast.success("Credit risk assessment completed!");
     } catch (error: any) {
       console.error("Credit Risk API Error:", error);
@@ -933,14 +943,14 @@ export function CamCalculator({
   }
   return (
     <>
-      {showLoadDialog && (
+      {/* {showLoadDialog && (
         <Dialog
           onClose={() => setShowLoadDialog(false)}
           isOpen={showLoadDialog}
           title="Load Previous Calculations"
           size="md"
         >
-          {/* Header / Summary */}
+          Header / Summary
           <div className="mb-3">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -975,7 +985,7 @@ export function CamCalculator({
           </div>
 
           <div className="max-h-96 overflow-y-auto pr-1">
-            {/* Loading State */}
+            Loading State
             {loadingExisting && (
               <div className="space-y-2">
                 {new Array(1).fill(null).map((_, index) => (
@@ -984,12 +994,12 @@ export function CamCalculator({
                     className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm animate-pulse"
                   >
                     <div className="space-y-3">
-                      {/* Badge Skeleton */}
+                      Badge Skeleton
                       <div className="flex items-center gap-2">
                         <div className="h-5 w-20 rounded-full bg-slate-200" />
                       </div>
 
-                      {/* Content Skeleton */}
+                      Content Skeleton
                       <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1.5">
                           <div className="h-3 w-16 rounded bg-slate-200" />
@@ -1001,7 +1011,7 @@ export function CamCalculator({
                         </div>
                       </div>
 
-                      {/* Footer Skeleton */}
+                      Footer Skeleton
                       <div className="flex flex-wrap gap-2 pt-2">
                         <div className="h-3 w-32 rounded-full bg-slate-200" />
                         <div className="h-3 w-24 rounded-full bg-slate-200" />
@@ -1012,7 +1022,7 @@ export function CamCalculator({
               </div>
             )}
 
-            {/* Error State */}
+            Error State
             {!loadingExisting && loadingError && (
               <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                 <div className="flex items-start gap-3">
@@ -1037,7 +1047,7 @@ export function CamCalculator({
               </div>
             )}
 
-            {/* Success State - Calculations List */}
+            Success State - Calculations List
             {!loadingExisting &&
               !loadingError &&
               existingCalculations &&
@@ -1055,23 +1065,22 @@ export function CamCalculator({
                       >
                         <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition-all hover:border-blue-300 hover:shadow-lg hover:bg-blue-50 group-active:scale-95">
                           <div className="flex items-start justify-between gap-3">
-                            {/* Main Content */}
+                            Main Content
                             <div className="min-w-0 flex-1">
-                              {/* FOIR Badge */}
+                              FOIR Badge
                               <div className="flex items-center gap-2 mb-2">
                                 <span
-                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold transition-all ${
-                                    isHighFoir
-                                      ? "bg-red-50 text-red-700 ring-1 ring-red-200"
-                                      : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                                  }`}
+                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold transition-all ${isHighFoir
+                                    ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+                                    : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                                    }`}
                                 >
                                   {isHighFoir ? "⚠️" : "✓"} FOIR{" "}
                                   {foir ? `${foir.toFixed(1)}%` : "N/A"}
                                 </span>
                               </div>
 
-                              {/* Loan Details Grid */}
+                              Loan Details Grid
                               <div className="mt-2 grid grid-cols-2 gap-2">
                                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-2 group-hover:bg-blue-100 transition-colors">
                                   <p className="text-[10px] font-semibold text-slate-500">
@@ -1098,7 +1107,7 @@ export function CamCalculator({
                                 </div>
                               </div>
 
-                              {/* Metadata */}
+                              Metadata
                               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500">
                                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 group-hover:bg-slate-200">
                                   <span>📅</span>
@@ -1120,7 +1129,7 @@ export function CamCalculator({
                               </div>
                             </div>
 
-                            {/* Action Arrow */}
+                            Action Arrow
                             <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-lg bg-slate-100 group-hover:bg-blue-200 transition-colors">
                               <span className="text-lg group-hover:translate-x-1 transition-transform">
                                 →
@@ -1134,7 +1143,7 @@ export function CamCalculator({
                 </div>
               )}
 
-            {/* Empty State */}
+            Empty State
             {!loadingExisting &&
               !loadingError &&
               (!existingCalculations || existingCalculations.length === 0) && (
@@ -1160,6 +1169,18 @@ export function CamCalculator({
             </button>
           </div>
         </Dialog>
+      )} */}
+
+      {showLoadDialog && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/20 backdrop-blur-sm">
+          <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-2xl border border-blue-100 animate-in fade-in zoom-in duration-300">
+            <Spinner theme="dark" />
+            <p className="mt-4 text-lg font-bold text-blue-800">
+              Loading...
+            </p>
+
+          </div>
+        </div>
       )}
 
       <Dialog
@@ -1522,19 +1543,33 @@ export function CamCalculator({
               {/* Column 3 - Status & Summary */}
               <div>
                 {renderRepaymentDetailsSection()}
-                
+
                 {/* Credit Risk Assessment Section */}
                 <div>
-                  
-                  
-                  <Button
-                    onClick={checkCreditRisk}
-                    disabled={loadingCreditRisk}
-                    loading={loadingCreditRisk}
-                    className="w-[20%] mb-2 mx-auto"
-                  >
-                    {loadingCreditRisk ? "Assessing..." : "Check Credit Risk"}
-                  </Button>
+
+
+                  {!creditRiskData && !loadingCreditRisk && (
+                    <Button
+                      onClick={checkCreditRisk}
+                      disabled={loadingCreditRisk}
+                      loading={loadingCreditRisk}
+                      className="w-[20%] mb-2 mx-auto"
+                    >
+                      {loadingCreditRisk ? "Assessing..." : "Check Credit Risk"}
+                    </Button>
+                  )}
+
+                  {loadingCreditRisk && (
+                    <div className="flex flex-col items-center justify-center py-8 bg-blue-50/50 rounded-lg border border-blue-100 border-dashed animate-pulse">
+                      <Spinner theme="dark" />
+                      <p className="mt-3 text-sm font-semibold text-blue-700">
+                        Generating Credit Risk Report...
+                      </p>
+                      <p className="text-xs text-blue-500 mt-1">
+                        Performing advanced risk modeling
+                      </p>
+                    </div>
+                  )}
 
                   {creditRiskError && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
@@ -1545,18 +1580,16 @@ export function CamCalculator({
                   {creditRiskData && (
                     <div className="space-y-2 mt-2">
                       {/* Risk Score Card */}
-                      <div className={`p-3 rounded-lg border ${
-                        creditRiskData.risk_score?.risk_band === 'High Risk' ? 'bg-red-50 border-red-200' :
+                      <div className={`p-3 rounded-lg border ${creditRiskData.risk_score?.risk_band === 'High Risk' ? 'bg-red-50 border-red-200' :
                         creditRiskData.risk_score?.risk_band === 'Medium Risk' ? 'bg-yellow-50 border-yellow-200' :
-                        'bg-green-50 border-green-200'
-                      }`}>
+                          'bg-green-50 border-green-200'
+                        }`}>
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-base font-bold text-gray-700">Risk Score</span>
-                          <span className={`text-2xl font-black ${
-                            creditRiskData.risk_score?.risk_band === 'High Risk' ? 'text-red-700' :
+                          <span className={`text-2xl font-black ${creditRiskData.risk_score?.risk_band === 'High Risk' ? 'text-red-700' :
                             creditRiskData.risk_score?.risk_band === 'Medium Risk' ? 'text-yellow-700' :
-                            'text-green-700'
-                          }`}>{creditRiskData.risk_score?.risk_score}</span>
+                              'text-green-700'
+                            }`}>{creditRiskData.risk_score?.risk_score}</span>
                         </div>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-gray-600 font-medium">Grade:</span>
@@ -1585,29 +1618,23 @@ export function CamCalculator({
 
                       {/* Eligibility Cards */}
                       <div className="grid grid-cols-3 gap-2">
-                        <div className={`p-2 rounded border text-center ${
-                          creditRiskData.credit_card_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-                        }`}>
+                        <div className={`p-2 rounded border text-center ${creditRiskData.credit_card_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}>
                           <p className="text-sm text-gray-600 font-medium">Credit Card</p>
-                          <p className={`text-base font-bold ${
-                            creditRiskData.credit_card_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
-                          }`}>{creditRiskData.credit_card_eligibility?.decision}</p>
+                          <p className={`text-base font-bold ${creditRiskData.credit_card_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                            }`}>{creditRiskData.credit_card_eligibility?.decision}</p>
                         </div>
-                        <div className={`p-2 rounded border text-center ${
-                          creditRiskData.micro_lending_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-                        }`}>
+                        <div className={`p-2 rounded border text-center ${creditRiskData.micro_lending_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}>
                           <p className="text-sm text-gray-600 font-medium">Micro Loan</p>
-                          <p className={`text-base font-bold ${
-                            creditRiskData.micro_lending_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
-                          }`}>{creditRiskData.micro_lending_eligibility?.decision}</p>
+                          <p className={`text-base font-bold ${creditRiskData.micro_lending_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                            }`}>{creditRiskData.micro_lending_eligibility?.decision}</p>
                         </div>
-                        <div className={`p-2 rounded border text-center ${
-                          creditRiskData.device_financing_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-                        }`}>
+                        <div className={`p-2 rounded border text-center ${creditRiskData.device_financing_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}>
                           <p className="text-sm text-gray-600 font-medium">Device Finance</p>
-                          <p className={`text-base font-bold ${
-                            creditRiskData.device_financing_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
-                          }`}>{creditRiskData.device_financing_eligibility?.decision}</p>
+                          <p className={`text-base font-bold ${creditRiskData.device_financing_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                            }`}>{creditRiskData.device_financing_eligibility?.decision}</p>
                         </div>
                       </div>
 
@@ -1640,11 +1667,10 @@ export function CamCalculator({
                       )}
 
                       {/* Confidence Score */}
-                      <div className={`p-3 rounded-lg border ${
-                        creditRiskData.confidence_score?.confidence_level === 'Very Low' ? 'bg-red-50 border-red-200' :
+                      <div className={`p-3 rounded-lg border ${creditRiskData.confidence_score?.confidence_level === 'Very Low' ? 'bg-red-50 border-red-200' :
                         creditRiskData.confidence_score?.confidence_level === 'Low' ? 'bg-yellow-50 border-yellow-200' :
-                        'bg-green-50 border-green-200'
-                      }`}>
+                          'bg-green-50 border-green-200'
+                        }`}>
                         <div className="flex justify-between items-center">
                           <span className="text-base font-bold text-gray-700">Confidence In Prediction</span>
                           <span className="text-2xl font-black text-gray-900">{creditRiskData.confidence_score?.confidence_score_pct}%</span>

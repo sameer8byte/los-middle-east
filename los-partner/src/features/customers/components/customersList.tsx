@@ -350,7 +350,25 @@ export default function CustomersList() {
           },
           queryWithExecutiveFilter,
         );
-        setCustomers(response.users);
+        // Filter out customers where creditScore is explicitly 0 or "N/A"
+        // (Supports if creditScore is either directly on the user or inside userDetails)
+        // Also filter out users with an empty name ("")
+        // Also filter out users where they have loans but NONE are >= 12156
+        const filteredUsers = (response.users || []).filter((user: any) => {
+          const score = user.creditScore ?? user.userDetails?.creditScore;
+          const hasValidScore = score !== 0 && score !== "0" && score !== "N/A";
+          const hasValidName = user.name !== "";
+
+          // Check loans condition
+          let hasValidLoan = false; // By default, assume false unless proven otherwise
+          if (user.loans && user.loans.length > 0) {
+            hasValidLoan = user.loans.some((loan: any) => (loan.amount || 0) >= 12156);
+          }
+
+          return hasValidScore && hasValidName && hasValidLoan;
+        });
+
+        setCustomers(filteredUsers);
         setTotalCount(response.meta.total);
       } catch (err) {
         setError("Failed to fetch customers");
@@ -566,8 +584,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                 <button
                   onClick={(e) => copyCustomerInfo(customer, e)}
                   className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity- group-hover:opacity-100 transition-all ${copiedCustomerId === customer.id
-                      ? "bg-green-500 scale-110 opacity-100"
-                      : "bg-[var(--color-surface)]"
+                    ? "bg-green-500 scale-110 opacity-100"
+                    : "bg-[var(--color-surface)]"
                     }`}
                   title="Copy customer information"
                 >
@@ -780,8 +798,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
         key: "loans",
         label: "Loans",
         render: (_: any, customer: Customer) => {
-          const loanCount = customer.loanCount || 0;
-          const loans = customer.loans || [];
+          const loans = (customer.loans || []).filter((loan) => (loan.amount || 0) >= 12156);
+          const loanCount = loans.length;
           const userAllocatedPartnerId = customer.allocatedPartnerUserId;
           const userExecutiveIds = new Set(
             userAllocatedPartnerId ? [userAllocatedPartnerId] : [],
@@ -817,8 +835,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                     <div
                       key={loan.id}
                       className={`p-2.5 rounded-lg border transition-all ${hasDifferentExecutive
-                          ? "bg-amber-50 border-amber-200 border-opacity-50"
-                          : "bg-[var(--color-surface)] border-[var(--color-muted)] border-opacity-30 hover:border-opacity-50"
+                        ? "bg-amber-50 border-amber-200 border-opacity-50"
+                        : "bg-[var(--color-surface)] border-[var(--color-muted)] border-opacity-30 hover:border-opacity-50"
                         }`}
                     >
                       {/* Loan Header with Different Executive Badge */}
@@ -894,8 +912,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                 <div
                                   key={partner.id}
                                   className={`flex items-start gap-1.5 px-2 py-1 rounded-md border transition-all ${isDifferentFromUser
-                                      ? "bg-amber-100 border-amber-300 border-opacity-60"
-                                      : "bg-[var(--color-background)] border-[var(--color-muted)] border-opacity-20"
+                                    ? "bg-amber-100 border-amber-300 border-opacity-60"
+                                    : "bg-[var(--color-background)] border-[var(--color-muted)] border-opacity-20"
                                     }`}
                                   title={`${partner.partnerUser.name || "Unknown"
                                     } - ${partner.partnerUser.email
@@ -911,8 +929,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                       {/* 🔹 FULL NAME VISIBLE */}
                                       <span
                                         className={`text-[10px] font-medium break-words leading-tight ${isDifferentFromUser
-                                            ? "text-amber-900"
-                                            : "text-[var(--color-on-background)]"
+                                          ? "text-amber-900"
+                                          : "text-[var(--color-on-background)]"
                                           }`}
                                       >
                                         {partner.partnerUser.name || "Unknown"}
@@ -921,8 +939,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                       {partner.partnerUser.reportsToId ? (
                                         <span
                                           className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider rounded shrink-0 ${isDifferentFromUser
-                                              ? "bg-amber-300 text-amber-900 border border-amber-400"
-                                              : "bg-blue-100 text-blue-700"
+                                            ? "bg-amber-300 text-amber-900 border border-amber-400"
+                                            : "bg-blue-100 text-blue-700"
                                             }`}
                                         >
                                           Executive
@@ -930,8 +948,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                                       ) : (
                                         <span
                                           className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider rounded shrink-0 ${isDifferentFromUser
-                                              ? "bg-amber-300 text-amber-900 border border-amber-400"
-                                              : "bg-purple-100 text-purple-700"
+                                            ? "bg-amber-300 text-amber-900 border border-amber-400"
+                                            : "bg-purple-100 text-purple-700"
                                             }`}
                                         >
                                           Manager
@@ -941,8 +959,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
 
                                     <span
                                       className={`text-[9px] ${isDifferentFromUser
-                                          ? "text-amber-800 font-medium"
-                                          : "text-[var(--color-on-surface)] opacity-60"
+                                        ? "text-amber-800 font-medium"
+                                        : "text-[var(--color-on-surface)] opacity-60"
                                         }`}
                                     >
                                       {
@@ -1464,8 +1482,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                   onClick={handleExecutiveDropdownToggle}
                   variant="surface"
                   className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedExecutives.length > 0
-                      ? "bg-blue-50 border-blue-300 hover:bg-blue-100"
-                      : "bg-white border-gray-300 hover:bg-gray-50"
+                    ? "bg-blue-50 border-blue-300 hover:bg-blue-100"
+                    : "bg-white border-gray-300 hover:bg-gray-50"
                     }`}
                 >
                   <HiChevronDown
@@ -1569,8 +1587,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                   onClick={handleSupervisorDropdownToggle}
                   variant="surface"
                   className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedSupervisors.length > 0
-                      ? "bg-purple-50 border-purple-300 hover:bg-purple-100"
-                      : "bg-white border-gray-300 hover:bg-gray-50"
+                    ? "bg-purple-50 border-purple-300 hover:bg-purple-100"
+                    : "bg-white border-gray-300 hover:bg-gray-50"
                     }`}
                 >
                   <HiChevronDown
@@ -1653,8 +1671,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
             onClick={() => setLoansDropdownOpen(!loansDropdownOpen)}
             variant="surface"
             className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedLoanFilter
-                ? "bg-green-50 border-green-300 hover:bg-green-100"
-                : "bg-white border-gray-300 hover:bg-gray-50"
+              ? "bg-green-50 border-green-300 hover:bg-green-100"
+              : "bg-white border-gray-300 hover:bg-gray-50"
               }`}
           >
             <HiChevronDown
@@ -1684,8 +1702,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                     setLoansDropdownOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm transition ${selectedLoanFilter === ">0"
-                      ? "bg-green-50 font-semibold text-green-800"
-                      : ""
+                    ? "bg-green-50 font-semibold text-green-800"
+                    : ""
                     }`}
                 >
                   <div className="flex items-center gap-2">
@@ -1700,8 +1718,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
                     setLoansDropdownOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm transition ${selectedLoanFilter === "0"
-                      ? "bg-blue-50 font-semibold text-blue-800"
-                      : ""
+                    ? "bg-blue-50 font-semibold text-blue-800"
+                    : ""
                     }`}
                 >
                   <div className="flex items-center gap-2">
@@ -1824,8 +1842,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.
             onClick={() => setSalaryDropdownOpen(!salaryDropdownOpen)}
             variant="surface"
             className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${salaryRange.min || salaryRange.max
-                ? "bg-indigo-50 border-indigo-300 hover:bg-indigo-100"
-                : "bg-white border-gray-300 hover:bg-gray-50"
+              ? "bg-indigo-50 border-indigo-300 hover:bg-indigo-100"
+              : "bg-white border-gray-300 hover:bg-gray-50"
               }`}
           >
             <HiChevronDown

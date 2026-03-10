@@ -282,7 +282,7 @@ export default function CreditPerformance({ data = MOCK_DATA }: { data?: SalesPe
                         </div>
 
                         {/* Pagination Footer */}
-                        <div className="px-4 py-3 2xl:px-6 2xl:py-4 flex items-center justify-between border-t border-gray-200">
+                        {/* <div className="px-4 py-3 2xl:px-6 2xl:py-4 flex items-center justify-between border-t border-gray-200">
                             <div className="text-[11px] 2xl:text-[13px] text-gray-500 font-medium">
                                 1–50 of 2,619
                             </div>
@@ -294,7 +294,7 @@ export default function CreditPerformance({ data = MOCK_DATA }: { data?: SalesPe
                                     <ChevronRightIcon />
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                 </div>
