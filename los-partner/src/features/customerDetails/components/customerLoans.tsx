@@ -213,15 +213,15 @@ export function CustomerLoans(
 
       try {
         const statementData = await getLoanStatement(userId, loanId);
-        
+
         if (brand.brandConfig.loanAgreementFooter) {
           statementData.brand.loanAgreementFooter = brand.brandConfig.loanAgreementFooter;
         }
-        
+
         // Generate PDF using the statement data
         const { generateLoanStatement } = await import('../../../utils/loanStatementGenerator');
         const pdfBytes = await generateLoanStatement(statementData);
-        
+
         // Download PDF
         const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
@@ -232,7 +232,7 @@ export function CustomerLoans(
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        
+
         toast.success("Statement generated successfully");
       } catch (error) {
         console.error("Error generating statement:", error);
@@ -264,8 +264,8 @@ export function CustomerLoans(
       updatedLoan.status === LoanStatusEnum.REJECTED
         ? "Loan application has been rejected"
         : updatedLoan.status === LoanStatusEnum.CREDIT_EXECUTIVE_APPROVED
-        ? "Loan application has been approved and forwarded"
-        : "Loan status has been updated";
+          ? "Loan application has been approved and forwarded"
+          : "Loan status has been updated";
 
     toast.success(statusMessage);
 
@@ -659,9 +659,8 @@ export function CustomerLoans(
                     <>
                       <tr
                         key={loan.id}
-                        className={`hover:bg-slate-50/50 transition-colors ${
-                          isExpanded ? "bg-slate-50/30" : ""
-                        }`}
+                        className={`hover:bg-slate-50/50 transition-colors ${isExpanded ? "bg-slate-50/30" : ""
+                          }`}
                       >
                         {/* Expand Toggle */}
                         <td className="px-3 py-3">
@@ -673,11 +672,10 @@ export function CustomerLoans(
                                 if (newId && !loanComments[loan.id])
                                   fetchLoanComments(loan.id);
                               }}
-                              className={`p-1.5 rounded-md transition-all ${
-                                isExpanded
+                              className={`p-1.5 rounded-md transition-all ${isExpanded
                                   ? "bg-slate-200 text-slate-700"
                                   : "hover:bg-slate-100 text-slate-400"
-                              }`}
+                                }`}
                             >
                               {isExpanded ? (
                                 <FaChevronUp className="w-3 h-3" />
@@ -755,7 +753,7 @@ export function CustomerLoans(
                             const penaltyAmount = getPenaltyPaid(loan);
                             return penaltyAmount !== null ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-xl text-[13px] font-semibold bg-orange-100 text-orange-700 border-orange-200 whitespace-nowrap">
-                                BHD{penaltyAmount.toLocaleString()}
+                                {Conversion.formatCurrency(penaltyAmount)}
                               </span>
                             ) : (
                               <span className="text-slate-300">—</span>
@@ -795,21 +793,21 @@ export function CustomerLoans(
                               LoanStatusEnum.POST_ACTIVE,
                               LoanStatusEnum.PARTIALLY_PAID,
                             ].includes(loan.status) && (
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleLoanStatement(loan.userId, loan.id);
-                                }}
-                                disabled={statementLoading === loan.id}
-                              >
-                                {statementLoading === loan.id ? (
-                                  <Spinner theme="light" />
-                                ) : (
-                                  <FaFileAlt className="w-3.5 h-3.5" />
-                                )}
-                                <span>Statement</span>
-                              </Button>
-                            )}
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleLoanStatement(loan.userId, loan.id);
+                                  }}
+                                  disabled={statementLoading === loan.id}
+                                >
+                                  {statementLoading === loan.id ? (
+                                    <Spinner theme="light" />
+                                  ) : (
+                                    <FaFileAlt className="w-3.5 h-3.5" />
+                                  )}
+                                  <span>Statement</span>
+                                </Button>
+                              )}
                             {loan.status === LoanStatusEnum.PENDING ? (
                               <>
                                 {loan?.is_skip_evaluation_approval ? (
@@ -835,36 +833,36 @@ export function CustomerLoans(
                                   <>
                                     {brand?.brandConfig?.evaluationVersion ===
                                       "V1" && (
-                                      <Button
-                                        onClick={() => {
-                                          setLoan(loan);
-                                          fetchEvaluation(
-                                            loan.userId,
-                                            brandId || "",
-                                            loan.id
-                                          );
-                                        }}
-                                        disabled={evaluationLoading === loan.id}
-                                      >
-                                        {evaluationLoading === loan.id ? (
-                                          <Spinner theme="light" />
-                                        ) : (
-                                          <FaEye className="w-3.5 h-3.5" />
-                                        )}
-                                        <span>Evaluate</span>
-                                      </Button>
-                                    )}
+                                        <Button
+                                          onClick={() => {
+                                            setLoan(loan);
+                                            fetchEvaluation(
+                                              loan.userId,
+                                              brandId || "",
+                                              loan.id
+                                            );
+                                          }}
+                                          disabled={evaluationLoading === loan.id}
+                                        >
+                                          {evaluationLoading === loan.id ? (
+                                            <Spinner theme="light" />
+                                          ) : (
+                                            <FaEye className="w-3.5 h-3.5" />
+                                          )}
+                                          <span>Evaluate</span>
+                                        </Button>
+                                      )}
                                     {brand?.brandConfig?.evaluationVersion ===
                                       "V2" && (
-                                      <Button
-                                        onClick={() =>
-                                          setEvaluationV2LoanId(loan.id)
-                                        }
-                                      >
-                                        <FaFileAlt className="w-3.5 h-3.5" />
-                                        <span>Risk</span>
-                                      </Button>
-                                    )}
+                                        <Button
+                                          onClick={() =>
+                                            setEvaluationV2LoanId(loan.id)
+                                          }
+                                        >
+                                          <FaFileAlt className="w-3.5 h-3.5" />
+                                          <span>Risk</span>
+                                        </Button>
+                                      )}
                                   </>
                                 )}
                               </>
@@ -890,35 +888,35 @@ export function CustomerLoans(
                                   LoanStatusEnum.POST_ACTIVE,
                                   LoanStatusEnum.PARTIALLY_PAID,
                                 ].includes(loan.status) && (
-                                  <Button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setNonGetwayPaymentLoanId(loan.id);
-                                      setNonGetwayPaymentUserId(loan.userId);
-                                    }}
-                                  >
-                                    <FaMoneyBillWave className="w-3.5 h-3.5" />
-                                    <span>Payment</span>
-                                  </Button>
-                                )}
+                                    <Button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setNonGetwayPaymentLoanId(loan.id);
+                                        setNonGetwayPaymentUserId(loan.userId);
+                                      }}
+                                    >
+                                      <FaMoneyBillWave className="w-3.5 h-3.5" />
+                                      <span>Payment</span>
+                                    </Button>
+                                  )}
                                 {[
                                   LoanStatusEnum.PAID,
                                   LoanStatusEnum.COMPLETED,
                                   LoanStatusEnum.WRITE_OFF,
                                   LoanStatusEnum.SETTLED,
                                 ].includes(loan.status) && (
-                                  <Button
-                                    onClick={() =>
-                                      setQuery(
-                                        "paymentRequestIdLoanId",
-                                        loan.id
-                                      )
-                                    }
-                                  >
-                                    <FaCheckCircle className="w-3.5 h-3.5" />
-                                    <span>Transactions</span>
-                                  </Button>
-                                )}
+                                    <Button
+                                      onClick={() =>
+                                        setQuery(
+                                          "paymentRequestIdLoanId",
+                                          loan.id
+                                        )
+                                      }
+                                    >
+                                      <FaCheckCircle className="w-3.5 h-3.5" />
+                                      <span>Transactions</span>
+                                    </Button>
+                                  )}
                               </>
                             )}
                           </div>
@@ -938,100 +936,100 @@ export function CustomerLoans(
                                 {(loan.repayment ||
                                   loan.disbursement ||
                                   loan.costSummary) && (
-                                  <div className="bg-[var(--color-background)] rounded-lg border border-[var(--color-muted)] border-opacity-30 p-3 shadow-sm">
-                                    <h6 className="text-[11px] font-semibold text-[var(--color-on-surface)] opacity-70 uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                                      <FaChartLine className="w-3.5 h-3.5 text-[var(--color-on-surface)] opacity-50" />{" "}
-                                      Financial Summary
-                                    </h6>
-                                    <div className="grid grid-cols-3 gap-3 text-xs">
-                                      {loan?.amount && (
-                                        <div className="bg-[var(--color-surface)] rounded-md p-2">
-                                          <span className="text-[var(--color-on-surface)] opacity-70 text-[10px] block">
-                                            Principal
-                                          </span>
-                                          <span className="font-bold text-[var(--color-on-background)]">
-                                            BHD
-                                            {loan.amount.toLocaleString()}
-                                          </span>
-                                        </div>
-                                      )}
-                                      {loan.repayment?.totalObligation && (
-                                        <div className="bg-[var(--color-error)] bg-opacity-10 rounded-md p-2">
-                                          <span className="text-[var(--color-on-error)] text-[10px] block">
-                                            Obligation
-                                          </span>
-                                          <span className="font-bold text-[var(--color-on-error)]">
-                                            BHD
-                                            {loan.repayment.totalObligation.toLocaleString()}
-                                          </span>
-                                        </div>
-                                      )}
-                                      {loan.repayment?.totalFees && (
-                                        <div className="bg-[var(--color-warning)] bg-opacity-10 rounded-md p-2">
-                                          <span className="text-[var(--color-on-error)] text-[10px] block">
-                                            Fees
-                                          </span>
-                                          <span className="font-bold text-[var(--color-on-warning)]">
-                                            BHD
-                                            {loan.repayment.totalFees.toLocaleString()}
-                                          </span>
-                                        </div>
-                                      )}
-                                      {loan.costSummary?.totalTaxes && (
-                                        <div className="bg-[var(--color-secondary)] bg-opacity-10 rounded-md p-2">
-                                          <span className="text-[var(--color-on-error)] text-[10px] block">
-                                            Taxes
-                                          </span>
-                                          <span className="font-bold text-[var(--color-on-secondary)]">
-                                            BHD
-                                            {loan.costSummary.totalTaxes.toLocaleString()}
-                                          </span>
-                                        </div>
-                                      )}
-                                      {loan.costSummary?.effectiveAPR && (
-                                        <div className="bg-[var(--color-info)] bg-opacity-10 rounded-md p-2">
-                                          <span className="text-[var(--color-on-error)] text-[10px] block">
-                                            APR
-                                          </span>
-                                          <span className="font-bold text-[var(--color-on-info)]">
-                                            {loan.costSummary.effectiveAPR.toFixed(
-                                              2
-                                            )}
-                                            %
-                                          </span>
-                                        </div>
-                                      )}
-                                      {loan.disbursement && (
-                                        <>
+                                    <div className="bg-[var(--color-background)] rounded-lg border border-[var(--color-muted)] border-opacity-30 p-3 shadow-sm">
+                                      <h6 className="text-[11px] font-semibold text-[var(--color-on-surface)] opacity-70 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                                        <FaChartLine className="w-3.5 h-3.5 text-[var(--color-on-surface)] opacity-50" />{" "}
+                                        Financial Summary
+                                      </h6>
+                                      <div className="grid grid-cols-3 gap-3 text-xs">
+                                        {loan?.amount && (
                                           <div className="bg-[var(--color-surface)] rounded-md p-2">
                                             <span className="text-[var(--color-on-surface)] opacity-70 text-[10px] block">
-                                              Gross
+                                              Principal
                                             </span>
                                             <span className="font-bold text-[var(--color-on-background)]">
-                                              BHD
-                                              {(
-                                                loan.disbursement
-                                                  ?.grossAmount ?? 0
-                                              ).toLocaleString()}
+
+                                              {Conversion.formatCurrency(loan.amount)}
                                             </span>
                                           </div>
-                                          <div className="bg-[var(--color-success)] bg-opacity-10 rounded-md p-2">
-                                          <span className="text-[var(--color-on-error)] text-[10px] block">
-                                              Net
+                                        )}
+                                        {loan.repayment?.totalObligation && (
+                                          <div className="bg-[var(--color-error)] bg-opacity-10 rounded-md p-2">
+                                            <span className="text-[var(--color-on-error)] text-[10px] block">
+                                              Obligation
                                             </span>
-                                            <span className="font-bold text-[var(--color-on-success)]">
-                                              BHD
-                                              {(
-                                                loan.disbursement?.netAmount ??
-                                                0
-                                              ).toLocaleString()}
+                                            <span className="font-bold text-[var(--color-on-error)]">
+
+                                              {Conversion.formatCurrency(loan.repayment.totalObligation)}
                                             </span>
                                           </div>
-                                        </>
-                                      )}
+                                        )}
+                                        {loan.repayment?.totalFees && (
+                                          <div className="bg-[var(--color-warning)] bg-opacity-10 rounded-md p-2">
+                                            <span className="text-[var(--color-on-error)] text-[10px] block">
+                                              Fees
+                                            </span>
+                                            <span className="font-bold text-[var(--color-on-warning)]">
+
+                                              {Conversion.formatCurrency(loan.repayment.totalFees)}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {loan.costSummary?.totalTaxes && (
+                                          <div className="bg-[var(--color-secondary)] bg-opacity-10 rounded-md p-2">
+                                            <span className="text-[var(--color-on-error)] text-[10px] block">
+                                              Taxes
+                                            </span>
+                                            <span className="font-bold text-[var(--color-on-secondary)]">
+
+                                              {Conversion.formatCurrency(loan.costSummary.totalTaxes)}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {loan.costSummary?.effectiveAPR && (
+                                          <div className="bg-[var(--color-info)] bg-opacity-10 rounded-md p-2">
+                                            <span className="text-[var(--color-on-error)] text-[10px] block">
+                                              APR
+                                            </span>
+                                            <span className="font-bold text-[var(--color-on-info)]">
+                                              {loan.costSummary.effectiveAPR.toFixed(
+                                                2
+                                              )}
+                                              %
+                                            </span>
+                                          </div>
+                                        )}
+                                        {loan.disbursement && (
+                                          <>
+                                            <div className="bg-[var(--color-surface)] rounded-md p-2">
+                                              <span className="text-[var(--color-on-surface)] opacity-70 text-[10px] block">
+                                                Gross
+                                              </span>
+                                              <span className="font-bold text-[var(--color-on-background)]">
+
+                                                {Conversion.formatCurrency(
+                                                  loan.disbursement
+                                                    ?.grossAmount ?? 0
+                                                )}
+                                              </span>
+                                            </div>
+                                            <div className="bg-[var(--color-success)] bg-opacity-10 rounded-md p-2">
+                                              <span className="text-[var(--color-on-error)] text-[10px] block">
+                                                Net
+                                              </span>
+                                              <span className="font-bold text-[var(--color-on-success)]">
+
+                                                {Conversion.formatCurrency(
+                                                  loan.disbursement?.netAmount ??
+                                                  0
+                                                )}
+                                              </span>
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
+                                  )}
 
                                 {/* Loan Info */}
                                 <div className="bg-[var(--color-background)] rounded-lg border border-[var(--color-muted)] border-opacity-30 p-3 shadow-sm">
@@ -1140,19 +1138,17 @@ export function CustomerLoans(
                                                     {fee.type}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-[var(--color-on-surface)] opacity-70">
-                                                    BHD
-                                                    {fee.calculationBaseAmount?.toLocaleString() &&
+
+                                                    {Conversion.formatCurrency(fee.calculationBaseAmount) &&
                                                       fee.calculationBaseAmount?.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-[var(--color-on-surface)] opacity-70">
-                                                    BHD
-                                                    {fee.calculationTaxAmount &&
-                                                      fee.calculationTaxAmount?.toLocaleString()}
+
+                                                    {Conversion.formatCurrency(fee.calculationTaxAmount)}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-[var(--color-on-background)]">
-                                                    BHD
-                                                    {fee.total &&
-                                                      fee.total?.toLocaleString()}
+
+                                                    {Conversion.formatCurrency(fee.total)}
                                                   </td>
                                                 </tr>
                                               )
@@ -1187,12 +1183,12 @@ export function CustomerLoans(
                                             </div>
                                             <div className="flex justify-between text-[11px]">
                                               <span className="text-red-600">
-                                                BHD
-                                                {penalty.chargeValue.toLocaleString()}
+
+                                                {Conversion.formatCurrency(penalty.chargeValue)}
                                               </span>
                                               <span className="text-red-500">
-                                                +Tax: BHD
-                                                {penalty.taxChargeValue.toLocaleString()}
+                                                +Tax:
+                                                {Conversion.formatCurrency(penalty.taxChargeValue)}
                                               </span>
                                             </div>
                                           </div>
@@ -1238,24 +1234,18 @@ export function CustomerLoans(
                                                     {d.type}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
-                                                    BHD
-                                                    {(
-                                                      d.calculationBaseAmount ??
-                                                      0
-                                                    ).toLocaleString()}
+
+                                                    {Conversion.formatCurrency(d.calculationBaseAmount)}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
-                                                    BHD
-                                                    {(
-                                                      d.calculationTaxAmount ??
+
+                                                    {Conversion.formatCurrency(d.calculationTaxAmount ??
                                                       0
-                                                    ).toLocaleString()}
+                                                    )}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-slate-800">
-                                                    BHD
-                                                    {(
-                                                      d.total ?? 0
-                                                    ).toLocaleString()}
+
+                                                    {Conversion.formatCurrency(d.total ?? 0)}
                                                   </td>
                                                 </tr>
                                               )
@@ -1355,11 +1345,10 @@ export function CustomerLoans(
                                           Signed:{" "}
                                         </span>
                                         <span
-                                          className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                            loan.agreement.signedByUser
+                                          className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${loan.agreement.signedByUser
                                               ? "bg-emerald-100 text-emerald-800"
                                               : "bg-red-100 text-red-800"
-                                          }`}
+                                            }`}
                                         >
                                           {loan.agreement.signedByUser
                                             ? "Yes"
@@ -1555,8 +1544,8 @@ export function CustomerLoans(
                                                     {partner.partnerUser.email}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-emerald-600">
-                                                    BHD
-                                                    {partner.amount.toLocaleString()}
+
+                                                    {Conversion.formatCurrency(partner.amount)}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
                                                     {formatDate(
@@ -1584,11 +1573,10 @@ export function CustomerLoans(
                                       </span>
                                     )}
                                     <span
-                                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${
-                                        loan.forceBsaReportByPass
+                                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${loan.forceBsaReportByPass
                                           ? "bg-red-100 text-red-700"
                                           : "bg-emerald-100 text-emerald-700"
-                                      }`}
+                                        }`}
                                     >
                                       BSA:{" "}
                                       {loan.forceBsaReportByPass
@@ -1596,11 +1584,10 @@ export function CustomerLoans(
                                         : "OK"}
                                     </span>
                                     <span
-                                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${
-                                        loan.forceCreditReportByPass
+                                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${loan.forceCreditReportByPass
                                           ? "bg-red-100 text-red-700"
                                           : "bg-emerald-100 text-emerald-700"
-                                      }`}
+                                        }`}
                                     >
                                       Credit:{" "}
                                       {loan.forceCreditReportByPass
