@@ -69,7 +69,7 @@ const AmountCard: React.FC<AmountMetric> = ({ amount, label, accentColor }) => (
     />
     <div className="flex flex-col min-w-0">
       <div className="text-sm font-bold text-gray-800 leading-none">
-        ₹{amount}
+        BHD {amount}
       </div>
       <div className="text-xs font-medium text-gray-400 mt-0.5 leading-tight whitespace-normal">
         {label}

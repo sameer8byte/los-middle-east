@@ -6,9 +6,9 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { FiMail, FiCopy } from "react-icons/fi";
-import { FaRupeeSign } from "react-icons/fa"; // Add this import
 import { useQueryParams } from "../../../hooks/useQueryParams";
 import { useToast } from "../../../context/toastContext";
+import { Conversion } from "../../../utils/conversion";
 import {
   PartnerUserRoleEnum,
   PartnerUserPermissionEnum,
@@ -350,7 +350,25 @@ export default function CustomersList() {
           },
           queryWithExecutiveFilter,
         );
-        setCustomers(response.users);
+        // Filter out customers where creditScore is explicitly 0 or "N/A"
+        // (Supports if creditScore is either directly on the user or inside userDetails)
+        // Also filter out users with an empty name ("")
+        // Also filter out users where they have loans but NONE are >= 12156
+        const filteredUsers = (response.users || []).filter((user: any) => {
+          const score = user.creditScore ?? user.userDetails?.creditScore;
+          const hasValidScore = score !== 0 && score !== "0" && score !== "N/A";
+          const hasValidName = user.name !== "";
+
+          // Check loans condition
+          let hasValidLoan = false; // By default, assume false unless proven otherwise
+          if (user.loans && user.loans.length > 0) {
+            hasValidLoan = user.loans.some((loan: any) => (loan.amount || 0) >= 12156);
+          }
+
+          return hasValidScore && hasValidName && hasValidLoan;
+        });
+
+        setCustomers(filteredUsers);
         setTotalCount(response.meta.total);
       } catch (err) {
         setError("Failed to fetch customers");
@@ -433,9 +451,8 @@ export default function CustomersList() {
 🔄 Onboarding: ${onboardingStep}
 💰 Total Loans: ${loanCount}
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- CUSTOMER DETAILS ----
 ═══════════════════════════════
 
@@ -566,11 +583,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 {/* Copy Button */}
                 <button
                   onClick={(e) => copyCustomerInfo(customer, e)}
-                  className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity- group-hover:opacity-100 transition-all ${
-                    copiedCustomerId === customer.id
-                      ? "bg-green-500 scale-110 opacity-100"
-                      : "bg-[var(--color-surface)]"
-                  }`}
+                  className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity- group-hover:opacity-100 transition-all ${copiedCustomerId === customer.id
+                    ? "bg-green-500 scale-110 opacity-100"
+                    : "bg-[var(--color-surface)]"
+                    }`}
                   title="Copy customer information"
                 >
                   {copiedCustomerId === customer.id ? (
@@ -637,10 +653,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
 
                 {customer.Salary && (
                   <div className="flex items-center gap-2 text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
-                    <FaRupeeSign className="w-3 h-3" />{" "}
-                    {/* Add this import at top */}
                     <span>
-                      Salary: ₹{customer.Salary?.toLocaleString() || "N/A"}
+                      Salary: {customer.Salary ? Conversion.formatCurrency(customer.Salary) : "N/A"}
                     </span>
                     {formatDateWithTime(customer.createdAt)}
                   </div>
@@ -658,9 +672,9 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                             ? isEmailVisible
                               ? customer.email
                               : customer.email.replace(
-                                  /(?<=^.{1}).*?(?=@)/g,
-                                  (match) => "X".repeat(match.length),
-                                )
+                                /(?<=^.{1}).*?(?=@)/g,
+                                (match) => "X".repeat(match.length),
+                              )
                             : ""}
                         </span>
                       </div>
@@ -784,8 +798,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
         key: "loans",
         label: "Loans",
         render: (_: any, customer: Customer) => {
-          const loanCount = customer.loanCount || 0;
-          const loans = customer.loans || [];
+          const loans = (customer.loans || []).filter((loan) => (loan.amount || 0) >= 12156);
+          const loanCount = loans.length;
           const userAllocatedPartnerId = customer.allocatedPartnerUserId;
           const userExecutiveIds = new Set(
             userAllocatedPartnerId ? [userAllocatedPartnerId] : [],
@@ -820,11 +834,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   return (
                     <div
                       key={loan.id}
-                      className={`p-2.5 rounded-lg border transition-all ${
-                        hasDifferentExecutive
-                          ? "bg-amber-50 border-amber-200 border-opacity-50"
-                          : "bg-[var(--color-surface)] border-[var(--color-muted)] border-opacity-30 hover:border-opacity-50"
-                      }`}
+                      className={`p-2.5 rounded-lg border transition-all ${hasDifferentExecutive
+                        ? "bg-amber-50 border-amber-200 border-opacity-50"
+                        : "bg-[var(--color-surface)] border-[var(--color-muted)] border-opacity-30 hover:border-opacity-50"
+                        }`}
                     >
                       {/* Loan Header with Different Executive Badge */}
                       <div className="flex items-center justify-between mb-2">
@@ -861,7 +874,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                       {/* Loan Amount & Duration */}
                       <div className="flex items-center gap-3 text-xs mb-2">
                         <span className="font-medium text-[var(--color-on-background)]">
-                          ₹{loan.amount?.toLocaleString()}
+                          {Conversion.formatCurrency(loan.amount)}
                         </span>
                         <span className="text-[var(--color-on-surface)] opacity-60">
                           •
@@ -898,53 +911,46 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                               return (
                                 <div
                                   key={partner.id}
-                                  className={`flex items-start gap-1.5 px-2 py-1 rounded-md border transition-all ${
-                                    isDifferentFromUser
-                                      ? "bg-amber-100 border-amber-300 border-opacity-60"
-                                      : "bg-[var(--color-background)] border-[var(--color-muted)] border-opacity-20"
-                                  }`}
-                                  title={`${
-                                    partner.partnerUser.name || "Unknown"
-                                  } - ${
-                                    partner.partnerUser.email
-                                  }\nAllotted: ${formatDateWithTime(
-                                    partner.allottedAt,
-                                  )}${
-                                    isDifferentFromUser
+                                  className={`flex items-start gap-1.5 px-2 py-1 rounded-md border transition-all ${isDifferentFromUser
+                                    ? "bg-amber-100 border-amber-300 border-opacity-60"
+                                    : "bg-[var(--color-background)] border-[var(--color-muted)] border-opacity-20"
+                                    }`}
+                                  title={`${partner.partnerUser.name || "Unknown"
+                                    } - ${partner.partnerUser.email
+                                    }\nAllotted: ${formatDateWithTime(
+                                      partner.allottedAt,
+                                    )}${isDifferentFromUser
                                       ? "\n⚠️ Different from user assignment"
                                       : ""
-                                  }`}
+                                    }`}
                                 >
                                   <div className="flex flex-col min-w-0">
                                     <div className="flex items-start gap-1.5">
                                       {/* 🔹 FULL NAME VISIBLE */}
                                       <span
-                                        className={`text-[10px] font-medium break-words leading-tight ${
-                                          isDifferentFromUser
-                                            ? "text-amber-900"
-                                            : "text-[var(--color-on-background)]"
-                                        }`}
+                                        className={`text-[10px] font-medium break-words leading-tight ${isDifferentFromUser
+                                          ? "text-amber-900"
+                                          : "text-[var(--color-on-background)]"
+                                          }`}
                                       >
                                         {partner.partnerUser.name || "Unknown"}
                                       </span>
 
                                       {partner.partnerUser.reportsToId ? (
                                         <span
-                                          className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider rounded shrink-0 ${
-                                            isDifferentFromUser
-                                              ? "bg-amber-300 text-amber-900 border border-amber-400"
-                                              : "bg-blue-100 text-blue-700"
-                                          }`}
+                                          className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider rounded shrink-0 ${isDifferentFromUser
+                                            ? "bg-amber-300 text-amber-900 border border-amber-400"
+                                            : "bg-blue-100 text-blue-700"
+                                            }`}
                                         >
                                           Executive
                                         </span>
                                       ) : (
                                         <span
-                                          className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider rounded shrink-0 ${
-                                            isDifferentFromUser
-                                              ? "bg-amber-300 text-amber-900 border border-amber-400"
-                                              : "bg-purple-100 text-purple-700"
-                                          }`}
+                                          className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider rounded shrink-0 ${isDifferentFromUser
+                                            ? "bg-amber-300 text-amber-900 border border-amber-400"
+                                            : "bg-purple-100 text-purple-700"
+                                            }`}
                                         >
                                           Manager
                                         </span>
@@ -952,11 +958,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                                     </div>
 
                                     <span
-                                      className={`text-[9px] ${
-                                        isDifferentFromUser
-                                          ? "text-amber-800 font-medium"
-                                          : "text-[var(--color-on-surface)] opacity-60"
-                                      }`}
+                                      className={`text-[9px] ${isDifferentFromUser
+                                        ? "text-amber-800 font-medium"
+                                        : "text-[var(--color-on-surface)] opacity-60"
+                                        }`}
                                     >
                                       {
                                         formatDateWithTime(
@@ -1472,213 +1477,207 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           {/* Executive Filter Dropdown */}
           {(auth.role[0] !== "CREDIT_EXECUTIVE" ||
             brand.brandConfig.autoAllocationType === "LOGIN") && (
-            <div className="relative" ref={executiveDropdownRef}>
-              <Button
-                onClick={handleExecutiveDropdownToggle}
-                variant="surface"
-                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                  selectedExecutives.length > 0
+              <div className="relative" ref={executiveDropdownRef}>
+                <Button
+                  onClick={handleExecutiveDropdownToggle}
+                  variant="surface"
+                  className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedExecutives.length > 0
                     ? "bg-blue-50 border-blue-300 hover:bg-blue-100"
                     : "bg-white border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <HiChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    executiveDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-                <span>
-                  {selectedExecutives.length > 0
-                    ? `Executive (${selectedExecutives.length})`
-                    : "Executive"}
-                </span>
-              </Button>
+                    }`}
+                >
+                  <HiChevronDown
+                    className={`w-4 h-4 transition-transform ${executiveDropdownOpen ? "rotate-180" : ""
+                      }`}
+                  />
+                  <span>
+                    {selectedExecutives.length > 0
+                      ? `Executive (${selectedExecutives.length})`
+                      : "Executive"}
+                  </span>
+                </Button>
 
-              {executiveDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-800">
-                      Filter by Executive
-                    </span>
-                    {selectedExecutives.length > 0 && (
-                      <button
-                        onClick={clearExecutiveFilter}
-                        className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Clear All
-                      </button>
-                    )}
-                  </div>
-
-                  {isLoadingPartnerUsers ? (
-                    <div className="p-6 text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Loading executives...
-                      </p>
-                    </div>
-                  ) : partnerUsers.length > 0 ? (
-                    <div className="p-2">
-                      {/* Not Assigned Option */}
-                      <label className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition">
-                        <input
-                          type="checkbox"
-                          checked={selectedExecutives.includes("NOT_ASSIGNED")}
-                          onChange={() => handleExecutiveToggle("NOT_ASSIGNED")}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                            <HiOutlineUser className="w-4 h-4 text-gray-500" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700">
-                            Not Assigned
-                          </span>
-                        </div>
-                      </label>
-
-                      {/* Partner Users */}
-                      {partnerUsers.map((user) => (
-                        <label
-                          key={user.id}
-                          className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition"
+                {executiveDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                    <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-center">
+                      <span className="text-sm font-semibold text-gray-800">
+                        Filter by Executive
+                      </span>
+                      {selectedExecutives.length > 0 && (
+                        <button
+                          onClick={clearExecutiveFilter}
+                          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                         >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+
+                    {isLoadingPartnerUsers ? (
+                      <div className="p-6 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Loading executives...
+                        </p>
+                      </div>
+                    ) : partnerUsers.length > 0 ? (
+                      <div className="p-2">
+                        {/* Not Assigned Option */}
+                        <label className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition">
                           <input
                             type="checkbox"
-                            checked={selectedExecutives.includes(user.id)}
-                            onChange={() => handleExecutiveToggle(user.id)}
+                            checked={selectedExecutives.includes("NOT_ASSIGNED")}
+                            onChange={() => handleExecutiveToggle("NOT_ASSIGNED")}
                             className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm">
-                              {user.name?.charAt(0)?.toUpperCase() || "?"}
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                              <HiOutlineUser className="w-4 h-4 text-gray-500" />
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-gray-900">
-                                {user.name}
-                              </span>
-                              <span className="text-xs  text-gray-500">
-                                {user.email}
-                              </span>
-                            </div>
+                            <span className="text-sm font-medium text-gray-700">
+                              Not Assigned
+                            </span>
                           </div>
                         </label>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 text-center text-sm text-gray-500">
-                      <HiOutlineUser className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                      <p>No executives found</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+
+                        {/* Partner Users */}
+                        {partnerUsers.map((user) => (
+                          <label
+                            key={user.id}
+                            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedExecutives.includes(user.id)}
+                              onChange={() => handleExecutiveToggle(user.id)}
+                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm">
+                                {user.name?.charAt(0)?.toUpperCase() || "?"}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {user.name}
+                                </span>
+                                <span className="text-xs  text-gray-500">
+                                  {user.email}
+                                </span>
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-6 text-center text-sm text-gray-500">
+                        <HiOutlineUser className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                        <p>No executives found</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* Supervisor Filter Dropdown */}
           {(auth.role[0] !== "CREDIT_EXECUTIVE" ||
             brand.brandConfig.autoAllocationType === "LOGIN") && (
-            <div className="relative" ref={supervisorDropdownRef}>
-              <Button
-                onClick={handleSupervisorDropdownToggle}
-                variant="surface"
-                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                  selectedSupervisors.length > 0
+              <div className="relative" ref={supervisorDropdownRef}>
+                <Button
+                  onClick={handleSupervisorDropdownToggle}
+                  variant="surface"
+                  className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedSupervisors.length > 0
                     ? "bg-purple-50 border-purple-300 hover:bg-purple-100"
                     : "bg-white border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <HiChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    supervisorDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-                <span>
-                  {selectedSupervisors.length > 0
-                    ? `Supervisor (${selectedSupervisors.length})`
-                    : "Supervisor"}
-                </span>
-              </Button>
+                    }`}
+                >
+                  <HiChevronDown
+                    className={`w-4 h-4 transition-transform ${supervisorDropdownOpen ? "rotate-180" : ""
+                      }`}
+                  />
+                  <span>
+                    {selectedSupervisors.length > 0
+                      ? `Supervisor (${selectedSupervisors.length})`
+                      : "Supervisor"}
+                  </span>
+                </Button>
 
-              {supervisorDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-800">
-                      Filter by Supervisor
-                    </span>
-                    {selectedSupervisors.length > 0 && (
-                      <button
-                        onClick={clearSupervisorFilter}
-                        className="text-xs text-purple-600 hover:text-purple-800 font-medium"
-                      >
-                        Clear All
-                      </button>
+                {supervisorDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                    <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-center">
+                      <span className="text-sm font-semibold text-gray-800">
+                        Filter by Supervisor
+                      </span>
+                      {selectedSupervisors.length > 0 && (
+                        <button
+                          onClick={clearSupervisorFilter}
+                          className="text-xs text-purple-600 hover:text-purple-800 font-medium"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+
+                    {isLoadingSupervisorUsers ? (
+                      <div className="p-6 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Loading supervisors...
+                        </p>
+                      </div>
+                    ) : supervisorUsers.length > 0 ? (
+                      <div className="p-2">
+                        {/* Supervisor Users */}
+                        {supervisorUsers.map((user) => (
+                          <label
+                            key={user.id}
+                            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedSupervisors.includes(user.id)}
+                              onChange={() => handleSupervisorToggle(user.id)}
+                              className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                            />
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm">
+                                {user.name?.charAt(0)?.toUpperCase() || "?"}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {user.name}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {user.email}
+                                </span>
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-6 text-center text-sm text-gray-500">
+                        <HiOutlineUser className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                        <p>No supervisors found</p>
+                      </div>
                     )}
                   </div>
-
-                  {isLoadingSupervisorUsers ? (
-                    <div className="p-6 text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Loading supervisors...
-                      </p>
-                    </div>
-                  ) : supervisorUsers.length > 0 ? (
-                    <div className="p-2">
-                      {/* Supervisor Users */}
-                      {supervisorUsers.map((user) => (
-                        <label
-                          key={user.id}
-                          className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedSupervisors.includes(user.id)}
-                            onChange={() => handleSupervisorToggle(user.id)}
-                            className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                          />
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm">
-                              {user.name?.charAt(0)?.toUpperCase() || "?"}
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-gray-900">
-                                {user.name}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {user.email}
-                              </span>
-                            </div>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 text-center text-sm text-gray-500">
-                      <HiOutlineUser className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                      <p>No supervisors found</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
         </div>
         <div className="relative" ref={loansDropdownRef}>
           <Button
             onClick={() => setLoansDropdownOpen(!loansDropdownOpen)}
             variant="surface"
-            className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-              selectedLoanFilter
-                ? "bg-green-50 border-green-300 hover:bg-green-100"
-                : "bg-white border-gray-300 hover:bg-gray-50"
-            }`}
+            className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedLoanFilter
+              ? "bg-green-50 border-green-300 hover:bg-green-100"
+              : "bg-white border-gray-300 hover:bg-gray-50"
+              }`}
           >
             <HiChevronDown
-              className={`w-4 h-4 transition-transform ${
-                loansDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform ${loansDropdownOpen ? "rotate-180" : ""
+                }`}
             />
             <span>
               {selectedLoanFilter === ">0"
@@ -1702,11 +1701,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     setSelectedLoanFilter(">0");
                     setLoansDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm transition ${
-                    selectedLoanFilter === ">0"
-                      ? "bg-green-50 font-semibold text-green-800"
-                      : ""
-                  }`}
+                  className={`w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm transition ${selectedLoanFilter === ">0"
+                    ? "bg-green-50 font-semibold text-green-800"
+                    : ""
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-600"></span>
@@ -1719,11 +1717,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     setSelectedLoanFilter("0");
                     setLoansDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm transition ${
-                    selectedLoanFilter === "0"
-                      ? "bg-blue-50 font-semibold text-blue-800"
-                      : ""
-                  }`}
+                  className={`w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-sm transition ${selectedLoanFilter === "0"
+                    ? "bg-blue-50 font-semibold text-blue-800"
+                    : ""
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-600"></span>
@@ -1752,17 +1749,15 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
             variant="surface"
             className={`
       flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-all shadow-sm
-      ${
-        selectedReloanStatus
-          ? " font-semibold"
-          : "bg-white border-gray-300 hover:bg-gray-50 "
-      }
+      ${selectedReloanStatus
+                ? " font-semibold"
+                : "bg-white border-gray-300 hover:bg-gray-50 "
+              }
     `}
           >
             <HiChevronDown
-              className={`w-4 h-4 transition-transform ${
-                reloanStatusOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform ${reloanStatusOpen ? "rotate-180" : ""
+                }`}
             />
             <span>Reloan Status</span>
           </Button>
@@ -1775,9 +1770,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     setSelectedReloanStatus(null);
                     setReloanStatusOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition ${
-                    !selectedReloanStatus ? "bg-gray-100" : "hover:bg-gray-50"
-                  }`}
+                  className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition ${!selectedReloanStatus ? "bg-gray-100" : "hover:bg-gray-50"
+                    }`}
                 >
                   All Reloan Status
                 </button>
@@ -1847,22 +1841,19 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           <Button
             onClick={() => setSalaryDropdownOpen(!salaryDropdownOpen)}
             variant="surface"
-            className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-              salaryRange.min || salaryRange.max
-                ? "bg-indigo-50 border-indigo-300 hover:bg-indigo-100"
-                : "bg-white border-gray-300 hover:bg-gray-50"
-            }`}
+            className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${salaryRange.min || salaryRange.max
+              ? "bg-indigo-50 border-indigo-300 hover:bg-indigo-100"
+              : "bg-white border-gray-300 hover:bg-gray-50"
+              }`}
           >
             <HiChevronDown
-              className={`w-4 h-4 transition-transform ${
-                salaryDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform ${salaryDropdownOpen ? "rotate-180" : ""
+                }`}
             />
             <span>
               {salaryRange.min || salaryRange.max
-                ? `Salary (${salaryRange.min ? `₹${salaryRange.min}` : ""}${
-                    salaryRange.min && salaryRange.max ? "-" : ""
-                  }${salaryRange.max ? `₹${salaryRange.max}` : ""})`
+                ? `Salary (${salaryRange.min ? `BHD ${salaryRange.min}` : ""}${salaryRange.min && salaryRange.max ? "-" : ""
+                }${salaryRange.max ? `BHD ${salaryRange.max}` : ""})`
                 : "Salary"}
             </span>
           </Button>
@@ -1889,11 +1880,11 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 {/* Minimum Salary Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minimum Salary (₹)
+                    Minimum Salary (BHD)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      ₹
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[10px] font-bold">
+                      BHD
                     </span>
                     <input
                       type="number"
@@ -1914,11 +1905,11 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 {/* Maximum Salary Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Maximum Salary (₹)
+                    Maximum Salary (BHD)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      ₹
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[10px] font-bold">
+                      BHD
                     </span>
                     <input
                       type="number"
@@ -2055,10 +2046,9 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     onClick={() => handleAccountStatusClick(option.value)}
                     className={`
                       relative px-6 py-3 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap
-                      ${
-                        isActive
-                          ? "border-blue-500 text-blue-600 bg-blue-50"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                      ${isActive
+                        ? "border-blue-500 text-blue-600 bg-blue-50"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }
                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset
                     `}

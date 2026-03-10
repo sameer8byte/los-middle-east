@@ -77,12 +77,12 @@ export const Application = () => {
   // }, []);
 
   // 🔴 REPLACE MOCK DATA WITH API data
-  const totalCases = { closed: 48, total: 120, amount: "₹32 L" };
+  const totalCases = { closed: 48, total: 120, amount: "BHD32 L" };
   const closurePercentage = Math.round((totalCases.closed / totalCases.total) * 100);
   const statusCards = [
-    { count: 14, amount: "₹9 L", title: "Pre Closure", fresh: 8, repeat: 6, freshAmount: "₹18,20,000", repeatAmount: "₹4,20,000", borderColor: "#B433EA" },
-    { count: 22, amount: "₹15 L", title: "On Time Closure", fresh: 14, repeat: 8, freshAmount: "₹9,50,000", repeatAmount: "₹5,50,000", borderColor: "#00A63E" },
-    { count: 12, amount: "₹8 L", title: "Post Due (Current Due + Penalty)", fresh: 8, repeat: 4, freshAmount: "₹4,00,000", repeatAmount: "₹4,00,000", borderColor: "#E21616" },
+    { count: 14, amount: "BHD9 L", title: "Pre Closure", fresh: 8, repeat: 6, freshAmount: "BHD18,20,000", repeatAmount: "BHD4,20,000", borderColor: "#B433EA" },
+    { count: 22, amount: "BHD15 L", title: "On Time Closure", fresh: 14, repeat: 8, freshAmount: "BHD9,50,000", repeatAmount: "BHD5,50,000", borderColor: "#00A63E" },
+    { count: 12, amount: "BHD8 L", title: "Post Due (Current Due + Penalty)", fresh: 8, repeat: 4, freshAmount: "BHD4,00,000", repeatAmount: "BHD4,00,000", borderColor: "#E21616" },
   ];
 
   return (

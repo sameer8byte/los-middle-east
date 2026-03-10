@@ -45,7 +45,7 @@ import { useAppSelector } from "../../../shared/redux/store";
 import { LoanStatusBadge } from "../../../common/ui/LoanStatusBadge";
 import { useQueryParams } from "../../../hooks/useQueryParams";
 import { ColumnVisibilityDropdown } from "../../../common/ui/columnVisibilityDropdown";
-import { FaRupeeSign } from "react-icons/fa";
+import { Conversion } from "../../../utils/conversion";
 import { UserStatusReasonsDialog } from "../../customerDetails/components/UserStatusReasonsDialog";
 import {
   selectIsBrand,
@@ -390,40 +390,39 @@ export default function LoanList() {
 
       const formattedName = fullName
         ? fullName
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-            )
-            .join(" ")
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+          )
+          .join(" ")
         : "N/A";
 
       const documents = loan.user?.documents ?? [];
       const documentInfo = documents.length
         ? documents
-            .map((doc) => {
-              const docNumber =
-                doc.type === DocumentTypeEnum.AADHAAR
-                  ? maskAadhaar(doc.documentNumber)
-                  : maskPan(doc.documentNumber);
-              return `${doc.type}: ${docNumber}`;
-            })
-            .join("\n")
+          .map((doc) => {
+            const docNumber =
+              doc.type === DocumentTypeEnum.AADHAAR
+                ? maskAadhaar(doc.documentNumber)
+                : maskPan(doc.documentNumber);
+            return `${doc.type}: ${docNumber}`;
+          })
+          .join("\n")
         : "No documents";
 
       // Get assigned executives info
       const assignedPartners = loan.allottedPartners || [];
       const assignedInfo = assignedPartners.length
         ? assignedPartners
-            .map((partner) => {
-              const role = partner.partnerUser.reportsToId
-                ? "Executive"
-                : "Manager/Head";
-              return `  • ${partner.partnerUser.name || "N/A"} (${role}) - ₹${
-                partner.amount?.toLocaleString("en-IN") || "0"
+          .map((partner) => {
+            const role = partner.partnerUser.reportsToId
+              ? "Executive"
+              : "Manager/Head";
+            return `  • ${partner.partnerUser.name || "N/A"} (${role}) - ${partner.amount ? Conversion.formatCurrency(partner.amount) : "0"
               }`;
-            })
-            .join("\n")
+          })
+          .join("\n")
         : "  Not assigned";
 
       // Get status reasons if any
@@ -436,9 +435,9 @@ export default function LoanList() {
         latestStatusWithReasons?.loan_status_brand_reasons || [];
       const reasonsInfo = statusReasons.length
         ? "\nRejection Reasons:\n" +
-          statusReasons
-            .map((reason) => `  • ${reason.brandStatusReason.reason}`)
-            .join("\n")
+        statusReasons
+          .map((reason) => `  • ${reason.brandStatusReason.reason}`)
+          .join("\n")
         : "";
 
       const copyText = `
@@ -460,13 +459,12 @@ Phone: ${loan.user.phoneNumber || "N/A"}
 
 💰 Loan Details
 ━━━━━━━━━━━━━━━━━━━━
-Amount: ₹${loan.amount?.toLocaleString("en-IN") || "N/A"}
+Amount: ${loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
 Status: ${loan.status}
-Agreement: ${
-        loan?.agreement?.status
+Agreement: ${loan?.agreement?.status
           ? loan.agreement.status.toLowerCase().replace(/_/g, " ")
           : "N/A"
-      }
+        }
 Created: ${dayjs(loan.createdAt).format("MMMM D, YYYY h:mm A")}${reasonsInfo}
 
 👥 Assigned To
@@ -476,16 +474,14 @@ ${assignedInfo}
 📄 Documents
 ━━━━━━━━━━━━━━━━━━━━
 ${documentInfo}
-${
-  loan?.forceCreditReportByPass || loan?.forceBsaReportByPass
-    ? "\n⚠️  WARNING: Force Bypass Applied"
-    : ""
-}
+${loan?.forceCreditReportByPass || loan?.forceBsaReportByPass
+          ? "\n⚠️  WARNING: Force Bypass Applied"
+          : ""
+        }
 
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- LOAN ----
 ═══════════════════════════════
     `.trim();
@@ -587,13 +583,13 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <span className="text-[var(--color-on-background)] font-semibold text-sm truncate max-w-[180px]">
                     {fullName
                       ? fullName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase(),
+                        )
+                        .join(" ")
                       : "N/A"}
                   </span>
 
@@ -605,11 +601,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 </div>
                 {loan.user.employment?.salary && (
                   <div className="flex items-center gap-2 text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
-                    <FaRupeeSign className="w-3 h-3" />{" "}
-                    {/* Add this import at top */}
                     <span>
-                      Salary: ₹
-                      {loan.user.employment?.salary?.toLocaleString() || "N/A"}
+                      Salary: {loan.user.employment?.salary ? Conversion.formatCurrency(loan.user.employment.salary) : "N/A"}
                     </span>
                   </div>
                 )}
@@ -624,11 +617,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   {/* Loan Type Badge */}
                   {loan.loanType && (
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
-                        !loan?.is_repeat_loan
-                          ? "bg-green-100 text-green-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
+                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                        }`}
                     >
                       {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
                     </span>
@@ -644,9 +636,9 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                         ? isEmailVisible
                           ? loan.user.email
                           : loan.user.email.replace(
-                              /(?<=^.{1}).*?(?=@)/g,
-                              (match) => "X".repeat(match.length),
-                            )
+                            /(?<=^.{1}).*?(?=@)/g,
+                            (match) => "X".repeat(match.length),
+                          )
                         : "N/A"}
                     </span>
                   </div>
@@ -767,11 +759,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {/* Copy Button */}
               <button
                 onClick={(e) => copyCustomerInfo(loan, e)}
-                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${
-                  copiedLoanId === loan.id
-                    ? "bg-green-500 scale-110 opacity-100"
-                    : "bg-[var(--color-surface)]"
-                }`}
+                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
+                  ? "bg-green-500 scale-110 opacity-100"
+                  : "bg-[var(--color-surface)]"
+                  }`}
                 title={
                   copiedLoanId === loan.id ? "Copied!" : "Copy customer info"
                 }
@@ -879,7 +870,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 Amount will be visible post onboarding
               </span>
             ) : (
-              loan.amount?.toLocaleString("en-IN") || "N/A"
+              loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"
             )}
           </div>
         ),
@@ -951,8 +942,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                         {assignedPartner.partnerUser.email || "No email"}
                       </span>
                       <span className="text-xs text-[var(--color-on-surface)] opacity-60">
-                        Amount: ₹
-                        {assignedPartner.amount?.toLocaleString("en-IN") || "0"}
+                        Amount: {assignedPartner.amount ? Conversion.formatCurrency(assignedPartner.amount) : "0"}
                       </span>
                     </div>
                   </div>
@@ -1141,11 +1131,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <button
                       key={option.value || "all"}
                       onClick={() => handleLoanTypeFilterClick(option.value)}
-                      className={`relative px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                        isActive
-                          ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-                          : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
-                      }`}
+                      className={`relative px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${isActive
+                        ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                        : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
+                        }`}
                     >
                       {option.label}
                     </button>
@@ -1210,16 +1199,14 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               <Button
                 onClick={handleExecutiveDropdownToggle}
                 variant="surface"
-                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                  selectedExecutives.length > 0
-                    ? "bg-blue-50 border-blue-300 hover:bg-blue-100"
-                    : "bg-white border-gray-300 hover:bg-gray-50"
-                }`}
+                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedExecutives.length > 0
+                  ? "bg-blue-50 border-blue-300 hover:bg-blue-100"
+                  : "bg-white border-gray-300 hover:bg-gray-50"
+                  }`}
               >
                 <HiChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    executiveDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${executiveDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
                 <span>
                   {selectedExecutives.length > 0
@@ -1295,16 +1282,14 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               <Button
                 onClick={handleSupervisorDropdownToggle}
                 variant="surface"
-                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${
-                  selectedSupervisors.length > 0
-                    ? "bg-purple-50 border-purple-300 hover:bg-purple-100"
-                    : "bg-white border-gray-300 hover:bg-gray-50"
-                }`}
+                className={`flex items-center gap-2 border rounded-xl shadow-sm transition-all duration-150 ${selectedSupervisors.length > 0
+                  ? "bg-purple-50 border-purple-300 hover:bg-purple-100"
+                  : "bg-white border-gray-300 hover:bg-gray-50"
+                  }`}
               >
                 <HiChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    supervisorDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${supervisorDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
                 <span>
                   {selectedSupervisors.length > 0
@@ -1384,16 +1369,16 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               (window.location.origin !== "https://lm.qualoan.com" &&
                 window.location.origin !== "https://lm.salary4sure.com" &&
                 window.location.origin !== "https://crm.zeptofinance.com")) && (
-              <Button
-                variant="primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLoanReallocationOpen(true);
-                }}
-              >
-                Reallocate Loans
-              </Button>
-            )}
+                <Button
+                  variant="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLoanReallocationOpen(true);
+                  }}
+                >
+                  Reallocate Loans
+                </Button>
+              )}
             <Button
               variant="primary"
               onClick={(e) => {
@@ -1424,11 +1409,11 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               // Only show Onboarding tab when loanOnboardingEnabled is true
               ...(loanOnboardingEnabled
                 ? [
-                    {
-                      value: LoanStatusEnum.ONBOARDING,
-                      label: "Onboarding",
-                    },
-                  ]
+                  {
+                    value: LoanStatusEnum.ONBOARDING,
+                    label: "Onboarding",
+                  },
+                ]
                 : []),
               { value: LoanStatusEnum.PENDING, label: "Pending" },
               {
@@ -1454,11 +1439,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 <button
                   key={option.value || "all"}
                   onClick={() => handleLoanStatusClick(option.value)}
-                  className={`relative px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                    isActive
-                      ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-                      : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
-                  }`}
+                  className={`relative px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${isActive
+                    ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                    : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
+                    }`}
                 >
                   {option.label}
                 </button>

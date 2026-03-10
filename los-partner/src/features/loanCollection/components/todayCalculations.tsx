@@ -46,7 +46,7 @@ export interface PartialRepaymentCalculationResponse {
 
 // Currency formatter
 const formatCurrency = (value: number | string) =>
-  `₹${Number(value || 0).toLocaleString("en-IN", {
+  `BHD ${Number(value || 0).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -375,7 +375,7 @@ export function TodayCalculations({ loanId }: ClosingTypeProps) {
 
         {/* Interest */}
         <tr className="hover:bg-gray-50/50 transition-colors">
-          <td className="px-4 py-2.5 font-medium">Interest</td>
+          <td className="px-4 py-2.5 font-medium">Murabaha margin</td>
           <td className="px-4 py-2.5 text-right font-mono text-gray-600">{formatCurrency(totalInterestPayable)}</td>
           <td className="px-4 py-2.5 text-right font-mono text-green-600">{formatCurrency(totalInterestAmount)}</td>
           <td className="px-4 py-2.5 text-right font-mono text-gray-300">-</td>

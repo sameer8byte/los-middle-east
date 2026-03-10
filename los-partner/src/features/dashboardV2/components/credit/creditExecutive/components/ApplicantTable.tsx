@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiEye, FiChevronLeft, FiChevronRight, FiFilter, FiMoreVertical, FiEdit, FiTrash2, FiChevronDown } from 'react-icons/fi';
 import { LuArrowUpDown } from "react-icons/lu";
+import { Conversion } from "../../../../../../utils/conversion";
 
 /* =========================
    Types
@@ -131,7 +132,7 @@ const ApplicantTable: React.FC<ApplicantTableProps> = ({ data, onActionClick }) 
                       <td className="px-3 py-3 text-gray-700 font-semibold">{row.applicantName}</td>
                       <td className="px-3 py-3 text-gray-600">{row.phNo}</td>
                       <td className="px-3 py-3 text-gray-500">{row.email}</td>
-                      <td className="px-3 py-3 font-bold text-gray-800">₹{row.loanAmount}</td>
+                      <td className="px-3 py-3 font-bold text-gray-800">{Conversion.formatCurrency(row.loanAmount)}</td>
                       <td className="px-3 py-3 text-gray-600">{row.loanType}</td>
                       <td className="px-3 py-3 text-center">
                         <span className={`inline-block px-3 py-0.5 rounded-md border font-bold text-[9px] ${getStatusStyle(row.status)}`}>

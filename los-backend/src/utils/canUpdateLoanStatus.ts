@@ -15,7 +15,8 @@ type LoanStatus =
   | "SANCTION_MANAGER_APPROVED"
   | "SETTLED"
   | "WRITE_OFF"
-  | "ONBOARDING";
+  | "ONBOARDING"
+  | "AWAITING_DISBURSEMENT";
 
 const validStatusTransitions: Record<LoanStatus, LoanStatus[]> = {
   PENDING: ["CREDIT_EXECUTIVE_APPROVED", "REJECTED", "CANCELLED"],
@@ -45,6 +46,7 @@ const validStatusTransitions: Record<LoanStatus, LoanStatus[]> = {
   SETTLED: [],
   WRITE_OFF: [],
   ONBOARDING: ["PENDING"],
+  AWAITING_DISBURSEMENT: ["DISBURSED", "CANCELLED"],
 };
 
 export function canUpdateLoanStatus(

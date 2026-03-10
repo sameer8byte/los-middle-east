@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-export type IDFCTransferType = "IMPS" | "NEFT";
+export type IDFCTransferType = "BENEFIT Fawri+" | "ACH/BENEFIT";
 export enum IDFCTransferTypeEnum {
-  IMPS = "IMPS",
-  NEFT = "NEFT",
+  IMPS = "BENEFIT Fawri+",
+  NEFT = "ACH/BENEFIT",
 }
 import Sidebar from "../../../common/sidebar";
 import dayjs from "dayjs";
@@ -75,7 +75,7 @@ export function Disburse({
     dayjs().format("YYYY-MM-DD"),
   );
   const [idfcTransferType, setIdfcTransferType] =
-    useState<IDFCTransferType>("IMPS");
+    useState<IDFCTransferType>("BENEFIT Fawri+");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
@@ -581,7 +581,7 @@ export function Disburse({
                               Principal Amount:
                             </span>
                             <span className="font-semibold text-[var(--color-on-background)]">
-                              ₹{loanDetails?.amount?.toLocaleString() || "0"}
+                              BHD {loanDetails?.amount?.toLocaleString() || "0"}
                             </span>
                           </div>
 
@@ -590,7 +590,7 @@ export function Disburse({
                               Disbursement Amount:
                             </span>
                             <span className="font-semibold text-[var(--color-on-background)]">
-                              ₹
+                              BHD 
                               {loanDetails?.disbursement?.netAmount?.toLocaleString() ||
                                 "0"}
                             </span>
@@ -623,7 +623,7 @@ export function Disburse({
                                   </p>
                                   <p className="text-amber-700 text-sm mt-2">
                                     {provider === PaymentMethodEnum.ICICI
-                                      ? "ICICI uses IMPS → NEFT fallback for higher success rates."
+                                      ? "ICICI uses BENEFIT Fawri+ → ACH/BENEFIT fallback for higher success rates."
                                       : "No additional reference details or bank account selection is required."}
                                   </p>
                                 </div>
@@ -723,8 +723,8 @@ export function Disburse({
                                   className="w-full px-4 py-3 border border-[var(--color-muted)] border-opacity-50 rounded-md var(--color-background) focus:ring-2 focus:ring-[#EA5E18] focus:border-[#EA5E18] outline-none transition-all"
                                   required
                                 >
-                                  <option value="IMPS">IMPS</option>
-                                  <option value="NEFT">NEFT</option>
+                                  <option value="IMPS">BENEFIT Fawri+</option>
+                                  <option value="NEFT">ACH/BENEFIT</option>
                                 </select>
                                 <p className="text-[var(--color-on-surface)] opacity-70 text-sm mt-2">
                                   Select the transfer method for IDFC Bank
@@ -997,7 +997,7 @@ export function Disburse({
                         <div className="flex justify-between">
                           <span className="font-medium">Principal Amount:</span>
                           <span className="font-semibold text-[var(--color-on-background)]">
-                            ₹{loanDetails?.amount?.toLocaleString() || "0"}
+                            BHD {loanDetails?.amount?.toLocaleString() || "0"}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -1005,7 +1005,7 @@ export function Disburse({
                             Disbursement Amount:
                           </span>
                           <span className="font-semibold text-[var(--color-on-background)]">
-                            ₹
+                            BHD 
                             {loanDetails?.disbursement?.netAmount?.toLocaleString() ||
                               "0"}
                           </span>
@@ -1073,7 +1073,7 @@ export function Disburse({
                                   Mode:{" "}
                                 </span>
                                 <span className="text-amber-900 text-xs font-bold">
-                                  IMPS → NEFT Fallback
+                                  BENEFIT Fawri+ → ACH/BENEFIT Fallback
                                 </span>
                               </div>
                             )}

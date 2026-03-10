@@ -65,7 +65,7 @@ export function Employment() {
                 label="Monthly Salary"
                 value={
                   userEmployment.salary
-                    ? `₹${userEmployment.salary?.toLocaleString()}`
+                    ? `BHD${userEmployment.salary?.toLocaleString()}`
                     : undefined
                 }
               />

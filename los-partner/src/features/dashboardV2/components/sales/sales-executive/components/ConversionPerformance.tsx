@@ -103,7 +103,7 @@ const ConversionPerformance = ({ data, loading, error }: ConversionPerformancePr
           {/* Description */}
           <div className="text-sm text-gray-600 mb-4 text-center">
             Avg Converted Loan Amount :<br />
-            <span className="font-semibold">₹X.XX*</span>
+            <span className="font-semibold">BHD X.XX*</span>
           </div>
         </div>
 

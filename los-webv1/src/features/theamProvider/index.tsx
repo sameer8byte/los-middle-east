@@ -45,7 +45,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Typography
     root.style.setProperty("--font-family", theme.fontFamily);
-    root.style.setProperty("--base-font-size", `${theme.baseFontSize}px`);
+    root.style.setProperty("--base-font-size", `${theme.baseFontSize || 16}px`);
 
     // Theme Features
     root.style.setProperty(

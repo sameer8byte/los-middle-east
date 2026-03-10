@@ -54,7 +54,7 @@ import { usePersistedSearch } from "../../../hooks/usePersistedSearch";
 import { useAppSelector } from "../../../shared/redux/store";
 import { ColumnVisibilityDropdown } from "../../../common/ui/columnVisibilityDropdown";
 import { selectProvidersByType } from "../../../shared/redux/slices/brand.slice";
-import { FaRupeeSign } from "react-icons/fa";
+import { Conversion } from "../../../utils/conversion";
 import { SkipAutopayConsentDialog } from "../../../common/dialog/skipAutopayConsentDialog";
 import { ChangeLoanRuleType } from "../../loans/components/changeLoanRuleType";
 import { AcefoneClickToDialButton } from "../../acefone";
@@ -343,25 +343,25 @@ export default function LoanList() {
 
       const formattedName = fullName
         ? fullName
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-            )
-            .join(" ")
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+          )
+          .join(" ")
         : "N/A";
 
       const documents = loan.user?.documents ?? [];
       const documentInfo = documents.length
         ? documents
-            .map((doc) => {
-              const docNumber =
-                doc.type === DocumentTypeEnum.AADHAAR
-                  ? maskAadhaar(doc.documentNumber)
-                  : maskPan(doc.documentNumber);
-              return `${doc.type}: ${docNumber}`;
-            })
-            .join("\n")
+          .map((doc) => {
+            const docNumber =
+              doc.type === DocumentTypeEnum.AADHAAR
+                ? maskAadhaar(doc.documentNumber)
+                : maskPan(doc.documentNumber);
+            return `${doc.type}: ${docNumber}`;
+          })
+          .join("\n")
         : "No documents";
 
       const copyText = `
@@ -383,22 +383,20 @@ Phone: ${loan.user.phoneNumber || "N/A"}
 
 💰 Loan Details
 ━━━━━━━━━━━━━━━━━━━━
-Amount: ₹${loan.amount?.toLocaleString("en-IN") || "N/A"}
+Amount: ${loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
 Status: ${loan.status}
-Agreement: ${
-        loan?.agreement?.status
+Agreement: ${loan?.agreement?.status
           ? loan.agreement.status.toLowerCase().replace(/_/g, " ")
           : "N/A"
-      }
+        }
 
 📄 Documents
 ━━━━━━━━━━━━━━━━━━━━
 ${documentInfo}
 
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- LOAN SANCTION MANAGER ----
 ═══════════════════════════════
 
@@ -610,23 +608,19 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <div className="text-[var(--color-on-background)] font-semibold text-base break-words">
                     {fullName
                       ? fullName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase(),
+                        )
+                        .join(" ")
                       : "N/A"}
                   </div>
                   {loan.user.employment?.salary && (
                     <div className="flex items-center gap-2 text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
-                      <FaRupeeSign className="w-3 h-3" />{" "}
-                      {/* Add this import at top */}
                       <span>
-                        Salary: ₹
-                        {loan.user.employment?.salary?.toLocaleString() ||
-                          "N/A"}
+                        Salary: {loan.user.employment?.salary ? Conversion.formatCurrency(loan.user.employment.salary) : "N/A"}
                       </span>
                     </div>
                   )}
@@ -637,11 +631,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   {/* Copy Button */}
                   <button
                     onClick={(e) => copyCustomerInfo(loan, e)}
-                    className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${
-                      copiedLoanId === loan.id
-                        ? "bg-green-500 scale-110 opacity-100"
-                        : "bg-[var(--color-surface)]"
-                    }`}
+                    className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
+                      ? "bg-green-500 scale-110 opacity-100"
+                      : "bg-[var(--color-surface)]"
+                      }`}
                     title={
                       copiedLoanId === loan.id
                         ? "Copied!"
@@ -728,11 +721,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                 <div className="flex flex-col gap-1.5">
                   {loan.loanType && (
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
-                        !loan?.is_repeat_loan
-                          ? "bg-green-100 text-green-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
+                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                        }`}
                     >
                       {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
                     </span>
@@ -812,14 +804,14 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
             <div className="flex items-start gap-1">
               <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Loan Amount:</span>
               <span className="text-sm font-bold text-gray-900">
-                ₹{loan.amount?.toLocaleString("en-IN") || "N/A"}
+                {loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
               </span>
             </div>
             {loan.disbursement && (
               <div className="flex items-start gap-1">
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Disbursed:</span>
                 <span className="text-sm font-bold text-gray-900">
-                  ₹{loan.disbursement.netAmount?.toLocaleString("en-IN") || "N/A"}
+                  {loan.disbursement.netAmount ? Conversion.formatCurrency(loan.disbursement.netAmount) : "N/A"}
                 </span>
               </div>
             )}
@@ -893,8 +885,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                         {assignedPartner.partnerUser.email || "No email"}
                       </span>
                       <span className="text-xs text-[var(--color-on-surface)] opacity-60">
-                        Amount: ₹
-                        {assignedPartner.amount?.toLocaleString("en-IN") || "0"}
+                        Amount: {assignedPartner.amount ? Conversion.formatCurrency(assignedPartner.amount) : "0"}
                       </span>
                     </div>
                   </div>
@@ -992,7 +983,7 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
           loan.status === LoanStatusEnum.SANCTION_MANAGER_APPROVED ? (
             <div>
               {loan?.agreement?.status &&
-              loan?.agreement?.status !== AgreementStatusEnum.NOT_SENT ? (
+                loan?.agreement?.status !== AgreementStatusEnum.NOT_SENT ? (
                 <div className="text-sm text-[var(--color-on-surface)] opacity-70 space-y-2">
                   <div>{getAgreementStatusText(loan.agreement.status)}</div>
                   {loan?.agreement?.id && (
@@ -1160,8 +1151,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <span className="text-xs text-green-700">
                       {successfulConsents[0]?.updatedAt
                         ? new Date(
-                            successfulConsents[0].updatedAt,
-                          ).toLocaleDateString()
+                          successfulConsents[0].updatedAt,
+                        ).toLocaleDateString()
                         : "N/A"}
                     </span>
                   </div>
@@ -1189,8 +1180,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <span className="text-xs text-yellow-700">
                       {pendingConsents[0]?.createdAt
                         ? new Date(
-                            pendingConsents[0].createdAt,
-                          ).toLocaleDateString()
+                          pendingConsents[0].createdAt,
+                        ).toLocaleDateString()
                         : "N/A"}
                     </span>
                   </div>
@@ -1218,8 +1209,8 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <span className="text-xs text-red-700">
                       {failedConsents[0]?.updatedAt
                         ? new Date(
-                            failedConsents[0].updatedAt,
-                          ).toLocaleDateString()
+                          failedConsents[0].updatedAt,
+                        ).toLocaleDateString()
                         : "N/A"}
                     </span>
                   </div>
@@ -1258,31 +1249,31 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {/* Skip Autopay Consent Button - Show when no successful consents */}
               {(loan.status === LoanStatusEnum.SANCTION_MANAGER_APPROVED ||
                 loan.status === LoanStatusEnum.APPROVED) && (
-                // successfulConsents.length === 0 &&
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSkipAutopayConsent(loan);
-                  }}
-                  variant="outline"
-                  className="border-orange-300 hover:border-orange-400 hover:bg-orange-50 text-orange-700"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  // successfulConsents.length === 0 &&
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSkipAutopayConsent(loan);
+                    }}
+                    variant="outline"
+                    className="border-orange-300 hover:border-orange-400 hover:bg-orange-50 text-orange-700"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                  Skip Autopay
-                </Button>
-              )}
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                    Skip Autopay
+                  </Button>
+                )}
             </div>
           );
         },
@@ -1501,11 +1492,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                     <button
                       key={option.value || "all"}
                       onClick={() => handleLoanTypeFilterClick(option.value)}
-                      className={`relative px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                        isActive
-                          ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-                          : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
-                      }`}
+                      className={`relative px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${isActive
+                        ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                        : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
+                        }`}
                     >
                       {option.label}
                     </button>
@@ -1688,10 +1678,9 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               centerContent={
                 <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex items-center gap-1">
-                    <FaRupeeSign className="w-4 h-4 text-blue-600" />
                     <span className="text-xs text-blue-600 font-medium">Total Loan Amount:</span>
                     <span className="text-lg font-bold text-blue-700">
-                      {totalLoanAmount.toLocaleString("en-IN")}
+                      {Conversion.formatCurrency(totalLoanAmount)}
                     </span>
                     <span className="text-sm text-blue-600 font-medium">({totalCount} Loans)</span>
                   </div>

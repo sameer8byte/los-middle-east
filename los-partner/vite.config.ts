@@ -10,6 +10,14 @@ export default defineConfig({
     hmr: {
       protocol: "ws",
     },
+    proxy: {
+      '/api/credit_risk': {
+        target: 'http://13.205.69.164:8400',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+      }, 
+    },
   },
   build: {
     outDir: "dist",

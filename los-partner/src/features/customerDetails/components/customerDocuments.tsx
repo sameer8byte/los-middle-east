@@ -56,6 +56,7 @@ import { Button } from "../../../common/ui/button";
 import { GenerateAadhaarLink } from "./generateAddharLink";
 import { FiLink, FiShield } from "react-icons/fi";
 import { ensureS3Url } from "../../../constant/s3Config";
+import { Conversion } from "../../../utils/conversion";
 
 export type DocumentsData = {
   accountStatements: BankStatement[];
@@ -216,7 +217,7 @@ const MaskedAadhaarNumber = ({
         type="button"
         onClick={() => setIsVisible(!isVisible)}
         className="p-1 hover:bg-[var(--muted)] hover:bg-opacity-20 rounded transition-colors"
-        title={isVisible ? "Hide Aadhaar" : "Show Aadhaar"}
+        title={isVisible ? "Hide CPR Card" : "Show CPR Card"}
       >
         {isVisible ? (
           <FaEyeSlash className="w-3 h-3 text-[var(--on-surface)] opacity-70" />
@@ -932,7 +933,7 @@ export function CustomerDocuments() {
       }
 
       setIsUpdatingAadhaar(true);
-      toast.info("Updating Aadhaar number...", { autoClose: 2000 });
+      toast.info("Updating CPR Card number...", { autoClose: 2000 });
 
       const maskedAadhaar = `XXXXXXXX${aadhaarLastFour}`;
 
@@ -943,13 +944,13 @@ export function CustomerDocuments() {
         maskedAadhaar
       );
 
-      toast.success("Aadhaar number updated successfully!");
+      toast.success("CPR Card number updated successfully!");
       removeQuery("update-aadhaar");
       setAadhaarLastFour("");
       await refetchDocuments();
     } catch (error) {
-      console.error("Error updating Aadhaar number:", error);
-      toast.error("Failed to update Aadhaar number. Please try again.");
+      console.error("Error updating CPR Card number:", error);
+      toast.error("Failed to update CPR Card number. Please try again.");
     } finally {
       setIsUpdatingAadhaar(false);
     }
@@ -1099,7 +1100,7 @@ export function CustomerDocuments() {
       );
 
       if (!aadhaarDocument?.providerData?.documentLinks?.imageBase64) {
-        throw new Error("Aadhaar photo not available for verification");
+        throw new Error("CPR Card photo not available for verification");
       }
 
       if (!documentsData.userProfile.profilePicUrl) {
@@ -1305,7 +1306,7 @@ export function CustomerDocuments() {
         <Dialog
           isOpen={showAadhaarDialog}
           onClose={() => removeQuery("aadhaar-kyc")}
-          title="🔐 Aadhaar KYC Verification"
+          title="🔐 CPR Card KYC Verification"
           size="xl"
         >
           <GenerateAadhaarLink
@@ -1325,12 +1326,12 @@ export function CustomerDocuments() {
               setAadhaarLastFour("");
             }
           }}
-          title="📝 Update Aadhaar Number"
+          title="📝 Update CPR Card Number"
           size="md"
         >
           <div className="space-y-4">
             <div className="text-sm text-[var(--on-surface)] opacity-75">
-              Enter the last 4 digits of your Aadhaar number. The first 8 digits
+              Enter the last 4 digits of your CPR Card number. The first 8 digits
               will be masked for security.
             </div>
 
@@ -1339,7 +1340,7 @@ export function CustomerDocuments() {
                 htmlFor="aadhaar-last-four"
                 className="block text-sm font-medium text-[var(--on-background)]"
               >
-                Aadhaar Number
+                CPR
               </label>
               <div className="flex items-center gap-2">
                 <span className="text-lg font-mono text-[var(--on-surface)] opacity-60 px-3 py-2 bg-[var(--surface)] rounded-lg border">
@@ -1371,7 +1372,7 @@ export function CustomerDocuments() {
               {isUpdatingAadhaar && (
                 <div className="flex items-center gap-2 text-sm text-[var(--primary)] bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
                   <TbLoader2 className="w-4 h-4 animate-spin" />
-                  <span>Updating Aadhaar number...</span>
+                  <span>Updating CPR Card number...</span>
                 </div>
               )}
             </div>
@@ -1439,7 +1440,7 @@ export function CustomerDocuments() {
                 htmlFor="pan-number"
                 className="block text-sm font-medium text-[var(--on-background)]"
               >
-                PAN Number
+                CPR Validation
               </label>
               <input
                 id="pan-number"
@@ -1475,7 +1476,7 @@ export function CustomerDocuments() {
               {isVerifyingPan && (
                 <div className="flex items-center gap-2 text-sm text-[var(--primary)] bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
                   <TbLoader2 className="w-4 h-4 animate-spin" />
-                  <span>Verifying PAN with fallback providers...</span>
+                  <span>CPR Validation with fallback providers...</span>
                 </div>
               )}
             </div>
@@ -1583,7 +1584,7 @@ export function CustomerDocuments() {
                     Verifying...
                   </>
                 ) : (
-                  "Verify PAN"
+                  "Verify CPR Validation"
                 )}
               </Button>
             </div>
@@ -1616,7 +1617,7 @@ export function CustomerDocuments() {
           {isAadhaarApproved && (
             <div className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-800 rounded-lg border border-green-200">
               <FiShield className="w-4 h-4" />
-              <span className="text-sm font-medium">Aadhaar Verified ✓</span>
+              <span className="text-sm font-medium">CPR Card Verified ✓</span>
             </div>
           )}
 
@@ -1645,7 +1646,7 @@ export function CustomerDocuments() {
               ) : (
                 <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-500 rounded-lg border border-gray-200 cursor-not-allowed">
                   <TbEdit className="w-4 h-4 opacity-50" />
-                  <span className="text-sm">Update Aadhaar Number</span>
+                  <span className="text-sm">Update CPR Card Number</span>
                   <span className="text-xs opacity-70">(No Permission)</span>
                 </div>
               )}
@@ -1685,10 +1686,10 @@ export function CustomerDocuments() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-red-900 mb-1">
-                    Aadhaar Verification Required
+                    CPR Required
                   </h3>
                   <p className="text-sm text-red-700 mb-3">
-                    Complete Aadhaar verification to proceed with the loan
+                    Complete CPR Card verification to proceed with the loan
                     application.
                   </p>
                   <Button
@@ -1714,10 +1715,10 @@ export function CustomerDocuments() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-orange-900 mb-1">
-                    PAN Document Required
+                    CPR Validation Required
                   </h3>
                   <p className="text-sm text-orange-700 mb-3">
-                    Upload and verify your PAN document to complete the
+                    Upload and verify your CPR document to complete the
                     verification process.
                   </p>
                   {canEdit ? (
@@ -1731,7 +1732,7 @@ export function CustomerDocuments() {
                       className="border-orange-300 text-orange-700 hover:bg-orange-100"
                     >
                       <TbShieldCheck className="w-3 h-3 mr-1" />
-                      Verify PAN
+                      Verify CPR Validation
                     </Button>
                   ) : (
                     <div className="text-xs text-orange-600 opacity-75">
@@ -2318,7 +2319,7 @@ function DocumentCard({
           {iconMap[type as keyof typeof iconMap] || iconMap.default}
           <div>
             <h3 className="text-sm font-medium text-[var(--on-background)]">
-              {title}
+              {Conversion.isValidAadhaar(title)}
             </h3>
             <p className="text-xs text-[var(--on-surface)] opacity-70">
               {renderSubtitle()}
@@ -2465,7 +2466,7 @@ function DocumentCard({
                         <div className="absolute top-2 left-2 z-10">
                           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-[var(--primary)] text-white shadow-sm">
                             <TbFileText className="w-3 h-3" />
-                            Aadhaar
+                            CPR Card
                           </span>
                         </div>
 
@@ -2484,7 +2485,7 @@ function DocumentCard({
                         <div className="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100">
                           <img
                             src={`data:image/jpeg;base64,${providerData.documentLinks.imageBase64}`}
-                            alt="From Aadhaar"
+                            alt="From CPR Card"
                             className="w-full h-full object-contain p-2"
                           />
                         </div>
@@ -2620,7 +2621,7 @@ function DocumentCard({
                                 {localFaceVerificationResult.message ||
                                   (localFaceVerificationResult.isMatch ||
                                   localFaceVerificationResult.match
-                                    ? "The Aadhaar photo and profile photo appear to be of the same person"
+                                    ? "The CPR Card photo and profile photo appear to be of the same person"
                                     : "The photos do not appear to be of the same person")}
                               </p>
                             </div>

@@ -274,7 +274,7 @@ export function PendingEvaluate() {
                       {/* Amount */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-semibold text-[var(--color-on-background)]">
-                          ₹{loan.amount.toLocaleString()}
+                          BHD{loan.amount.toLocaleString()}
                         </div>
                       </td>
 

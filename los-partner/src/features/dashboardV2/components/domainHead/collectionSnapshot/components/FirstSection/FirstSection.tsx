@@ -1,4 +1,5 @@
 import React from 'react';
+import { Conversion } from '../../../../../../../utils/conversion';
 
 // -------------- Icons -------------- //
 const FileUserIcon = () => (
@@ -141,21 +142,21 @@ export interface AUMData {
 export default function FirstSection({ data }: { data?: AUMData }) {
     // Mock Dynamic Data fallback
     const currentData = data ?? {
-        totalLoansDueAmount: "₹14.8 Cr",
-        totalAmountCollected: "₹3.24 Cr",
-        totalAmountOutstanding: "82%",
-        postDueAmount: "₹1.2 Cr",
-        totalLoansIssued: 300,
-        ongoingLoans: 224,
-        closedLoans: 76,
-        overdueLoans: 44,
+        totalLoansDueAmount: 65000000,
+        totalAmountCollected: 28000000,
+        totalAmountOutstanding: "57%",
+        postDueAmount: 6000000,
+        totalLoansIssued: 180,
+        ongoingLoans: 130,
+        closedLoans: 50,
+        overdueLoans: 32,
     };
 
     return (
         <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm mt-2 2xl:mt-4 w-full">
             {/* Header */}
             <div className="bg-gray-100/70 px-4 2xl:px-6 py-2 2xl:py-3 border-b border-gray-100">
-                <h2 className="text-[11px] 2xl:text-[13px] font-bold text-gray-800 tracking-wide uppercase">AUM Snapshot</h2>
+                <h2 className="text-[11px] 2xl:text-[13px] font-bold text-gray-800 tracking-wide uppercase">Loan Collection & Repayment Overview</h2>
             </div>
 
             <div className="p-3 2xl:p-6">
@@ -165,21 +166,21 @@ export default function FirstSection({ data }: { data?: AUMData }) {
                         variant="large"
                         largeTheme="solid-blue"
                         title="Asset Under Management"
-                        value={currentData.totalLoansDueAmount}
+                        value={Conversion.formatCurrency(currentData.totalLoansDueAmount)}
                         icon={<FileUserIcon />}
                     />
                     <CommonCard
                         variant="large"
                         largeTheme="light-green"
                         title="Disbursed Amount"
-                        value={currentData.totalAmountCollected}
+                        value={Conversion.formatCurrency(currentData.totalAmountCollected)}
                         icon={<SplitArrowSVG />}
                     />
                     <CommonCard
                         variant="large"
                         largeTheme="light-red"
                         title="Bank Balance"
-                        value={currentData.postDueAmount}
+                        value={Conversion.formatCurrency(currentData.postDueAmount)}
                         icon={<CheckDocIcon />}
                     />
                     <CommonCard

@@ -30,11 +30,11 @@ interface TabSelectorProps {
 // --- Tab Configuration ---
 const ALL_TABS: readonly TabItem[] = [
   { key: TabKey.PERSONAL_DETAILS, label: "Personal Details" },
-  {
+/*   {
     key: TabKey.CENTRAL_DEDUPE,
     label: "Central Dedupe",
     description: "View deduplication results from central database.",
-  },
+  }, */
   { key: TabKey.ACCOUNT_DETAILS, label: "Bank Accounts" },
   { key: TabKey.EMPLOYMENT_DETAILS, label: "Employment" },
   { key: TabKey.DOCUMENTS, label: "Documents" },

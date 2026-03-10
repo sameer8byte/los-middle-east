@@ -44,7 +44,7 @@ export function UpdateLoanAmount() {
     }
 
     if (amount > 1000000) {
-      setError("Loan amount cannot exceed ₹10,00,000.");
+      setError("Loan amount cannot exceed BHD10,00,000.");
       return false;
     }
 
@@ -128,7 +128,7 @@ export function UpdateLoanAmount() {
                 htmlFor="loanAmount"
                 className="block text-sm font-medium text-[var(--color-on-surface)] opacity-80 mb-2"
               >
-                New Loan Amount (₹)
+                New Loan Amount (BHD)
               </label>
               <input
                 id="loanAmount"
@@ -143,7 +143,7 @@ export function UpdateLoanAmount() {
               />
               {loanAmount && (
                 <p className="text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
-                  Amount: ₹
+                  Amount: BHD
                   {parseFloat(loanAmount || "0").toLocaleString("en-IN")}
                 </p>
               )}

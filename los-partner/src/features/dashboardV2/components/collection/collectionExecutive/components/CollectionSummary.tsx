@@ -87,31 +87,31 @@ export const CollectionSummary = () => {
   // 🔴 REPLACE MOCK DATA WITH: data.totalLoanDueAmount, data.totalLoanAmountCollected, etc.
   const summaryData = [
     { 
-      amount: "₹50 L", 
+      amount: "BHD 50 L", 
       title: "Total Loan Due Amount", 
       fresh: 80, 
       repeat: 40,
-      freshAmount: "₹6,00,000",
-      repeatAmount: "₹14,00,000",
+      freshAmount: "BHD6,00,000",
+      repeatAmount: "BHD14,00,000",
       borderColor: "#2388FF" 
     },
     { 
-      amount: "₹32 L", 
+      amount: "BHD32 L", 
       title: "Total Loan Amount Collected", 
       percentage: "64 %",
       fresh: 15, 
       repeat: 17,
-      freshAmount: "₹25,00,000",
-      repeatAmount: "₹7,00,000",
+      freshAmount: "BHD25,00,000",
+      repeatAmount: "BHD7,00,000",
       borderColor: "#D882FC" 
     },
     { 
-      amount: "₹18 L", 
+      amount: "BHD18 L", 
       title: "Total Amount Outstanding", 
       fresh: 15, 
       repeat: 3,
-      freshAmount: "₹9,50,000",
-      repeatAmount: "₹8,50,000",
+      freshAmount: "BHD9,50,000",
+      repeatAmount: "BHD8,50,000",
       borderColor: "#DEA513" 
     },
   ];

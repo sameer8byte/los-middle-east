@@ -590,8 +590,9 @@ const Sidebar = memo(
               <div className={cn("flex items-center flex-1", !isOpen && "hidden")}>
                 {logoUrl && (
                   <img
-                    src={logoUrl}
-                    alt="Minutes Loan Logo"
+                    // src={logoUrl}
+                    src="https://8byte-middle-east-logo.s3.ap-south-1.amazonaws.com/Stc_pay.svg.png"
+                    alt="Stc Pay Loan Logo"
                     className="w-[112px] h-[62px] object-contain"
                   />
                 )}
@@ -637,7 +638,7 @@ const Sidebar = memo(
                         <h3
                           className="text-[14px] font-normal capitalize leading-[18px] ml-4 mt-2"
                           style={{
-                            fontFamily: "Open Sans",
+                            fontFamily: "Inter",
                             fontWeight: 400,
                             fontSize: "14px",
                             lineHeight: "18px",

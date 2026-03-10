@@ -44,6 +44,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { ColumnVisibilityDropdown } from "../../../common/ui/columnVisibilityDropdown";
 import { DownloadDisbursementFile } from "./downloadDisbursementFile";
+import { Conversion } from "../../../utils/conversion";
 import { AcefoneClickToDialButton } from "../../acefone";
 
 dayjs.extend(customParseFormat);
@@ -281,25 +282,25 @@ export default function LoanList() {
 
       const formattedName = fullName
         ? fullName
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-            )
-            .join(" ")
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+          )
+          .join(" ")
         : "N/A";
 
       const documents = loan.user?.documents ?? [];
       const documentInfo = documents.length
         ? documents
-            .map((doc) => {
-              const docNumber =
-                doc.type === DocumentTypeEnum.AADHAAR
-                  ? maskAadhaar(doc.documentNumber)
-                  : maskPan(doc.documentNumber);
-              return `${doc.type}: ${docNumber}`;
-            })
-            .join("\n")
+          .map((doc) => {
+            const docNumber =
+              doc.type === DocumentTypeEnum.AADHAAR
+                ? maskAadhaar(doc.documentNumber)
+                : maskPan(doc.documentNumber);
+            return `${doc.type}: ${docNumber}`;
+          })
+          .join("\n")
         : "No documents";
 
       const copyText = `
@@ -321,13 +322,12 @@ Phone: ${loan.user.phoneNumber || "N/A"}
 
 💰 Loan Details
 ━━━━━━━━━━━━━━━━━━━━
-Amount: ₹${loan.amount?.toLocaleString("en-IN") || "N/A"}
+Amount: ${loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
 Status: ${loan.status}
-Agreement: ${
-        loan?.agreement?.status
+Agreement: ${loan?.agreement?.status
           ? loan.agreement.status.toLowerCase().replace(/_/g, " ")
           : "N/A"
-      }
+        }
 Created: ${dayjs(loan.createdAt).format("MMMM D, YYYY h:mm A")}
 
 📄 Documents
@@ -335,9 +335,8 @@ Created: ${dayjs(loan.createdAt).format("MMMM D, YYYY h:mm A")}
 ${documentInfo}
 
 ═══════════════════════════════
-Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
-        auth.name
-      }) -  ${auth?.role || "N/A"} 
+Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${auth.name
+        }) -  ${auth?.role || "N/A"} 
 ---- LOAN OPS ----
 ═══════════════════════════════    `.trim();
 
@@ -411,13 +410,13 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <span className="text-[var(--color-on-background)] font-semibold text-sm truncate max-w-[180px]">
                     {fullName
                       ? fullName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase(),
+                        )
+                        .join(" ")
                       : "N/A"}
                   </span>
                   {isForceBypass && (
@@ -439,11 +438,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <div className="flex gap-1.5">
                     {loan.loanType && (
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
-                          !loan?.is_repeat_loan
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
+                        className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${!loan?.is_repeat_loan
+                          ? "bg-green-100 text-green-800"
+                          : "bg-blue-100 text-blue-800"
+                          }`}
                       >
                         {!loan?.is_repeat_loan ? "Fresh" : "Repeat"}
                       </span>
@@ -477,11 +475,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {/* Copy Button */}
               <button
                 onClick={(e) => copyCustomerInfo(loan, e)}
-                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${
-                  copiedLoanId === loan.id
-                    ? "bg-green-500 scale-110 opacity-100"
-                    : "bg-[var(--color-surface)]"
-                }`}
+                className={`absolute -top-1 -right-1 p-1.5 rounded-md hover:bg-[var(--color-background)] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-[var(--color-muted)] border-opacity-30 ${copiedLoanId === loan.id
+                  ? "bg-green-500 scale-110 opacity-100"
+                  : "bg-[var(--color-surface)]"
+                  }`}
                 title={
                   copiedLoanId === loan.id ? "Copied!" : "Copy customer info"
                 }
@@ -613,71 +610,71 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
               {[LoanStatusEnum.ACTIVE, LoanStatusEnum.PARTIALLY_PAID].includes(
                 loan.status,
               ) && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setQuery("paymentApprovalLoanId", loan.id);
-                  }}
-                  variant="outline"
-                >
-                  {isLoanActiveOrPartiallyPaid
-                    ? "Payment Approval"
-                    : "Payment Details"}
-                </Button>
-              )}
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQuery("paymentApprovalLoanId", loan.id);
+                    }}
+                    variant="outline"
+                  >
+                    {isLoanActiveOrPartiallyPaid
+                      ? "Payment Approval"
+                      : "Payment Details"}
+                  </Button>
+                )}
               {[
                 LoanStatusEnum.APPROVED,
                 LoanStatusEnum.SANCTION_MANAGER_APPROVED,
               ].includes(loan.status) && (
-                <>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDisburseLoanId(loan.id);
-                    }}
-                    className="flex items-center gap-1 px-3 py-1 text-xs text-black rounded bg-surface border border-gray-200"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="black"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M16 4.5A8.5 8.5 0 1 0 16 19.5" />
-                      <line x1="10" y1="12" x2="21" y2="12" />
-                      <polyline points="17,8 21,12 17,16" />
-                    </svg>
-                    <span>Disburse</span>
-                  </button>
-
-                  {/* Send Back Button */}
-                  {canSendBack && (
-                    <Button
+                  <>
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        const fullName =
-                          [
-                            loan.user?.userDetails?.firstName,
-                            loan.user?.userDetails?.middleName,
-                            loan.user?.userDetails?.lastName,
-                          ]
-                            .filter(Boolean)
-                            .join(" ") || "Unknown";
-                        openSendBackDialog(loan.id, fullName);
+                        setDisburseLoanId(loan.id);
                       }}
-                      variant="outline"
-                      className="border-orange-300 hover:border-orange-400 hover:bg-orange-50 text-orange-700"
+                      className="flex items-center gap-1 px-3 py-1 text-xs text-black rounded bg-surface border border-gray-200"
                     >
-                      Send Back
-                    </Button>
-                  )}
-                </>
-              )}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="black"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M16 4.5A8.5 8.5 0 1 0 16 19.5" />
+                        <line x1="10" y1="12" x2="21" y2="12" />
+                        <polyline points="17,8 21,12 17,16" />
+                      </svg>
+                      <span>Disburse</span>
+                    </button>
+
+                    {/* Send Back Button */}
+                    {canSendBack && (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const fullName =
+                            [
+                              loan.user?.userDetails?.firstName,
+                              loan.user?.userDetails?.middleName,
+                              loan.user?.userDetails?.lastName,
+                            ]
+                              .filter(Boolean)
+                              .join(" ") || "Unknown";
+                          openSendBackDialog(loan.id, fullName);
+                        }}
+                        variant="outline"
+                        className="border-orange-300 hover:border-orange-400 hover:bg-orange-50 text-orange-700"
+                      >
+                        Send Back
+                      </Button>
+                    )}
+                  </>
+                )}
             </div>
           );
         },
@@ -876,11 +873,10 @@ Generated on ${dayjs().format("DD MMM YYYY, hh:mm A")} by ${auth?.email}(${
                   <button
                     key={option.value}
                     onClick={() => handleOpsStatusClick(option.value)}
-                    className={`relative px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                      isActive
-                        ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-                        : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
-                    }`}
+                    className={`relative px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${isActive
+                      ? "text-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                      : "text-[var(--color-on-surface)] border-transparent hover:text-[var(--color-primary)] hover:border-gray-300"
+                      }`}
                   >
                     {option.label}
                   </button>

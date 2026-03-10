@@ -15,6 +15,7 @@ import { PartnerUser } from "../../shared/types/partnerUser";
 import { FiCopy } from "react-icons/fi";
 import { HiOutlineChevronDown } from "react-icons/hi2";
 import Dialog from "../../common/dialog";
+import { Conversion } from "../../utils/conversion";
 
 const UnallocatedLoansComponent = () => {
   const { brandId } = useParams<{ brandId: string }>();
@@ -186,11 +187,10 @@ const UnallocatedLoansComponent = () => {
                 setPartnerSearchQuery("");
                 setModalError(null);
               }}
-              className={`w-full text-left px-4 py-3 border-b border-[var(--color-muted)] border-opacity-10 hover:bg-[var(--color-muted)] hover:bg-opacity-10 transition ${
-                selectedPartnerUserId === partner.id
+              className={`w-full text-left px-4 py-3 border-b border-[var(--color-muted)] border-opacity-10 hover:bg-[var(--color-muted)] hover:bg-opacity-10 transition ${selectedPartnerUserId === partner.id
                   ? "bg-blue-50 border-l-4 border-l-blue-500"
                   : ""
-              }`}
+                }`}
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -265,220 +265,220 @@ const UnallocatedLoansComponent = () => {
         <div className="space-y-6">
           <div className="mb-6">
 
-              {/* Enhanced Search Bar */}
-              <SearchInput
-                placeholder="Search loans by ID, customer name..."
-                value={manualLoanId}
-                onChange={setManualLoanId}
-                onClear={() => {
-                  setManualLoanId("");
-                  setLoanError("");
-                }}
-              />
+            {/* Enhanced Search Bar */}
+            <SearchInput
+              placeholder="Search loans by ID, customer name..."
+              value={manualLoanId}
+              onChange={setManualLoanId}
+              onClear={() => {
+                setManualLoanId("");
+                setLoanError("");
+              }}
+            />
 
-              {loadingLoan && (
-                <div className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <CgSpinner className="animate-spin text-blue-600 mr-2" />
-                  <span className="text-sm text-blue-700 font-medium">
-                    Loading loan details...
-                  </span>
-                </div>
-              )}
+            {loadingLoan && (
+              <div className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <CgSpinner className="animate-spin text-blue-600 mr-2" />
+                <span className="text-sm text-blue-700 font-medium">
+                  Loading loan details...
+                </span>
+              </div>
+            )}
 
-              {loanError && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-700 font-medium">
-                    {loanError}
-                  </p>
-                </div>
-              )}
+            {loanError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-700 font-medium">
+                  {loanError}
+                </p>
+              </div>
+            )}
 
-              {/* Display Searched Loans */}
-              {displayedLoans.length > 0 ? (
-                <div className="rounded-lg mt-4">
-                  <div className="overflow-x-auto rounded-lg border border-[var(--color-muted)] border-opacity-20 bg-[var(--color-background)]">
-                    <>
-                      {selectedLoans.size > 0 && (
-                        <div className="p-4 border-b border-[var(--color-muted)] border-opacity-20 flex justify-between items-center bg-blue-50">
-                          <span className="text-sm font-medium">
-                            {selectedLoans.size} loan
-                            {selectedLoans.size !== 1 ? "s" : ""} selected for
-                            allocation
-                          </span>
-                          <Button
-                            onClick={handleAllocateClick}
-                            variant="primary"
-                            size="sm"
+            {/* Display Searched Loans */}
+            {displayedLoans.length > 0 ? (
+              <div className="rounded-lg mt-4">
+                <div className="overflow-x-auto rounded-lg border border-[var(--color-muted)] border-opacity-20 bg-[var(--color-background)]">
+                  <>
+                    {selectedLoans.size > 0 && (
+                      <div className="p-4 border-b border-[var(--color-muted)] border-opacity-20 flex justify-between items-center bg-blue-50">
+                        <span className="text-sm font-medium">
+                          {selectedLoans.size} loan
+                          {selectedLoans.size !== 1 ? "s" : ""} selected for
+                          allocation
+                        </span>
+                        <Button
+                          onClick={handleAllocateClick}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Allocate Selected
+                        </Button>
+                      </div>
+                    )}
+                    <table className="w-full">
+                      <thead className="bg-[var(--color-muted)] bg-opacity-10 border-b border-[var(--color-muted)] border-opacity-20">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase w-12">
+                            <input
+                              type="checkbox"
+                              checked={
+                                displayedLoans.length > 0 &&
+                                selectedLoans.size === displayedLoans.length
+                              }
+                              onChange={(e) =>
+                                handleSelectAll(e.target.checked)
+                              }
+                              className="w-4 h-4 cursor-pointer"
+                            />
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
+                            Loan ID
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
+                            Customer Name
+                          </th>
+
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
+                            Amount
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
+                            Status
+                          </th>
+
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--color-muted)] divide-opacity-20">
+                        {displayedLoans.map((displayLoan) => (
+                          <tr
+                            key={displayLoan.id}
+                            className="hover:bg-[var(--color-muted)] hover:bg-opacity-5 transition"
                           >
-                            Allocate Selected
-                          </Button>
-                        </div>
-                      )}
-                      <table className="w-full">
-                        <thead className="bg-[var(--color-muted)] bg-opacity-10 border-b border-[var(--color-muted)] border-opacity-20">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase w-12">
+                            <td className="px-6 py-4 whitespace-nowrap">
                               <input
                                 type="checkbox"
-                                checked={
-                                  displayedLoans.length > 0 &&
-                                  selectedLoans.size === displayedLoans.length
-                                }
+                                checked={selectedLoans.has(displayLoan.id)}
                                 onChange={(e) =>
-                                  handleSelectAll(e.target.checked)
+                                  handleLoanSelection(
+                                    displayLoan.id,
+                                    e.target.checked
+                                  )
                                 }
                                 className="w-4 h-4 cursor-pointer"
                               />
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
-                              Loan ID
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
-                              Customer Name
-                            </th>
-
-                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
-                              Amount
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
-                              Status
-                            </th>
-                           
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--color-muted)] divide-opacity-20">
-                          {displayedLoans.map((displayLoan) => (
-                            <tr
-                              key={displayLoan.id}
-                              className="hover:bg-[var(--color-muted)] hover:bg-opacity-5 transition"
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedLoans.has(displayLoan.id)}
-                                  onChange={(e) =>
-                                    handleLoanSelection(
-                                      displayLoan.id,
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="w-4 h-4 cursor-pointer"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <button
-                                  onClick={() =>
-                                      copyToClipboard(
-                                        displayLoan.formattedLoanId
-                                      )
-                                  }
-                                  className="flex items-center gap-1 text-primary hover:opacity-70 font-medium"
-                                  title="Copy Loan Id"
-                                >
-                                  <span className="font-mono font-medium text-primary">
-                                    {displayLoan.formattedLoanId}
-                                  </span>
-                                  <FiCopy className="w-4 h-4" />
-                                </button>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                {[
-                                  displayLoan.user?.userDetails?.firstName,
-                                  displayLoan.user?.userDetails?.lastName,
-                                ]
-                                  .filter(Boolean)
-                                  .join(" ") || "N/A"}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
-                                ₹{displayLoan.amount?.toLocaleString("en-IN")}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                  {displayLoan.status}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <button
+                                onClick={() =>
+                                  copyToClipboard(
+                                    displayLoan.formattedLoanId
+                                  )
+                                }
+                                className="flex items-center gap-1 text-primary hover:opacity-70 font-medium"
+                                title="Copy Loan Id"
+                              >
+                                <span className="font-mono font-medium text-primary">
+                                  {displayLoan.formattedLoanId}
                                 </span>
-                              </td>
-                              
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {/* Pagination */}
-                      {!loadingLoan && displayedLoans.length > 0 && (
-                        <div className="flex items-center justify-between pt-4 p-8">
-                          <div className="text-sm text-[var(--color-on-surface)] opacity-70">
-                            Showing{" "}
-                            {Math.min(pagination.limit, displayedLoans.length)}{" "}
-                            of {totalCount} unallocated loans
-                          </div>
-                          <div className="flex gap-2 items-center">
-                            <Button
-                              onClick={() =>
-                                handlePaginationChange(
-                                  Math.max(1, pagination.page - 1),
-                                  pagination.limit
-                                )
-                              }
-                              disabled={pagination.page === 1}
-                              variant="outline"
-                              size="sm"
-                            >
-                              Previous
-                            </Button>
-                            <span className="text-sm px-3">
-                              Page {pagination.page} of{" "}
-                              {Math.ceil(totalCount / pagination.limit) || 1}
-                            </span>
-                            <Button
-                              onClick={() =>
-                                handlePaginationChange(
-                                  pagination.page + 1,
-                                  pagination.limit
-                                )
-                              }
-                              disabled={
-                                pagination.page >=
-                                Math.ceil(totalCount / pagination.limit)
-                              }
-                              variant="outline"
-                              size="sm"
-                            >
-                              Next
-                            </Button>
-                            <select
-                              value={pagination.limit}
-                              onChange={(e) =>
-                                handlePaginationChange(
-                                  1,
-                                  Number(e.target.value)
-                                )
-                              }
-                              className="px-3 py-2 border border-[var(--color-muted)] border-opacity-20 rounded text-sm"
-                            >
-                              <option value={10}>10 per page</option>
-                              <option value={25}>25 per page</option>
-                              <option value={50}>50 per page</option>
-                              <option value={100}>100 per page</option>
-                            </select>
-                          </div>
+                                <FiCopy className="w-4 h-4" />
+                              </button>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              {[
+                                displayLoan.user?.userDetails?.firstName,
+                                displayLoan.user?.userDetails?.lastName,
+                              ]
+                                .filter(Boolean)
+                                .join(" ") || "N/A"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
+                              {displayLoan.amount ? Conversion.formatCurrency(displayLoan.amount) : "N/A"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {displayLoan.status}
+                              </span>
+                            </td>
+
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {/* Pagination */}
+                    {!loadingLoan && displayedLoans.length > 0 && (
+                      <div className="flex items-center justify-between pt-4 p-8">
+                        <div className="text-sm text-[var(--color-on-surface)] opacity-70">
+                          Showing{" "}
+                          {Math.min(pagination.limit, displayedLoans.length)}{" "}
+                          of {totalCount} unallocated loans
                         </div>
-                      )}
-                    </>
+                        <div className="flex gap-2 items-center">
+                          <Button
+                            onClick={() =>
+                              handlePaginationChange(
+                                Math.max(1, pagination.page - 1),
+                                pagination.limit
+                              )
+                            }
+                            disabled={pagination.page === 1}
+                            variant="outline"
+                            size="sm"
+                          >
+                            Previous
+                          </Button>
+                          <span className="text-sm px-3">
+                            Page {pagination.page} of{" "}
+                            {Math.ceil(totalCount / pagination.limit) || 1}
+                          </span>
+                          <Button
+                            onClick={() =>
+                              handlePaginationChange(
+                                pagination.page + 1,
+                                pagination.limit
+                              )
+                            }
+                            disabled={
+                              pagination.page >=
+                              Math.ceil(totalCount / pagination.limit)
+                            }
+                            variant="outline"
+                            size="sm"
+                          >
+                            Next
+                          </Button>
+                          <select
+                            value={pagination.limit}
+                            onChange={(e) =>
+                              handlePaginationChange(
+                                1,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="px-3 py-2 border border-[var(--color-muted)] border-opacity-20 rounded text-sm"
+                          >
+                            <option value={10}>10 per page</option>
+                            <option value={25}>25 per page</option>
+                            <option value={50}>50 per page</option>
+                            <option value={100}>100 per page</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                </div>
+              </div>
+            ) : (
+              !loadingLoan && (
+                <div className="flex items-center justify-center py-12 border border-[var(--color-muted)] border-opacity-20 rounded-lg mt-4">
+                  <div className="text-center">
+                    <HiOutlineUser className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm text-[var(--color-on-surface)] opacity-70">
+                      No unallocated loans found
+                    </p>
                   </div>
                 </div>
-              ) : (
-                !loadingLoan && (
-                  <div className="flex items-center justify-center py-12 border border-[var(--color-muted)] border-opacity-20 rounded-lg mt-4">
-                    <div className="text-center">
-                      <HiOutlineUser className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-sm text-[var(--color-on-surface)] opacity-70">
-                        No unallocated loans found
-                      </p>
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
+              )
+            )}
           </div>
+        </div>
       </div>
 
       {/* Allocation Modal */}
@@ -517,13 +517,12 @@ const UnallocatedLoansComponent = () => {
                   >
                     {selectedPartnerUserId
                       ? partnerUsers.find((p) => p.id === selectedPartnerUserId)
-                          ?.name || "Select a partner..."
+                        ?.name || "Select a partner..."
                       : "Select a partner..."}
                   </span>
                   <HiOutlineChevronDown
-                    className={`w-5 h-5 transition-transform ${
-                      showPartnerDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-5 h-5 transition-transform ${showPartnerDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -577,7 +576,7 @@ const UnallocatedLoansComponent = () => {
                             ]
                               .filter(Boolean)
                               .join(" ") || "N/A"}{" "}
-                            - ₹{loan.amount?.toLocaleString("en-IN")}
+                            - {loan.amount ? Conversion.formatCurrency(loan.amount) : "N/A"}
                           </p>
                         </div>
                       </div>

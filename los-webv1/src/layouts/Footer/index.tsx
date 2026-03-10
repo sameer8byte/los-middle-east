@@ -22,9 +22,9 @@ const Footer = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-1">
               <div className="flex justify-between items-center py-4 border-b border-slate-50">
                 <span className="text-sm text-gray-700 font-medium">Loan Amount</span>
-                <span className="text-sm md:text-lg text-black font-semibold">₹10,000 - ₹1,00,000</span>
+                <span className="text-sm md:text-lg text-black font-semibold">BHD 50 - BHD 1000</span>
               </div>
-              <div className="flex justify-between items-center py-4 border-b border-slate-50">
+              <div className="flex justify-between items-center py-4 border-b border-slate-50"> 
                 <span className="text-sm text-gray-700 font-medium">Pre-closure Charges</span>
                 <span className="text-sm md:text-lg text-emerald-500 font-semibold">No Charges</span>
               </div>
@@ -42,7 +42,7 @@ const Footer = () => {
               </div>
               <div className="flex justify-between items-center py-4">
                 <span className="text-sm text-gray-700 font-medium">Min. Salary</span>
-                <span className="text-sm md:text-lg text-black font-semibold">≥ ₹35,000</span>
+                <span className="text-sm md:text-lg text-black font-semibold">≥ BHD 500</span>
               </div>
             </div>
           </div>
@@ -51,30 +51,30 @@ const Footer = () => {
           <div className="bg-[#f8faff] rounded-[2.5rem] border border-blue-50/50 p-6 md:p-12 overflow-hidden">
             <h3 className="text-xl md:text-3xl font-bold text-black text-center mb-2">Illustrations</h3>
             <p className="text-center text-sm text-black font-medium mb-1">Representative Example: How Your {brand.name} Loan Works</p>
-            <p className="text-center text-gray-500 text-[11px] md:text-sm mb-10">(Example: ₹10,000 Loan)</p>
+            <p className="text-center text-gray-500 text-[11px] md:text-sm mb-10">(Example: BHD 1000 Loan)</p>
 
             <div className="bg-white rounded-2xl border border-slate-100 p-6 md:p-12 max-w-4xl mx-auto shadow-sm">
               <p className="text-xs md:text-sm text-center text-gray-600 mb-8 leading-relaxed">
-                When you take a loan of ₹10,000 from {brand.name}, here's how the charges and disbursal break down:
+                When you take a loan of BHD 1000 from {brand.name}, here's how the charges and disbursal break down:
               </p>
 
               <div className="space-y-1">
                 <div className="flex justify-between items-center py-4 border-b border-slate-50">
                   <span className="text-sm text-gray-700 font-medium">Processing Fee</span>
-                  <span className="text-sm font-semibold text-black text-right">10% of ₹10,000 = ₹1,000</span>
+                  <span className="text-sm font-semibold text-black text-right">10% of BHD 1000 = BHD 100</span>
                 </div>
                 <div className="flex justify-between items-center py-4 border-b border-slate-50">
                   <span className="text-sm text-gray-700 font-medium">GST on Processing Fee</span>
-                  <span className="text-sm font-semibold text-black text-right">18% of ₹1,000 = ₹180</span>
+                  <span className="text-sm font-semibold text-black text-right">18% of BHD 1000 = BHD 180</span> 
                 </div>
                 <div className="flex justify-between items-center py-5">
                   <span className="text-sm text-black font-bold">Total Deduction</span>
-                  <span className="text-sm font-bold text-black text-right">₹1,180 (11.8% of loan amount)</span>
+                  <span className="text-sm font-bold text-black text-right">BHD 1,180 (11.8% of loan amount)</span>
                 </div>
 
                 <div className="mt-6 bg-emerald-50 text-emerald-700 p-5 md:p-6 rounded-xl flex flex-col md:flex-row md:justify-between items-center gap-2 md:gap-0 font-bold text-center md:text-left border border-emerald-100/50">
                   <span className="text-sm uppercase tracking-tight">Final Amount Disbursed to You</span>
-                  <span className="text-sm">₹10,000 - ₹1,180 = ₹8,820</span>
+                  <span className="text-sm">BHD 1000 - BHD 180 = BHD 820</span>
                 </div>
               </div>
             </div>
@@ -97,7 +97,7 @@ const Footer = () => {
             {/* RBI License */}
             <div className="flex items-center gap-2  px-3 py-1 rounded-full border border-[var(--text-primary)]">
               <span className="text-sm font-medium text-[var(--text-primary)]">
-                RBI NBFC Registration No:
+                CBB (Central Bank of Bahrain):
                 {brand.brandDetails.rbiRegistrationNo}
               </span>
             </div>{" "}

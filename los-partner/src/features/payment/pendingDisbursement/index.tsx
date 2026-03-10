@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { Conversion } from "../../../utils/conversion";
 import { useParams } from "react-router-dom";
 import {
   HiCheckCircle,
@@ -103,9 +104,9 @@ const AgreementBadge = ({
   agreement,
 }: {
   agreement:
-    | { signedAt?: string | null; status?: string; signed?: string | null }
-    | null
-    | undefined;
+  | { signedAt?: string | null; status?: string; signed?: string | null }
+  | null
+  | undefined;
 }) => {
   if (!agreement) {
     return (
@@ -244,12 +245,10 @@ export function PendingDisbursementComponent() {
         aVal = a.amount || 0;
         bVal = b.amount || 0;
       } else if (sortField === "name") {
-        aVal = `${a.user?.userDetails?.firstName || ""} ${
-          a.user?.userDetails?.lastName || ""
-        }`.trim();
-        bVal = `${b.user?.userDetails?.firstName || ""} ${
-          b.user?.userDetails?.lastName || ""
-        }`.trim();
+        aVal = `${a.user?.userDetails?.firstName || ""} ${a.user?.userDetails?.lastName || ""
+          }`.trim();
+        bVal = `${b.user?.userDetails?.firstName || ""} ${b.user?.userDetails?.lastName || ""
+          }`.trim();
       } else {
         aVal = new Date(a.createdAt).getTime();
         bVal = new Date(b.createdAt).getTime();
@@ -336,12 +335,6 @@ export function PendingDisbursementComponent() {
     }
   };
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(amount || 0);
 
   const formatDate = (date: string) => {
     if (!date) return "—";
@@ -430,10 +423,9 @@ export function PendingDisbursementComponent() {
                   text-[var(--on-surface)]
                   placeholder-[var(--on-surface)]/40
                   focus:outline-none
-                  ${
-                    isSearchFocused || searchTerm
-                      ? "border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10"
-                      : "border-[var(--muted)]/30 hover:border-[var(--muted)]/50"
+                  ${isSearchFocused || searchTerm
+                    ? "border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10"
+                    : "border-[var(--muted)]/30 hover:border-[var(--muted)]/50"
                   }
                 `}
               />
@@ -441,10 +433,9 @@ export function PendingDisbursementComponent() {
                 className={`
                   absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4
                   transition-colors duration-200
-                  ${
-                    isSearchFocused || searchTerm
-                      ? "text-[var(--primary)]"
-                      : "text-[var(--on-surface)]/40"
+                  ${isSearchFocused || searchTerm
+                    ? "text-[var(--primary)]"
+                    : "text-[var(--on-surface)]/40"
                   }
                 `}
               />
@@ -464,10 +455,9 @@ export function PendingDisbursementComponent() {
               disabled={loading}
               className={`
                 p-2.5 rounded-xl border-2 transition-all duration-200
-                ${
-                  loading
-                    ? "border-[var(--muted)]/20 bg-[var(--muted)]/10 text-[var(--on-surface)]/30"
-                    : "border-[var(--muted)]/30 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 text-[var(--on-surface)]/60 hover:text-[var(--primary)]"
+                ${loading
+                  ? "border-[var(--muted)]/20 bg-[var(--muted)]/10 text-[var(--on-surface)]/30"
+                  : "border-[var(--muted)]/30 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 text-[var(--on-surface)]/60 hover:text-[var(--primary)]"
                 }
               `}
               title="Refresh data"
@@ -616,19 +606,17 @@ export function PendingDisbursementComponent() {
               {!loading &&
                 sortedTransactions.map((tx, idx) => {
                   const name =
-                    `${tx.user?.userDetails?.firstName || ""} ${
-                      tx.user?.userDetails?.lastName || ""
-                    }`.trim() || "—";
+                    `${tx.user?.userDetails?.firstName || ""} ${tx.user?.userDetails?.lastName || ""
+                      }`.trim() || "—";
                   const hasExistingDisbursement = !!tx.existingDisbursement;
 
                   return (
                     <tr
                       key={tx.id}
-                      className={`transition-colors group ${
-                        hasExistingDisbursement 
-                          ? 'bg-red-50 border-l-4 border-red-500 hover:bg-red-50' 
+                      className={`transition-colors group ${hasExistingDisbursement
+                          ? 'bg-red-50 border-l-4 border-red-500 hover:bg-red-50'
                           : 'hover:bg-[var(--primary)]/[0.03]'
-                      }`}
+                        }`}
                     >
                       <td className="px-4 py-3.5 text-[var(--on-surface)]/30 tabular-nums font-medium text-xs">
                         {(page - 1) * limit + idx + 1}
@@ -645,11 +633,11 @@ export function PendingDisbursementComponent() {
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex flex-col">
-                            {tx.id && (
-                                                                                               <AcefoneClickToDialButton userId={tx.user?.id!}
-                                                                                               loanId={tx.id}  
-                                                                                               />
-                                                                                             )}{" "}      
+                          {tx.id && (
+                            <AcefoneClickToDialButton userId={tx.user?.id!}
+                              loanId={tx.id}
+                            />
+                          )}{" "}
                           <span className="text-[var(--on-surface)]/70 font-mono text-sm">
                             {tx.user?.phoneNumber || "—"}
                           </span>
@@ -680,12 +668,12 @@ export function PendingDisbursementComponent() {
 
                       <td className="px-4 py-3.5 text-right hidden md:table-cell">
                         <span className="font-bold text-emerald-600 tabular-nums text-sm">
-                          {formatCurrency(tx.amount)}
+                          {Conversion.formatCurrency(tx.amount)}
                         </span>
                       </td>
                       <td className="px-4 py-3.5 text-right hidden md:table-cell">
                         <span className="font-bold text-blue-600 tabular-nums text-sm">
-                          {formatCurrency(tx.disbursement?.netAmount || 0)}
+                          {Conversion.formatCurrency(tx.disbursement?.netAmount || 0)}
                         </span>
                       </td>
                       <td className="px-4 py-3.5 hidden lg:table-cell">
@@ -733,9 +721,8 @@ export function PendingDisbursementComponent() {
                           <Button
                             onClick={() => {
                               const customerName =
-                                `${tx.user?.userDetails?.firstName || ""} ${
-                                  tx.user?.userDetails?.lastName || ""
-                                }`.trim() || "Customer";
+                                `${tx.user?.userDetails?.firstName || ""} ${tx.user?.userDetails?.lastName || ""
+                                  }`.trim() || "Customer";
                               openSendBackDialog(tx.id, customerName);
                             }}
                             variant="outline"
@@ -785,7 +772,7 @@ export function PendingDisbursementComponent() {
                 Total Pending Amount
               </p>
               <p className="text-base font-bold text-[var(--on-surface)]">
-                {formatCurrency(totalPendingAmount)}
+                {Conversion.formatCurrency(totalPendingAmount)}
               </p>
             </div>
             <div className="text-right">
@@ -793,7 +780,7 @@ export function PendingDisbursementComponent() {
                 Total Net Amount
               </p>
               <p className="text-base font-bold text-blue-600">
-                {formatCurrency(totalNetPendingAmount)}
+                {Conversion.formatCurrency(totalNetPendingAmount)}
               </p>
             </div>
           </div>
@@ -867,10 +854,9 @@ export function PendingDisbursementComponent() {
                     onClick={() => setPage(pageNum)}
                     className={`
                       min-w-[32px] h-8 text-xs font-semibold rounded-lg transition-all duration-200
-                      ${
-                        page === pageNum
-                          ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/30"
-                          : "text-[var(--on-surface)]/50 hover:bg-[var(--muted)]/15 hover:text-[var(--on-surface)]/80"
+                      ${page === pageNum
+                        ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/30"
+                        : "text-[var(--on-surface)]/50 hover:bg-[var(--muted)]/15 hover:text-[var(--on-surface)]/80"
                       }
                     `}
                   >

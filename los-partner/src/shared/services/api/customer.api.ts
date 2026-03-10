@@ -392,7 +392,7 @@ export const sendAadhaarLink = async (userId: string, brandId: string) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error sending Aadhaar link:", error);
+    console.error("Error sending CPR Card link:", error);
     throw error;
   }
 };
@@ -899,7 +899,7 @@ export const generateAadhaarLink = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error generating Aadhaar link:", error);
+    console.error("Error generating CPR Card link:", error);
     throw error;
   }
 };

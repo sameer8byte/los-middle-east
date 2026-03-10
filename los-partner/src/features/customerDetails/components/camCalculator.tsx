@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
-import { FaCheckCircle, FaClipboardList, FaCoins } from "react-icons/fa";
+import { FaCheckCircle, FaCoins } from "react-icons/fa";
 import Dialog from "../../../common/dialog";
 import { Button } from "../../../common/ui/button";
+import { Spinner } from "../../../common/ui/spinner";
 import { useParams } from "react-router-dom";
 import {
   getLoanRuleTenures,
   calculateRepaymentForPartner,
 } from "../../../shared/services/api/loan.api";
 import {
-  saveCAMCalculator,
   getCAMCalculatorByUser,
 } from "../../../shared/services/api/cam-calculator.api";
 import { FeeValueType, PenaltyType, TaxType } from "../../../constant/enum";
 import { toast } from "react-toastify";
+import axios from "axios";
+import {
+  getCustomerDetails,
+  getCustomerEmployment,
+} from "../../../shared/services/api/customer.api";
 type LoanDetails = {
   type: "PAYDAY_LOAN" | string;
   durationDays: number;
@@ -183,68 +188,6 @@ const calculateEligibleLoan = (
 };
 
 // --- START OF UI ADJUSTMENTS ---
-// Reusable Input Component with adjusted styles for compactness
-interface CompactInputFieldProps {
-  readonly id: keyof FormData;
-  readonly label: string;
-  readonly value: string;
-  readonly onChange?: (val: string) => void;
-  readonly type?: string;
-  readonly readOnly?: boolean;
-  readonly placeholder?: string;
-  readonly required?: boolean;
-  readonly step?: string;
-  readonly hint?: string;
-  readonly error?: string;
-}
-
-const getInputClassName = (error: string, readOnly: boolean): string => {
-  // Adjusted: py-1.5 instead of py-2, text-xs instead of text-sm
-  const baseClass = "w-full px-3 py-1.5 border rounded text-xs transition-all ";
-  if (error) return baseClass + "border-red-300 bg-red-50";
-  if (readOnly) return baseClass + "bg-gray-50 border-gray-200 text-gray-700";
-  return (
-    baseClass +
-    "border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-  );
-};
-
-function CompactInputField({
-  id,
-  label,
-  value,
-  onChange,
-  type = "text",
-  readOnly = false,
-  placeholder = "",
-  required = false,
-  step = "1",
-  // hint = "", // Removed hint for compactness
-  error = "",
-}: Readonly<CompactInputFieldProps>) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        {/* Adjusted: text-xs instead of text-sm */}
-        <label htmlFor={id} className="block text-xs font-medium text-gray-600">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        {/* {hint && <span className="text-xs text-gray-500 truncate">{hint}</span>} */}
-      </div>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        placeholder={placeholder}
-        readOnly={readOnly}
-        step={step}
-        className={getInputClassName(error, readOnly)}
-      />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
 // --- END OF UI ADJUSTMENTS ---
 
 interface CamCalculatorProps {
@@ -257,10 +200,12 @@ interface CamCalculatorProps {
     };
     userId?: string;
     id?: string;
+    loanType?: string;
+    isRepeatLoan?: boolean;
   };
   readonly brandId?: string;
-  refresh: boolean;
-  setRefresh: (val: boolean) => void;
+  readonly refresh?: boolean;
+  readonly setRefresh?: (val: boolean) => void;
 }
 
 interface TenureOption {
@@ -293,16 +238,15 @@ interface TenureOption {
 
 export function CamCalculator({
   loan,
-  refresh,
-  setRefresh,
 }: Readonly<CamCalculatorProps>) {
   const { brandId } = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(true);
   const [tenures, setTenures] = useState<TenureOption[]>([]);
+  // @ts-ignore
   const [loadingTenures, setLoadingTenures] = useState(false);
-  const [existingCalculations, setExistingCalculations] = useState<any[]>([]);
-  const [loadingExisting, setLoadingExisting] = useState(false);
+  // const [existingCalculations, setExistingCalculations] = useState<any[]>([]);
+  // const [loadingExisting, setLoadingExisting] = useState(false);
   const [formData, setFormData] = useState<FormData>(() => ({
     ...INITIAL_DATA,
     disbursalDate: formatDate(new Date()),
@@ -314,11 +258,14 @@ export function CamCalculator({
   );
   const [repaymentError, setRepaymentError] = useState<string | null>(null);
   const [isCalculatingRepayment, setIsCalculatingRepayment] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [manuallyEditedFields, setManuallyEditedFields] = useState<
-    Set<keyof FormData>
-  >(new Set());
-  const [loadingError, setLoadingError] = useState<string | null>(null);
+  // const [manuallyEditedFields, setManuallyEditedFields] = useState<
+  //   Set<keyof FormData>
+  // >(new Set());
+  // const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [creditRiskData, setCreditRiskData] = useState<any>(null);
+  const [loadingCreditRisk, setLoadingCreditRisk] = useState(false);
+  const [creditRiskError, setCreditRiskError] = useState<string | null>(null);
+  // @ts-ignore
   const isReadOnly = loan?.status !== "PENDING";
 
   // Fetch loan rule tenures when dialog opens
@@ -330,6 +277,26 @@ export function CamCalculator({
       }
     }
   }, [isOpen, brandId, tenures.length]);
+
+  // Restore credit risk data from session storage on component mount or user change
+  useEffect(() => {
+    if (loan?.userId) {
+      const storageKey = `creditRiskData_${loan.userId}`;
+      const storedCreditRiskData = sessionStorage.getItem(storageKey);
+      if (storedCreditRiskData) {
+        try {
+          const parsedData = JSON.parse(storedCreditRiskData);
+          setCreditRiskData(parsedData);
+          console.log(`✅ Credit Risk Data for user ${loan.userId} restored from Session Storage`);
+        } catch (error) {
+          console.error("Error parsing credit risk data from session storage:", error);
+          sessionStorage.removeItem(storageKey);
+        }
+      } else {
+        setCreditRiskData(null); // Clear data if no cache for new user
+      }
+    }
+  }, [loan?.userId]);
 
   const calculateRepayment = async (tenureIdOverride?: string) => {
     // Use the override if provided (for immediate calculation after selection)
@@ -392,8 +359,8 @@ export function CamCalculator({
 
   const fetchExistingCalculations = async () => {
     if (!loan?.userId || !brandId) return;
-    setLoadingExisting(true);
-    setLoadingError(null);
+    // setLoadingExisting(true);
+    // setLoadingError(null);
     try {
       const result = await getCAMCalculatorByUser(loan.userId, brandId);
       if (result.success && result.data && result.data.length > 0) {
@@ -413,7 +380,7 @@ export function CamCalculator({
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        setExistingCalculations(uniqueCalculations);
+        // setExistingCalculations(uniqueCalculations);
         if (uniqueCalculations.length > 0) {
           setShowLoadDialog(true);
         }
@@ -421,55 +388,55 @@ export function CamCalculator({
         setShowLoadDialog(false);
       }
     } catch (error) {
-      const errorMsg =
-        error instanceof Error ? error.message : "Failed to load calculations";
-      setLoadingError(errorMsg);
+      // const errorMsg =
+      //   error instanceof Error ? error.message : "Failed to load calculations";
+      // setLoadingError(errorMsg);
     } finally {
-      setLoadingExisting(false);
+      // setLoadingExisting(false);
     }
   };
 
-  const loadExistingCalculation = (calculationId: string) => {
-    const calculation = existingCalculations.find(
-      (calc) => calc.loanId === calculationId
-    );
-    if (calculation) {
-      setFormData({
-        salaryCreditDate1: calculation.salaryCreditDate1 || "",
-        salaryCreditDate2: calculation.salaryCreditDate2 || "",
-        salaryCreditDate3: calculation.salaryCreditDate3 || "",
-        salaryAmount1: calculation.salaryAmount1?.toString() || "",
-        salaryAmount2: calculation.salaryAmount2?.toString() || "",
-        salaryAmount3: calculation.salaryAmount3?.toString() || "",
-        nextPayDate: calculation.nextPayDate || "",
-        salaryVariance: calculation.salaryVariance?.toString() || "",
-        actualSalary: calculation.actualSalary?.toString() || "",
-        eligibleFoir: calculation.eligibleFoir?.toString() || "",
-        loanApplied: calculation.loanApplied?.toString() || "",
-        finalFoir: "",
-        processingFee: "18",
-        totalProcessingFee: "",
-        repayDate: calculation.repayDate || "",
-        tenureId: calculation.tenureId || "",
-        repayAmount: "",
-        avgSalary: calculation.avgSalary?.toString() || "",
-        obligations: calculation.obligations?.toString() || "",
-        eligibleLoan: calculation.eligibleLoan?.toString() || "",
-        loanRecommended: calculation.loanRecommended?.toString() || "",
-        foirAchieved: calculation.foirAchieved?.toString() || "",
-        proposedFoir: calculation.proposedFoir?.toString() || "",
-        disbursalDate: calculation.disbursalDate || formatDate(new Date()),
-        salaryFrequency: "monthly",
-      });
+  // const loadExistingCalculation = (calculationId: string) => {
+  //   const calculation = existingCalculations.find(
+  //     (calc) => calc.loanId === calculationId
+  //   );
+  //   if (calculation) {
+  //     setFormData({
+  //       salaryCreditDate1: calculation.salaryCreditDate1 || "",
+  //       salaryCreditDate2: calculation.salaryCreditDate2 || "",
+  //       salaryCreditDate3: calculation.salaryCreditDate3 || "",
+  //       salaryAmount1: calculation.salaryAmount1?.toString() || "",
+  //       salaryAmount2: calculation.salaryAmount2?.toString() || "",
+  //       salaryAmount3: calculation.salaryAmount3?.toString() || "",
+  //       nextPayDate: calculation.nextPayDate || "",
+  //       salaryVariance: calculation.salaryVariance?.toString() || "",
+  //       actualSalary: calculation.actualSalary?.toString() || "",
+  //       eligibleFoir: calculation.eligibleFoir?.toString() || "",
+  //       loanApplied: calculation.loanApplied?.toString() || "",
+  //       finalFoir: "",
+  //       processingFee: "18",
+  //       totalProcessingFee: "",
+  //       repayDate: calculation.repayDate || "",
+  //       tenureId: calculation.tenureId || "",
+  //       repayAmount: "",
+  //       avgSalary: calculation.avgSalary?.toString() || "",
+  //       obligations: calculation.obligations?.toString() || "",
+  //       eligibleLoan: calculation.eligibleLoan?.toString() || "",
+  //       loanRecommended: calculation.loanRecommended?.toString() || "",
+  //       foirAchieved: calculation.foirAchieved?.toString() || "",
+  //       proposedFoir: calculation.proposedFoir?.toString() || "",
+  //       disbursalDate: calculation.disbursalDate || formatDate(new Date()),
+  //       salaryFrequency: "monthly",
+  //     });
 
-      // FIX: Force the repayment data into state so UI cards appear
-      if (calculation?.repaymentData) {
-        setRepaymentData(calculation.repaymentData);
-      }
-      setManuallyEditedFields(new Set(["loanRecommended"]));
-      setShowLoadDialog(false);
-    }
-  };
+  //     // FIX: Force the repayment data into state so UI cards appear
+  //     if (calculation?.repaymentData) {
+  //       setRepaymentData(calculation.repaymentData);
+  //     }
+  //     setManuallyEditedFields(new Set(["loanRecommended"]));
+  //     setShowLoadDialog(false);
+  //   }
+  // };
 
   // Auto-calculate derived fields
   useEffect(() => {
@@ -518,32 +485,32 @@ export function CamCalculator({
   ]);
 
   // ADDED: useEffect to handle recommended field auto-updates
-  useEffect(() => {
-    const loanApplied = parseNum(formData.loanApplied);
-    const eligibleLoan = parseNum(formData.eligibleLoan);
-    const isRecommendedManuallyEdited =
-      manuallyEditedFields.has("loanRecommended");
-    const currentRecommended = formData.loanRecommended;
+  // useEffect(() => {
+  //   const loanApplied = parseNum(formData.loanApplied);
+  //   const eligibleLoan = parseNum(formData.eligibleLoan);
+    // const isRecommendedManuallyEdited =
+    //   manuallyEditedFields.has("loanRecommended");
+    // const currentRecommended = formData.loanRecommended;
 
-    if (
-      !isRecommendedManuallyEdited &&
-      (loanApplied > 0 || eligibleLoan > 0) &&
-      currentRecommended !== ""
-    ) {
-      const recommendedValue = Math.min(loanApplied, eligibleLoan);
+    // if (
+    //   !isRecommendedManuallyEdited &&
+    //   (loanApplied > 0 || eligibleLoan > 0) &&
+    //   currentRecommended !== ""
+    // ) {
+    //   const recommendedValue = Math.min(loanApplied, eligibleLoan);
 
-      // Only update if the calculated value is different from current
-      if (
-        recommendedValue > 0 &&
-        recommendedValue !== parseNum(currentRecommended)
-      ) {
-        setFormData((prev) => ({
-          ...prev,
-          loanRecommended: recommendedValue.toFixed(2),
-        }));
-      }
-    }
-  }, [formData.loanApplied, formData.eligibleLoan, manuallyEditedFields]);
+    //   // Only update if the calculated value is different from current
+    //   if (
+    //     recommendedValue > 0 &&
+    //     recommendedValue !== parseNum(currentRecommended)
+    //   ) {
+    //     setFormData((prev) => ({
+    //       ...prev,
+    //       loanRecommended: recommendedValue.toFixed(2),
+    //     }));
+    //   }
+    // }
+  // }, [formData.loanApplied, formData.eligibleLoan, manuallyEditedFields]);
 
   const calculateDerivedFields = () => {
     const updates: Partial<FormData> = {};
@@ -594,325 +561,128 @@ export function CamCalculator({
       recommendedValue = eligibleLoan;
     }
 
-    const isRecommendedManuallyEdited =
-      manuallyEditedFields.has("loanRecommended");
-    const currentRecommended = formData.loanRecommended;
+    // const isRecommendedManuallyEdited =
+    //   manuallyEditedFields.has("loanRecommended");
+    // const currentRecommended = formData.loanRecommended;
 
-    if (!isRecommendedManuallyEdited) {
-      updates.loanRecommended = recommendedValue.toFixed(2);
-    } else if (currentRecommended === "") {
-      updates.loanRecommended = "";
-    }
+    // if (!isRecommendedManuallyEdited) {
+    updates.loanRecommended = recommendedValue.toFixed(2);
+    // } else if (currentRecommended === "") {
+    //   updates.loanRecommended = "";
+    // }
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    // If user is typing in the recommended field
-    if (field === "loanRecommended") {
-      // Mark it as manually edited if it has a value
-      if (value !== "" && value !== formData.loanRecommended) {
-        setManuallyEditedFields((prev) => new Set(prev).add(field));
-      }
-      // If user clears the field (empty string), keep it cleared
-      if (value === "") {
-        setManuallyEditedFields((prev) => new Set(prev).add(field));
-        setFormData((prev) => ({ ...prev, [field]: value }));
-        return;
-      }
-    }
-
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // ADDED: Reset function
-  const handleReset = () => {
-    setFormData({
-      ...INITIAL_DATA,
-      disbursalDate: formatDate(new Date()),
-      loanApplied: loan?.amount ? loan.amount.toString() : "",
-      loanRecommended: loan?.amount ? loan.amount.toString() : "",
-    });
-    setManuallyEditedFields(new Set()); // Clear the manual edits tracking
-    setRepaymentData(null);
-    setRepaymentError(null);
-  };
-
-  const handleSalaryDateChange = (
-    field: "salaryCreditDate1" | "salaryCreditDate2" | "salaryCreditDate3",
-    value: string
-  ) => {
-    const updates: Partial<FormData> = { [field]: value };
-
-    // When first date is set, calculate previous two months going backwards
-    if (field === "salaryCreditDate1" && value) {
-      const date1 = new Date(value);
-
-      // Go back 1 month for date 2
-      const date2 = new Date(date1);
-      date2.setMonth(date2.getMonth() - 1);
-      updates.salaryCreditDate2 = formatDate(date2);
-
-      // Go back 2 months for date 3
-      const date3 = new Date(date1);
-      date3.setMonth(date3.getMonth() - 2);
-      updates.salaryCreditDate3 = formatDate(date3);
-
-      // Auto-set next pay date (next month)
-      const nextPayDate = new Date(date1);
-      nextPayDate.setMonth(nextPayDate.getMonth() + 1);
-      updates.nextPayDate = formatDate(nextPayDate);
-    }
-
-    // When second date is set, auto-calculate first and third
-    if (field === "salaryCreditDate2" && value) {
-      const date2 = new Date(value);
-
-      // Calculate date 1 (next month)
-      const date1 = new Date(date2);
-      date1.setMonth(date1.getMonth() + 1);
-      updates.salaryCreditDate1 = formatDate(date1);
-
-      // Calculate date 3 (previous month)
-      const date3 = new Date(date2);
-      date3.setMonth(date3.getMonth() - 1);
-      updates.salaryCreditDate3 = formatDate(date3);
-
-      // Auto-set next pay date
-      const nextPayDate = new Date(date1);
-      nextPayDate.setMonth(nextPayDate.getMonth() + 1);
-      updates.nextPayDate = formatDate(nextPayDate);
-    }
-
-    // When third date is set, auto-calculate date 1 and 2
-    if (field === "salaryCreditDate3" && value) {
-      const date3 = new Date(value);
-
-      // Calculate date 2 (next month)
-      const date2 = new Date(date3);
-      date2.setMonth(date2.getMonth() + 1);
-      updates.salaryCreditDate2 = formatDate(date2);
-
-      // Calculate date 1 (two months ahead)
-      const date1 = new Date(date3);
-      date1.setMonth(date1.getMonth() + 2);
-      updates.salaryCreditDate1 = formatDate(date1);
-
-      // Auto-set next pay date
-      const nextPayDate = new Date(date1);
-      nextPayDate.setMonth(nextPayDate.getMonth() + 1);
-      updates.nextPayDate = formatDate(nextPayDate);
-    }
-
-    setFormData((prev) => ({ ...prev, ...updates }));
-  };
-
-  const handleSave = async () => {
-    if (!loan?.id || !loan?.userId || !brandId) {
-      alert("Missing required loan information");
+  const checkCreditRisk = async () => {
+    if (!loan?.userId || !brandId) {
+      toast.error("Missing user or brand information");
       return;
     }
 
+    setLoadingCreditRisk(true);
+    setCreditRiskError(null);
+
     try {
-      setIsSaving(true);
-      const savePayload = {
-        loanId: loan.id,
-        userId: loan.userId,
-        partnerUserId: loan?.userId || "",
-        salaryCreditDate1: formData.salaryCreditDate1,
-        salaryCreditDate2: formData.salaryCreditDate2,
-        salaryCreditDate3: formData.salaryCreditDate3,
-        salaryAmount1: formData.salaryAmount1
-          ? parseNum(formData.salaryAmount1)
-          : undefined,
-        salaryAmount2: formData.salaryAmount2
-          ? parseNum(formData.salaryAmount2)
-          : undefined,
-        salaryAmount3: formData.salaryAmount3
-          ? parseNum(formData.salaryAmount3)
-          : undefined,
-        nextPayDate: formData.nextPayDate,
-        salaryVariance: formData.salaryVariance
-          ? parseNum(formData.salaryVariance)
-          : undefined,
-        actualSalary: formData.actualSalary
-          ? parseNum(formData.actualSalary)
-          : undefined,
-        eligibleFoir: formData.eligibleFoir
-          ? parseNum(formData.eligibleFoir)
-          : undefined,
-        loanApplied: formData.loanApplied
-          ? parseNum(formData.loanApplied)
-          : undefined,
-        eligibleLoan: formData.eligibleLoan
-          ? parseNum(formData.eligibleLoan)
-          : undefined,
-        loanRecommended: formData.loanRecommended
-          ? parseNum(formData.loanRecommended)
-          : undefined,
-        disbursalDate: formData.disbursalDate,
-        repayDate: formData.repayDate,
-        tenureId: formData.tenureId,
-        avgSalary: formData.avgSalary
-          ? parseNum(formData.avgSalary)
-          : undefined,
-        foirAchieved: formData.foirAchieved
-          ? parseNum(formData.foirAchieved)
-          : undefined,
-        proposedFoir: formData.proposedFoir
-          ? parseNum(formData.proposedFoir)
-          : undefined,
-        obligations: formData.obligations
-          ? parseNum(formData.obligations)
-          : undefined,
-        repaymentData: repaymentData,
+      // Fetch user-details, employment, and CAM data in parallel
+      const [userDetails, employmentData, camData] = await Promise.all([
+        getCustomerDetails(loan.userId, brandId),
+        getCustomerEmployment(loan.userId, brandId),
+        getCAMCalculatorByUser(loan.userId, brandId),
+      ]);
+
+      // Extract fields from user-details
+      const score = userDetails?.creditScore ?? 650;
+      const creditScore: number = score === 0 ? 650 : score;
+      const rawGender: string = userDetails?.gender ?? "MALE";
+      const state: string = userDetails?.state ?? "Lagos";
+
+      // Normalize gender: "MALE" → "Male", "FEMALE" → "Female"
+      const gender = rawGender.charAt(0).toUpperCase() + rawGender.slice(1).toLowerCase();
+
+      // Extract fields from employment
+      const rawEmploymentType: string = employmentData?.employmenttype ?? "FULL_TIME";
+      const joiningDate: string = employmentData?.joiningDate
+        ? new Date(employmentData.joiningDate).toISOString().split("T")[0]
+        : formData.salaryCreditDate1 || "2023-01-15";
+
+      // Normalize employmenttype: "FULL_TIME" → "Salaried", "SELF_EMPLOYED" → "Self-Employed"
+      const employmentTypeMap: Record<string, string> = {
+        FULL_TIME: "Salaried",
+        SELF_EMPLOYED: "Self-Employed",
+        PART_TIME: "Part-Time",
+        CONTRACTUAL: "Contractual",
+      };
+      const employmenttype = employmentTypeMap[rawEmploymentType.toUpperCase()] ?? rawEmploymentType;
+
+      // Get actualSalary from CAM data (most recent entry) or fall back to employment salary
+      const latestCam = Array.isArray(camData?.data) && camData.data.length > 0
+        ? camData.data[0]
+        : null;
+      const salaryInINR: number =
+        latestCam?.actualSalary ??
+        employmentData?.salary ??
+        (formData.actualSalary ? parseNum(formData.actualSalary) : 800);
+
+      // Convert salary from INR to BHD (1 BHD = ₹242)
+      const INR_TO_BHD_RATE = 242;
+      const salary = Math.round((salaryInINR / INR_TO_BHD_RATE) * 100) / 100;
+      const loanAmountInINR = formData.loanRecommended ? parseNum(formData.loanRecommended) : 1000;
+      const loan_applied_amount = Math.round((loanAmountInINR / INR_TO_BHD_RATE) * 100) / 100;
+
+      const payload = {
+        salary,
+        creditScore,
+        loan_applied_amount,
+        "Loan.tenure": formData.tenureId
+          ? tenures.find((t) => t.id === formData.tenureId)?.minTermDays ?? 90
+          : 90,
+        gender,
+        employmenttype,
+        loanType: loan?.loanType ?? "Personal",
+        state,
+        verificationStatus: userDetails?.userDataStatus === "VERIFIED" ? "Verified" : "Unverified",
+        accountExists: true,
+        is_repeat_loan: loan?.isRepeatLoan ?? false,
+        joiningDate,
       };
 
-      const result = await saveCAMCalculator(brandId, savePayload);
+      // console.log("💷 Salary Conversion: ₹", salaryInINR.toFixed(2), "→ BHD", salary.toFixed(2));
+      // console.log("💷 Loan Amount Conversion: ₹", loanAmountInINR.toFixed(2), "→ BHD", loan_applied_amount.toFixed(2));
+      // console.log("Credit Risk API Payload:", payload);
 
-      if (result.success) {
-        toast.success("✅ CAM Calculator data saved successfully!");
-        setExistingCalculations([result.data, ...existingCalculations]);
-        setRefresh(!refresh);
-        setIsOpen(false);
-      } else {
-        alert("❌ " + (result.message || "Failed to save CAM Calculator data"));
+      const response = await axios({
+        method: "POST",
+        url: `${import.meta.env.VITE_ML_SERVICE_URL || ''}/api/credit_risk`,
+        data: payload,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Credit Risk API Response:", response.data);
+      setCreditRiskData(response.data);
+
+      // Store credit risk data in session storage with user-specific key
+      if (loan?.userId) {
+        const storageKey = `creditRiskData_${loan.userId}`;
+        sessionStorage.setItem(storageKey, JSON.stringify(response.data));
+        console.log(`✅ Credit Risk Data for user ${loan.userId} stored in Session Storage`);
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to save CAM Calculator data";
-      alert("❌ " + errorMessage);
+
+      toast.success("Credit risk assessment completed!");
+    } catch (error: any) {
+      console.error("Credit Risk API Error:", error);
+      console.error("Error Response:", error?.response?.data);
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to assess credit risk";
+      setCreditRiskError(errorMsg);
+      toast.error(errorMsg);
     } finally {
-      setIsSaving(false);
+      setLoadingCreditRisk(false);
     }
-  };
-
-  const getTenurePlaceholder = () => {
-    if (loadingTenures) return "Loading tenures...";
-    if (tenures.length === 0) return "No tenures available";
-    return "Select a tenure option";
-  };
-
-  const renderTenureChargesSection = () => {
-    const selectedTenureObj = formData.tenureId
-      ? tenures.find((t) => t.id === formData.tenureId)
-      : null;
-
-    if (
-      !selectedTenureObj ||
-      !selectedTenureObj.loan_charge_config ||
-      selectedTenureObj.loan_charge_config.length === 0
-    ) {
-      return null;
-    }
-    // Reduced padding and font sizes here
-    return (
-      <div>
-        <div className="flex items-center gap-1 mb-2">
-          <FaClipboardList className="w-3 h-3 text-blue-600" />
-          <h4 className="text-xs font-bold text-gray-900">
-            Tenure Charges Configuration
-          </h4>
-        </div>
-
-        <div className="space-y-1">
-          {/* Tenure Info */}
-          <div className="bg-white/80 p-2 rounded-lg border border-blue-100 grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <p className="text-gray-500 text-[10px]">Duration</p>
-              <p className="font-bold text-blue-700">
-                {selectedTenureObj.minTermDays}-{selectedTenureObj.maxTermDays}d
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-[10px]">Grace Period</p>
-              <p className="font-bold text-blue-700">
-                {selectedTenureObj.gracePeriod}d
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-[10px]">Repayment</p>
-              <p className="font-bold text-blue-700">
-                {selectedTenureObj.minRepaymentDays}d
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-[10px]">Type</p>
-              <p className="font-bold text-blue-700 text-[10px]">
-                {selectedTenureObj.loan_type}
-              </p>
-            </div>
-          </div>
-
-          {/* Charges */}
-          {selectedTenureObj.loan_charge_config.map((charge, cidx) => (
-            <div
-              key={`charge-tenure-${cidx}`}
-              className="bg-white/80 p-2 rounded-lg border border-amber-100 hover:shadow-sm transition-shadow"
-            >
-              <div className="flex justify-between items-start mb-1">
-                <div>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    {charge.type}
-                  </p>
-                  <div className="flex gap-1 mt-0.5 text-[10px] text-gray-500">
-                    <span
-                      className={`px-1 py-0.5 rounded ${
-                        charge.chargeMode === "INCLUSIVE"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-teal-100 text-teal-700"
-                      }`}
-                    >
-                      {charge.chargeMode.substring(0, 3)}
-                    </span>
-                    <span className="px-1 py-0.5 bg-gray-100 rounded">
-                      {charge.valueType === "percentage"
-                        ? charge.chargeValue + "%"
-                        : "₹" + charge.chargeValue}
-                    </span>
-                    {charge.isRecurringDaily && (
-                      <span className="px-1 py-0.5 bg-blue-100 text-blue-700 rounded">
-                        Daily
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Taxes for this charge */}
-              {charge.loan_charge_taxes &&
-                charge.loan_charge_taxes.length > 0 && (
-                  <div className="ml-2 mt-1 space-y-0.5 border-t pt-1">
-                    {charge.loan_charge_taxes.map((tax, tidx) => (
-                      <div
-                        key={`tax-tenure-${cidx}-${tidx}`}
-                        className="flex justify-between text-xs bg-amber-50 p-1 rounded"
-                      >
-                        <span className="text-gray-700 text-[10px]">
-                          <span className="font-medium">{tax.type}:</span>{" "}
-                          {tax.valueType === "percentage"
-                            ? tax.chargeValue + "%"
-                            : "₹" + tax.chargeValue}
-                        </span>
-                        <span
-                          className={`text-[10px] ${
-                            tax.isInclusive
-                              ? "text-amber-600"
-                              : "text-orange-600"
-                          }`}
-                        >
-                          {tax.isInclusive ? "(Incl.)" : "(Excl.)"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
   };
 
   const renderRepaymentDetailsSection = () => {
@@ -937,20 +707,20 @@ export function CamCalculator({
                 <div className="bg-blue-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Gross</p>
                   <p className="font-bold text-blue-700 text-xs">
-                    ₹
+                    BHD
                     {repaymentData.disbursement?.grossAmount?.toFixed(2) || "0"}
                   </p>
                 </div>
                 <div className="bg-green-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Net</p>
                   <p className="font-bold text-green-700 text-xs">
-                    ₹{repaymentData.disbursement?.netAmount?.toFixed(2) || "0"}
+                    BHD{repaymentData.disbursement?.netAmount?.toFixed(2) || "0"}
                   </p>
                 </div>
                 <div className="bg-red-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Deductions</p>
                   <p className="font-bold text-red-600 text-xs">
-                    ₹
+                    BHD
                     {repaymentData.disbursement?.totalDeductions?.toFixed(2) ||
                       "0"}
                   </p>
@@ -967,7 +737,7 @@ export function CamCalculator({
                 <div className="bg-green-50 p-1.5 rounded-lg col-span-2">
                   <p className="text-gray-500 text-[10px]">Total Obligation</p>
                   <p className="font-bold text-green-700 text-xs">
-                    ₹
+                    BHD
                     {repaymentData.repayment?.totalObligation?.toFixed(2) ||
                       "0"}
                   </p>
@@ -975,7 +745,7 @@ export function CamCalculator({
                 <div className="bg-orange-50 p-1.5 rounded-lg">
                   <p className="text-gray-500 text-[10px]">Fees</p>
                   <p className="font-bold text-orange-600 text-xs">
-                    ₹{repaymentData.repayment?.totalFees?.toFixed(2) || "0"}
+                    BHD{repaymentData.repayment?.totalFees?.toFixed(2) || "0"}
                   </p>
                 </div>
               </div>
@@ -989,7 +759,7 @@ export function CamCalculator({
               <div className="bg-purple-50 p-1.5 rounded-lg">
                 <p className="text-gray-500 text-[10px]">Total Taxes</p>
                 <p className="font-bold text-purple-700 text-xs">
-                  ₹{repaymentData.costSummary?.totalTaxes?.toFixed(2) || "0"}
+                  BHD{repaymentData.costSummary?.totalTaxes?.toFixed(2) || "0"}
                 </p>
               </div>
             </div>
@@ -1013,7 +783,7 @@ export function CamCalculator({
                               {charge.type}
                             </span>
                             <span className="font-bold text-amber-700 text-[10px]">
-                              ₹{charge.total?.toFixed(2) || "0"}
+                              BHD{charge.total?.toFixed(2) || "0"}
                             </span>
                           </div>
                           {charge.taxes && charge.taxes.length > 0 && (
@@ -1027,7 +797,7 @@ export function CamCalculator({
                                     {tax.type}: {tax.rate}%
                                   </span>
                                   <span className="text-amber-600">
-                                    ₹{tax.amount?.toFixed(2) || "0"}
+                                    BHD{tax.amount?.toFixed(2) || "0"}
                                   </span>
                                 </div>
                               ))}
@@ -1058,7 +828,7 @@ export function CamCalculator({
                             {fee.type}
                           </span>
                           <span className="font-bold text-teal-700 text-[10px]">
-                            ₹{fee.total?.toFixed(2) || "0"}
+                            BHD{fee.total?.toFixed(2) || "0"}
                           </span>
                         </div>
                         {fee.taxes && fee.taxes.length > 0 && (
@@ -1072,7 +842,7 @@ export function CamCalculator({
                                   {tax.type}: {tax.rate}%
                                 </span>
                                 <span className="text-teal-600">
-                                  ₹{tax.amount?.toFixed(2) || "0"}
+                                  BHD{tax.amount?.toFixed(2) || "0"}
                                 </span>
                               </div>
                             ))}
@@ -1161,7 +931,7 @@ export function CamCalculator({
   if (!isOpen) {
     return (
       <Button onClick={() => setIsOpen(true)}>
-        CAM Calculator
+        Credit Risk
         {loan && (
           <span
             className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"
@@ -1173,14 +943,14 @@ export function CamCalculator({
   }
   return (
     <>
-      {showLoadDialog && (
+      {/* {showLoadDialog && (
         <Dialog
           onClose={() => setShowLoadDialog(false)}
           isOpen={showLoadDialog}
           title="Load Previous Calculations"
           size="md"
         >
-          {/* Header / Summary */}
+          Header / Summary
           <div className="mb-3">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -1215,7 +985,7 @@ export function CamCalculator({
           </div>
 
           <div className="max-h-96 overflow-y-auto pr-1">
-            {/* Loading State */}
+            Loading State
             {loadingExisting && (
               <div className="space-y-2">
                 {new Array(1).fill(null).map((_, index) => (
@@ -1224,12 +994,12 @@ export function CamCalculator({
                     className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm animate-pulse"
                   >
                     <div className="space-y-3">
-                      {/* Badge Skeleton */}
+                      Badge Skeleton
                       <div className="flex items-center gap-2">
                         <div className="h-5 w-20 rounded-full bg-slate-200" />
                       </div>
 
-                      {/* Content Skeleton */}
+                      Content Skeleton
                       <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1.5">
                           <div className="h-3 w-16 rounded bg-slate-200" />
@@ -1241,7 +1011,7 @@ export function CamCalculator({
                         </div>
                       </div>
 
-                      {/* Footer Skeleton */}
+                      Footer Skeleton
                       <div className="flex flex-wrap gap-2 pt-2">
                         <div className="h-3 w-32 rounded-full bg-slate-200" />
                         <div className="h-3 w-24 rounded-full bg-slate-200" />
@@ -1252,7 +1022,7 @@ export function CamCalculator({
               </div>
             )}
 
-            {/* Error State */}
+            Error State
             {!loadingExisting && loadingError && (
               <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                 <div className="flex items-start gap-3">
@@ -1277,7 +1047,7 @@ export function CamCalculator({
               </div>
             )}
 
-            {/* Success State - Calculations List */}
+            Success State - Calculations List
             {!loadingExisting &&
               !loadingError &&
               existingCalculations &&
@@ -1295,30 +1065,29 @@ export function CamCalculator({
                       >
                         <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition-all hover:border-blue-300 hover:shadow-lg hover:bg-blue-50 group-active:scale-95">
                           <div className="flex items-start justify-between gap-3">
-                            {/* Main Content */}
+                            Main Content
                             <div className="min-w-0 flex-1">
-                              {/* FOIR Badge */}
+                              FOIR Badge
                               <div className="flex items-center gap-2 mb-2">
                                 <span
-                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold transition-all ${
-                                    isHighFoir
-                                      ? "bg-red-50 text-red-700 ring-1 ring-red-200"
-                                      : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                                  }`}
+                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold transition-all ${isHighFoir
+                                    ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+                                    : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                                    }`}
                                 >
                                   {isHighFoir ? "⚠️" : "✓"} FOIR{" "}
                                   {foir ? `${foir.toFixed(1)}%` : "N/A"}
                                 </span>
                               </div>
 
-                              {/* Loan Details Grid */}
+                              Loan Details Grid
                               <div className="mt-2 grid grid-cols-2 gap-2">
                                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-2 group-hover:bg-blue-100 transition-colors">
                                   <p className="text-[10px] font-semibold text-slate-500">
                                     Recommended
                                   </p>
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
-                                    ₹
+                                    BHD
                                     {parseNum(
                                       calc.loanRecommended
                                     ).toLocaleString("en-IN")}
@@ -1330,7 +1099,7 @@ export function CamCalculator({
                                     Avg Salary
                                   </p>
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
-                                    ₹
+                                    BHD
                                     {parseNum(calc.avgSalary).toLocaleString(
                                       "en-IN"
                                     )}
@@ -1338,7 +1107,7 @@ export function CamCalculator({
                                 </div>
                               </div>
 
-                              {/* Metadata */}
+                              Metadata
                               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500">
                                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 group-hover:bg-slate-200">
                                   <span>📅</span>
@@ -1360,7 +1129,7 @@ export function CamCalculator({
                               </div>
                             </div>
 
-                            {/* Action Arrow */}
+                            Action Arrow
                             <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-lg bg-slate-100 group-hover:bg-blue-200 transition-colors">
                               <span className="text-lg group-hover:translate-x-1 transition-transform">
                                 →
@@ -1374,7 +1143,7 @@ export function CamCalculator({
                 </div>
               )}
 
-            {/* Empty State */}
+            Empty State
             {!loadingExisting &&
               !loadingError &&
               (!existingCalculations || existingCalculations.length === 0) && (
@@ -1400,28 +1169,40 @@ export function CamCalculator({
             </button>
           </div>
         </Dialog>
+      )} */}
+
+      {showLoadDialog && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/20 backdrop-blur-sm">
+          <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-2xl border border-blue-100 animate-in fade-in zoom-in duration-300">
+            <Spinner theme="dark" />
+            <p className="mt-4 text-lg font-bold text-blue-800">
+              Loading...
+            </p>
+
+          </div>
+        </div>
       )}
 
       <Dialog
         onClose={() => setIsOpen(false)}
         isOpen={isOpen && !showLoadDialog}
-        title="CAM Calculator"
+        title="Credit Risk Assessment"
         size="xl"
       >
         <div className="flex flex-col h-full max-h-[75vh]">
           {/* Scrollable Content (Reduced gap and padding) */}
           <div className="overflow-y-auto flex-1 pr-2">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {/* Column 1 - Salary Information */}
-              <div>
+              {/* <div>
                 <h3 className="text-sm font-bold text-gray-900 mb-3 pb-1 border-b-2 border-blue-300 flex items-center gap-1">
                   <span className="text-blue-600">💰</span>
                   Last 3 Months Salary
                 </h3>
 
-                {/* Salary Date and Amount Grid (Reduced spacing) */}
+                Salary Date and Amount Grid (Reduced spacing)
                 <div className="space-y-2">
-                  {/* Latest Salary */}
+                  Latest Salary
                   <div className="bg-white p-2 rounded-lg border border-blue-200">
                     <h4 className="text-xs font-semibold text-blue-800 mb-2">
                       Latest Salary
@@ -1453,7 +1234,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* 2nd Month Salary */}
+                  2nd Month Salary
                   <div className="bg-white p-2 rounded-lg border border-blue-100">
                     <h4 className="text-xs font-semibold text-blue-700 mb-2">
                       2nd Month
@@ -1483,7 +1264,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* 3rd Month Salary */}
+                  3rd Month Salary
                   <div className="bg-white p-2 rounded-lg border border-blue-100">
                     <h4 className="text-xs font-semibold text-blue-700 mb-2">
                       3rd Month
@@ -1514,7 +1295,7 @@ export function CamCalculator({
                   </div>
                 </div>
 
-                {/* Summary Box (Reduced padding and font sizes) */}
+                Summary Box (Reduced padding and font sizes)
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-2 mt-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -1540,7 +1321,7 @@ export function CamCalculator({
                   </div>
                 </div>
 
-                {/* Next Pay Date and Other Info (Reduced spacing) */}
+                Next Pay Date and Other Info (Reduced spacing)
                 <div className="space-y-2 mt-3">
                   <CompactInputField
                     id="nextPayDate"
@@ -1572,17 +1353,17 @@ export function CamCalculator({
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Column 2 - Loan Details */}
-              <div>
+              {/* <div>
                 <h3 className="text-sm font-bold text-gray-900 mb-3 pb-1 border-b-2 border-purple-300 flex items-center gap-1">
                   <span className="text-purple-600">💳</span>
                   Loan Details
                 </h3>
 
                 <div className="space-y-3">
-                  {/* FOIR and Eligible Loan */}
+                  FOIR and Eligible Loan
                   <div className="bg-white p-2 rounded-lg border border-purple-100">
                     <h4 className="text-xs font-semibold text-purple-800 mb-2">
                       FOIR & Eligibility
@@ -1610,7 +1391,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* Loan Applied and Recommended */}
+                  Loan Applied and Recommended
                   <div className="space-y-2">
                     <CompactInputField
                       id="loanApplied"
@@ -1633,14 +1414,14 @@ export function CamCalculator({
                   </div>
                 </div>
 
-                {/* Repayment Section */}
+                Repayment Section
                 <h3 className="text-sm font-bold text-gray-900 mb-3 mt-4 pb-1 border-b-2 border-purple-300 flex items-center gap-1">
                   <span className="text-purple-600">📅</span>
                   Repayment
                 </h3>
 
                 <div className="space-y-3">
-                  {/* Dates */}
+                  Dates
                   <div className="bg-white p-2 rounded-lg border border-purple-100">
                     <h4 className="text-xs font-semibold text-purple-800 mb-2">
                       Dates
@@ -1667,7 +1448,7 @@ export function CamCalculator({
                     </div>
                   </div>
 
-                  {/* Tenure Selection */}
+                  Tenure Selection
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Select Tenure *
@@ -1677,12 +1458,12 @@ export function CamCalculator({
                       value={formData.tenureId}
                       onChange={(e) => {
                         const selectedId = e.target.value;
-                        // Update form data first
+                        Update form data first
                         setFormData((prev) => ({
                           ...prev,
                           tenureId: selectedId,
                         }));
-                        // Call calculateRepayment with the selected ID
+                        Call calculateRepayment with the selected ID
                         if (selectedId) {
                           calculateRepayment(selectedId);
                         }
@@ -1692,7 +1473,7 @@ export function CamCalculator({
                         tenures.length === 0 || loadingTenures || isReadOnly
                       }
                     >
-                      <option value="">{getTenurePlaceholder()}</option>
+                      <option value="">Select a tenure option</option>
                       {tenures
                         .filter((tenure) => {
                           const ruleType = tenure.ruleType?.toLowerCase() || "";
@@ -1720,12 +1501,12 @@ export function CamCalculator({
                           let processingFee = "0%";
                           let interestRate = "0%";
 
-                          // Extract processing fee and interest rate from loan_charge_config
+                          Extract processing fee and interest rate from loan_charge_config
                           if (
                             tenure.loan_charge_config &&
                             tenure.loan_charge_config.length > 0
                           ) {
-                            // Find processing fee (type: "processing")
+                            Find processing fee (type: "processing")
                             const processingConfig =
                               tenure.loan_charge_config.find(
                                 (config) => config.type === "processing"
@@ -1734,7 +1515,7 @@ export function CamCalculator({
                               processingFee = `${processingConfig.chargeValue}%`;
                             }
 
-                            // Find interest rate (type: "interest")
+                            Find interest rate (type: "interest")
                             const interestConfig =
                               tenure.loan_charge_config.find(
                                 (config) => config.type === "interest"
@@ -1747,26 +1528,165 @@ export function CamCalculator({
                           return (
                             <option key={tenure.id} value={tenure.id}>
                               {tenure.ruleType?.toUpperCase()} | Processing
-                              Fees: {processingFee} | Interest: {interestRate}
+                              Fees: {processingFee} | Murabaha margin: {interestRate}
                             </option>
                           );
                         })}
                     </select>
                   </div>
 
-                  {/* Tenure Charges Configuration */}
+                  Tenure Charges Configuration
                   {renderTenureChargesSection()}
                 </div>
-              </div>
+              </div> */}
 
               {/* Column 3 - Status & Summary */}
-              <div>{renderRepaymentDetailsSection()}</div>
+              <div>
+                {renderRepaymentDetailsSection()}
+
+                {/* Credit Risk Assessment Section */}
+                <div>
+
+
+                  {!creditRiskData && !loadingCreditRisk && (
+                    <Button
+                      onClick={checkCreditRisk}
+                      disabled={loadingCreditRisk}
+                      loading={loadingCreditRisk}
+                      className="w-[20%] mb-2 mx-auto"
+                    >
+                      {loadingCreditRisk ? "Assessing..." : "Check Credit Risk"}
+                    </Button>
+                  )}
+
+                  {loadingCreditRisk && (
+                    <div className="flex flex-col items-center justify-center py-8 bg-blue-50/50 rounded-lg border border-blue-100 border-dashed animate-pulse">
+                      <Spinner theme="dark" />
+                      <p className="mt-3 text-sm font-semibold text-blue-700">
+                        Generating Credit Risk Report...
+                      </p>
+                      <p className="text-xs text-blue-500 mt-1">
+                        Performing advanced risk modeling
+                      </p>
+                    </div>
+                  )}
+
+                  {creditRiskError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
+                      <p className="text-base text-red-700 font-semibold">{creditRiskError}</p>
+                    </div>
+                  )}
+
+                  {creditRiskData && (
+                    <div className="space-y-2 mt-2">
+                      {/* Risk Score Card */}
+                      <div className={`p-3 rounded-lg border ${creditRiskData.risk_score?.risk_band === 'High Risk' ? 'bg-red-50 border-red-200' :
+                        creditRiskData.risk_score?.risk_band === 'Medium Risk' ? 'bg-yellow-50 border-yellow-200' :
+                          'bg-green-50 border-green-200'
+                        }`}>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-base font-bold text-gray-700">Risk Score</span>
+                          <span className={`text-2xl font-black ${creditRiskData.risk_score?.risk_band === 'High Risk' ? 'text-red-700' :
+                            creditRiskData.risk_score?.risk_band === 'Medium Risk' ? 'text-yellow-700' :
+                              'text-green-700'
+                            }`}>{creditRiskData.risk_score?.risk_score}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600 font-medium">Grade:</span>
+                          <span className="font-bold">{creditRiskData.risk_score?.risk_grade}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600 font-medium">Default Probability:</span>
+                          <span className="font-bold text-red-600">{(creditRiskData.default_probability * 100).toFixed(1)}%</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2 italic">{creditRiskData.risk_score?.summary}</p>
+                      </div>
+
+                      {/* Credit Limit */}
+                      <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                        <p className="text-base font-bold text-gray-700 mb-2">Credit Limit</p>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600 font-medium">Upper Credit Limit:</span>
+                          <span className="font-bold text-blue-700 text-lg">BHD {creditRiskData.credit_limit?.credit_limit_bhd || 0}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600 font-medium">Debt-To-Income Ratio:</span>
+                          <span className="font-bold text-orange-600">{creditRiskData.credit_limit?.dti_ratio_pct?.toFixed(1)}%</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2 italic">{creditRiskData.credit_limit?.justification}</p>
+                      </div>
+
+                      {/* Eligibility Cards */}
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className={`p-2 rounded border text-center ${creditRiskData.credit_card_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}>
+                          <p className="text-sm text-gray-600 font-medium">Credit Card</p>
+                          <p className={`text-base font-bold ${creditRiskData.credit_card_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                            }`}>{creditRiskData.credit_card_eligibility?.decision}</p>
+                        </div>
+                        <div className={`p-2 rounded border text-center ${creditRiskData.micro_lending_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}>
+                          <p className="text-sm text-gray-600 font-medium">Micro Loan</p>
+                          <p className={`text-base font-bold ${creditRiskData.micro_lending_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                            }`}>{creditRiskData.micro_lending_eligibility?.decision}</p>
+                        </div>
+                        <div className={`p-2 rounded border text-center ${creditRiskData.device_financing_eligibility?.eligible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}>
+                          <p className="text-sm text-gray-600 font-medium">Device Finance</p>
+                          <p className={`text-base font-bold ${creditRiskData.device_financing_eligibility?.eligible ? 'text-green-700' : 'text-red-700'
+                            }`}>{creditRiskData.device_financing_eligibility?.decision}</p>
+                        </div>
+                      </div>
+
+                      {/* Pricing Tier */}
+                      <div className="bg-purple-50 border border-purple-200 p-3 rounded-lg">
+                        <p className="text-base font-bold text-gray-700 mb-2">Pricing Tier</p>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600 font-medium">Tier:</span>
+                          <span className="font-bold text-purple-700">{creditRiskData.pricing_tier?.tier_name} (T{creditRiskData.pricing_tier?.pricing_tier})</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 font-medium">Recommended APR:</span>
+                          <span className="font-bold text-purple-700 text-lg">{creditRiskData.pricing_tier?.recommended_apr_pct}%</span>
+                        </div>
+                      </div>
+
+                      {/* Adverse Factors */}
+                      {creditRiskData.reason_codes?.adverse_factors?.length > 0 && (
+                        <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
+                          <p className="text-base font-bold text-red-700 mb-2">⚠️ Risk Factors</p>
+                          <div className="space-y-1.5">
+                            {creditRiskData.reason_codes.adverse_factors.slice(0, 3).map((factor: any, idx: number) => (
+                              <div key={idx} className="text-sm">
+                                <span className="font-bold text-red-600">{factor.factor}:</span>
+                                <span className="text-gray-600 ml-1">{factor.description}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Confidence Score */}
+                      <div className={`p-3 rounded-lg border ${creditRiskData.confidence_score?.confidence_level === 'Very Low' ? 'bg-red-50 border-red-200' :
+                        creditRiskData.confidence_score?.confidence_level === 'Low' ? 'bg-yellow-50 border-yellow-200' :
+                          'bg-green-50 border-green-200'
+                        }`}>
+                        <div className="flex justify-between items-center">
+                          <span className="text-base font-bold text-gray-700">Confidence In Prediction</span>
+                          <span className="text-2xl font-black text-gray-900">{creditRiskData.confidence_score?.confidence_score_pct}%</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2">{creditRiskData.confidence_score?.explanation}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Sticky Action Buttons (Reduced padding and button size) */}
-          <div className="sticky bottom-0 mt-3 pt-3 bg-white border-t border-gray-200 flex gap-2 justify-end">
-            {/* ONLY show Reset if NOT read-only */}
+          {/* <div className="sticky bottom-0 mt-3 pt-3 bg-white border-t border-gray-200 flex gap-2 justify-end">
+            ONLY show Reset if NOT read-only
             {!isReadOnly && (
               <button
                 onClick={handleReset}
@@ -1776,7 +1696,7 @@ export function CamCalculator({
               </button>
             )}
 
-            {/* Always show this button, but change text based on mode */}
+            Always show this button, but change text based on mode
             <button
               onClick={() => setIsOpen(false)}
               className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
@@ -1784,7 +1704,7 @@ export function CamCalculator({
               {isReadOnly ? "Close" : "Cancel"}
             </button>
 
-            {/* ONLY show Save if NOT read-only */}
+            ONLY show Save if NOT read-only
             {!isReadOnly && (
               <button
                 onClick={handleSave}
@@ -1797,7 +1717,7 @@ export function CamCalculator({
                 {isSaving ? "Saving..." : "Save Calculation"}
               </button>
             )}
-          </div>
+          </div> */}
         </div>
       </Dialog>
     </>

@@ -77,7 +77,7 @@ const MetricCard: React.FC<PortfolioMetric> = ({
       {/* Content */}
       <div className="flex flex-col justify-center min-w-0 flex-1">
         <div className="font-extrabold text-gray-800">
-          ₹{amount}
+          BHD {amount}
         </div>
 
         <div className="text-xs font-medium text-gray-400 mt-0.5 leading-snug whitespace-normal">

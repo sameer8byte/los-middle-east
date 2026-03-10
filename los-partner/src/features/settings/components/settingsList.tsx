@@ -149,7 +149,7 @@ export function SettingsList() {
         {
           id: 9,
           name: "Blocklist",
-          description: "Manage blocklisted PAN, Mobile, and Aadhaar numbers",
+          description: "Manage blocklisted PAN, Mobile, and CPR Card numbers",
           icon: HiDocumentText,
           link: "/blocklist",
         },
@@ -260,7 +260,7 @@ export function SettingsList() {
         {
           id: 25,
           name: "DigiLocker 2.0 Logs",
-          description: "View logs of Aadhaar DigiLocker verification requests",
+          description: "View logs of CPR Card DigiLocker verification requests",
           icon: HiDocumentText,
           link: "/digilocker-2.0-logs",
         },

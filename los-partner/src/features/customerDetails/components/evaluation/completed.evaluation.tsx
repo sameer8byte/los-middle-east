@@ -211,7 +211,7 @@ export function CompletedEvaluate() {
               </div>
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                 <p className="text-xs text-[var(--color-on-surface)] opacity-60 mb-1">Amount</p>
-                <p className="font-medium text-[var(--color-on-background)]">₹{loanData.amount?.toLocaleString()}</p>
+                <p className="font-medium text-[var(--color-on-background)]">BHD{loanData.amount?.toLocaleString()}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                 <p className="text-xs text-[var(--color-on-surface)] opacity-60 mb-1">Purpose</p>

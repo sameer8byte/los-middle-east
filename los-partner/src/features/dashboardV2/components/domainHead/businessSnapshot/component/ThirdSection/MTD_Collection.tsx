@@ -11,7 +11,7 @@ const MTD_Collection: React.FC<MTDCollectionProps> = ({
     title = "MTD Collection %",
     percentage = 82,
     variance = "-18%",
-    lastUpdated = "Last Updated “Time Stamp”",
+    // lastUpdated = "Last Updated “Time Stamp”",
 }) => {
     // Gauge Configuration - SCALED UP
     const width = 450;
@@ -123,7 +123,7 @@ const MTD_Collection: React.FC<MTDCollectionProps> = ({
                                 y: cy + ((labelRadius) * Math.sin(labelInRadians))
                             };
 
-                            let textAnchor = "middle";
+                            let textAnchor: "inherit" | "end" | "start" | "middle" | undefined = "middle";
                             let dx = 0;
                             let dy = 0;
 
@@ -197,9 +197,9 @@ const MTD_Collection: React.FC<MTDCollectionProps> = ({
                     <span className="text-[#ef4444] font-bold text-[13px] 2xl:text-[16px] mb-0.5 2xl:mb-1.5 tracking-wide">
                         {variance}
                     </span>
-                    <span className="text-[#64748b] text-[10px] 2xl:text-[12px] font-medium tracking-wide">
+                    {/* <span className="text-[#64748b] text-[10px] 2xl:text-[12px] font-medium tracking-wide">
                         {lastUpdated}
-                    </span>
+                    </span> */}
                 </div>
 
             </div>

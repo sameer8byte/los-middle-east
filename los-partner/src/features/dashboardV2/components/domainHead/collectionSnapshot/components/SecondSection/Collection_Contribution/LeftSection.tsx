@@ -1,3 +1,5 @@
+import { Conversion as ConversionUtil } from '../../../../../../../../utils/conversion';
+
 export default function LeftSection() {
     // Math for the 72% Gauge
     // 180 degrees total. 72% of 180 = 129.6 degrees.
@@ -86,19 +88,19 @@ export default function LeftSection() {
                         />
 
                         {/* Centered Gauge Text Area Native inside SVG */}
-                        <text x={cx} y={cy - 20} textAnchor="middle" fill="#334155" fontSize="42" fontWeight="bold">
+                        <text x={cx} y={cy - 10} textAnchor="middle" fill="#334155" fontSize="42" fontWeight="bold">
                             72%
                         </text>
-                        <text x={cx} y={cy + 4} textAnchor="middle" fill="#475569" fontSize="16" fontWeight="500">
-                            ₹3.6Cr/₹5Cr
+                        <text x={cx} y={cy + 40} textAnchor="middle" fill="#475569" fontSize="16" fontWeight="500">
+                            {ConversionUtil.formatCurrency(36000000)} / {ConversionUtil.formatCurrency(50000000)}
                         </text>
                     </svg>
 
                 </div>
 
-                <div className="mt-4 2xl:mt-6 text-center text-[11px] 2xl:text-[13px] font-medium text-[#64748b] tracking-wide">
+                <div className="mt-8 2xl:mt-10 text-center text-[11px] 2xl:text-[13px] font-medium text-[#64748b] tracking-wide">
                     Avg Collection Loan Amount : <br />
-                    <span className="text-[#334155] font-bold">'XX,XXX'</span>
+                    <span className="text-[#334155] font-bold">{ConversionUtil.formatCurrency(45000)}</span>
                 </div>
             </div>
 
@@ -109,7 +111,7 @@ export default function LeftSection() {
             <div className="w-full grid grid-cols-3 gap-2 mt-auto">
                 <div className="flex flex-col">
                     <span className="text-[#64748b] text-[10px] 2xl:text-[13px] font-medium mb-0.5 2xl:mb-1">Target</span>
-                    <span className="text-[12px] 2xl:text-[15px] font-bold text-gray-900">'X' %</span>
+                    <span className="text-[12px] 2xl:text-[15px] font-bold text-gray-900">90 %</span>
                 </div>
                 <div className="flex flex-col text-center items-center">
                     <span className="text-[#64748b] text-[10px] 2xl:text-[13px] font-medium mb-0.5 2xl:mb-1">Achieved</span>
@@ -117,7 +119,7 @@ export default function LeftSection() {
                 </div>
                 <div className="flex flex-col text-right items-end">
                     <span className="text-[#64748b] text-[10px] 2xl:text-[13px] font-medium mb-0.5 2xl:mb-1">Gap</span>
-                    <span className="text-[12px] 2xl:text-[15px] font-bold text-gray-900">'Y'%</span>
+                    <span className="text-[12px] 2xl:text-[15px] font-bold text-gray-900">18%</span>
                 </div>
             </div>
 

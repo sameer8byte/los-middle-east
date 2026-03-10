@@ -226,7 +226,7 @@ const LoanStatusUpdateModal = ({
                   {selectedLoan.user.userDetails.lastName}
                 </div>
                 <div className="text-xs text-[var(--on-surface)]/60 mt-1">
-                  ₹{selectedLoan.amount.toLocaleString("en-IN")} • Current
+                  BHD {selectedLoan.amount.toLocaleString("en-IN")} • Current
                   Status:{" "}
                   <span className="font-semibold">{selectedLoan.status}</span>
                 </div>
@@ -347,7 +347,7 @@ const LoanStatusUpdateModal = ({
                         {loan.user.userDetails.lastName}
                       </div>
                       <div className="text-xs text-[var(--on-surface)]/60 mt-1 flex justify-between">
-                        <span>₹{loan.amount.toLocaleString("en-IN")}</span>
+                        <span>BHD {loan.amount.toLocaleString("en-IN")}</span>
                         <span className="px-2 py-0.5 bg-[var(--primary)]/10 text-[var(--primary)] rounded text-[10px] font-semibold">
                           {loan.status}
                         </span>

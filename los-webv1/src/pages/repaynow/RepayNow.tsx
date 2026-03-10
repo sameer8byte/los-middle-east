@@ -554,7 +554,7 @@ const RepaymentNow: React.FC = () => {
                               {loan.formattedLoanId}
                             </p>
                             <p className="text-sm text-(--text-secondary) mt-1">
-                              Amount: ₹{loan.amount.toLocaleString("en-IN")}
+                              Amount: BHD{loan.amount.toLocaleString("en-IN")}
                             </p>
                             <p className="text-xs text-(--text-secondary) mt-1">
                               Status:{" "}
@@ -598,7 +598,7 @@ const RepaymentNow: React.FC = () => {
                             Principal
                           </td>
                           <td className="py-3 px-5">
-                            ₹
+                            BHD
                             {inquiry.repaymentDetails.principalAmount?.toLocaleString(
                               "en-IN",
                             ) || 0}
@@ -609,7 +609,7 @@ const RepaymentNow: React.FC = () => {
                             Interest
                           </td>
                           <td className="py-3 px-5">
-                            ₹
+                            BHD
                             {inquiry.repaymentDetails.totalInterest?.toLocaleString(
                               "en-IN",
                             ) || 0}
@@ -620,7 +620,7 @@ const RepaymentNow: React.FC = () => {
                             Penalties
                           </td>
                           <td className="py-3 px-5">
-                            ₹
+                            BHD
                             {inquiry.repaymentDetails.totalPenalties?.toLocaleString(
                               "en-IN",
                             ) || 0}
@@ -631,7 +631,7 @@ const RepaymentNow: React.FC = () => {
                             Total Repayment
                           </td>
                           <td className="py-3 px-5 text-(--primary)">
-                            ₹
+                            BHD
                             {inquiry.repaymentDetails.totalRepayment?.toLocaleString(
                               "en-IN",
                             ) || 0}

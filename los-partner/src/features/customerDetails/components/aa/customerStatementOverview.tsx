@@ -169,7 +169,7 @@ export const CustomerStatementOverview: React.FC<
   const formatCurrency = (amount: number | string) => {
     const numAmount =
       typeof amount === "string" ? Number.parseFloat(amount) : amount;
-    if (Number.isNaN(numAmount)) return "₹0.00";
+    if (Number.isNaN(numAmount)) return "BHD0.00";
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
@@ -330,7 +330,7 @@ export const CustomerStatementOverview: React.FC<
                   label="Account Type"
                   value={`${summary.type} - ${summary.accountType}`}
                 />
-                <InfoItem label="IFSC Code" value={summary.ifscCode} />
+                <InfoItem label="IBAN Code" value={summary.ifscCode} />
                 <InfoItem label="Branch" value={summary.branch} />
                 <InfoItem label="Status" value={summary.status} badge />
                 <InfoItem
@@ -554,7 +554,7 @@ export const CustomerStatementOverview: React.FC<
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="text"
-                    placeholder="Search by description, mode, ID, or amount (e.g., 5000, IMPS)..."
+                    placeholder="Search by description, mode, ID, or amount (e.g., 5000, BENEFIT Fawri+)..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"

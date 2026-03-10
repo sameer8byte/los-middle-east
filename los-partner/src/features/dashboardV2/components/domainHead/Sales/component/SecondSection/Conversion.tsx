@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Conversion as ConversionUtil } from "../../../../../../../utils/conversion";
 
 // Icon SVG
 const ChevronDown = ({ className }: { className?: string }) => (
@@ -22,7 +23,7 @@ export interface ManagerConversion {
     targetPercent: string;
     achievedPercent: number;
     gap: string;
-    avgLoan: string;
+    avgLoan: number;
 }
 
 interface ConversionProps {
@@ -34,37 +35,37 @@ const MOCK_DATA: ManagerConversion[] = [
         id: '1', initials: 'MR', name: 'Manager A', rank: 1,
         conversionCurrent: 720, conversionTotal: 1000, percentage: 95,
         freshCount: 210, freshPercent: 23, repeatCount: 150, repeatPercent: 26,
-        targetPercent: "'XX'", achievedPercent: 95, gap: "'YY'", avgLoan: "'XX,XXX'"
+        targetPercent: "'XX'", achievedPercent: 95, gap: "'YY'", avgLoan: 25000
     },
     {
         id: '2', initials: 'MR', name: 'Manager B', rank: 2,
         conversionCurrent: 610, conversionTotal: 900, percentage: 80,
         freshCount: 0, freshPercent: 0, repeatCount: 0, repeatPercent: 0,
-        targetPercent: "'XX'", achievedPercent: 80, gap: "'YY'", avgLoan: "'XX,XXX'"
+        targetPercent: "'XX'", achievedPercent: 80, gap: "'YY'", avgLoan: 18000
     },
     {
         id: '3', initials: 'MR', name: 'Manager C', rank: 3,
         conversionCurrent: 546, conversionTotal: 750, percentage: 55,
         freshCount: 0, freshPercent: 0, repeatCount: 0, repeatPercent: 0,
-        targetPercent: "'XX'", achievedPercent: 55, gap: "'YY'", avgLoan: "'XX,XXX'"
+        targetPercent: "'XX'", achievedPercent: 55, gap: "'YY'", avgLoan: 12000
     },
     {
         id: '4', initials: 'MR', name: 'Manager D', rank: 4,
         conversionCurrent: 400, conversionTotal: 600, percentage: 45,
         freshCount: 0, freshPercent: 0, repeatCount: 0, repeatPercent: 0,
-        targetPercent: "'XX'", achievedPercent: 45, gap: "'YY'", avgLoan: "'XX,XXX'"
+        targetPercent: "'XX'", achievedPercent: 45, gap: "'YY'", avgLoan: 10000
     },
     {
         id: '5', initials: 'MR', name: 'Manager D', rank: 5,
         conversionCurrent: 400, conversionTotal: 600, percentage: 45,
         freshCount: 0, freshPercent: 0, repeatCount: 0, repeatPercent: 0,
-        targetPercent: "'XX'", achievedPercent: 45, gap: "'YY'", avgLoan: "'XX,XXX'"
+        targetPercent: "'XX'", achievedPercent: 45, gap: "'YY'", avgLoan: 10000
     },
     {
         id: '6', initials: 'MR', name: 'Manager D', rank: 6,
         conversionCurrent: 400, conversionTotal: 600, percentage: 45,
         freshCount: 0, freshPercent: 0, repeatCount: 0, repeatPercent: 0,
-        targetPercent: "'XX'", achievedPercent: 45, gap: "'YY'", avgLoan: "'XX,XXX'"
+        targetPercent: "'XX'", achievedPercent: 45, gap: "'YY'", avgLoan: 10000
     },
 
 ];
@@ -169,7 +170,7 @@ const Conversion: React.FC<ConversionProps> = ({ data = MOCK_DATA }) => {
                                                     <span>Gap : </span><span className="font-semibold text-gray-900 ml-1">{item.gap}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1 bg-white border border-gray-200/80 px-2.5 py-1.5 2xl:px-4 2xl:py-2 rounded-md text-[11px] 2xl:text-[13px] text-gray-600">
-                                                    <span>Avg Loan : </span><span className="font-semibold text-gray-900 ml-1">{item.avgLoan}</span>
+                                                    <span>Avg Loan : </span><span className="font-semibold text-gray-900 ml-1">{ConversionUtil.formatCurrency(item.avgLoan)}</span>
                                                 </div>
                                             </div>
                                         </div>

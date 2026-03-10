@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Conversion } from '../../../../../../../utils/conversion';
+import { ErrorMessage } from '../../../../../../../common/ui/table';
 
 // --- Icons ---
 const ChevronDownIcon = () => (
@@ -7,17 +9,17 @@ const ChevronDownIcon = () => (
     </svg>
 );
 
-const ChevronLeftIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="15 18 9 12 15 6" />
-    </svg>
-);
+// const ChevronLeftIcon = () => (
+//     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//         <polyline points="15 18 9 12 15 6" />
+//     </svg>
+// );
 
-const ChevronRightIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="9 18 15 12 9 6" />
-    </svg>
-);
+// const ChevronRightIcon = () => (
+//     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//         <polyline points="9 18 15 12 9 6" />
+//     </svg>
+// );
 
 const CheckIcon = () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -40,9 +42,9 @@ export interface ExecutivePerformance {
     followup: number;
     disbursed: number;
     rejected: number;
-    sanctionedAmount: string;
-    disbursedAmount: string;
-    pendingDisbursalAmt: string;
+    sanctionedAmount: number;
+    disbursedAmount: number;
+    pendingDisbursalAmt: number;
     conversionPercent: number;
     dropoffRatePercent: number;
     performanceScore: number;
@@ -67,13 +69,13 @@ export interface SalesPerformanceData {
     leadFunnel: {
         followupLeads: number;
         sanctionedCount: number;
-        sanctionedAmt: string;
+        sanctionedAmt: number;
         disbursedCount: number;
-        disbursedAmt: string;
+        disbursedAmt: number;
         pendingCount: number;
-        pendingAmt: string;
+        pendingAmt: number;
         rejected: number;
-        avgLoan: string;
+        avgLoan: number;
     };
     executives: ExecutivePerformance[];
 }
@@ -91,35 +93,34 @@ const MOCK_DATA: SalesPerformanceData = {
     },
     teamAndPerformance: {
         allotted: 800,
-        underFollowup: 820, // Value from UI screenshot
+        underFollowup: 820,
         disbursed: 400,
         rejected: 220
     },
     leadFunnel: {
         followupLeads: 820,
         sanctionedCount: 600,
-        sanctionedAmt: '₹3.8 Cr',
+        sanctionedAmt: 38000000,
         disbursedCount: 400,
-        disbursedAmt: '₹3.1 Cr',
+        disbursedAmt: 31000000,
         pendingCount: 200,
-        pendingAmt: '₹0.52 Cr',
+        pendingAmt: 5200000,
         rejected: 220,
-        avgLoan: '₹46,300'
+        avgLoan: 46300
     },
     executives: [
-        { id: 1, name: 'Sofia T', role: 'EXEC', leads: 200, followup: 100, disbursed: 50, rejected: 50, sanctionedAmount: '₹ 8,00,000', disbursedAmount: '₹ 6,00,000', pendingDisbursalAmt: '₹ 2,00,000', conversionPercent: 80, dropoffRatePercent: 21, performanceScore: 7.5 },
-        { id: 2, name: 'Liam A', role: 'EXEC', leads: 180, followup: 90, disbursed: 45, rejected: 45, sanctionedAmount: '₹ 7,20,000', disbursedAmount: '₹ 5,40,000', pendingDisbursalAmt: '₹ 1,80,000', conversionPercent: 75, dropoffRatePercent: 20, performanceScore: 6.5 },
-        { id: 3, name: 'Emma J', role: 'EXEC', leads: 160, followup: 80, disbursed: 40, rejected: 40, sanctionedAmount: '₹ 6,40,000', disbursedAmount: '₹ 4,80,000', pendingDisbursalAmt: '₹ 1,60,000', conversionPercent: 70, dropoffRatePercent: 18, performanceScore: 5.5 },
-        { id: 4, name: 'Noah R', role: 'EXEC', leads: 140, followup: 70, disbursed: 35, rejected: 35, sanctionedAmount: '₹ 5,60,000', disbursedAmount: '₹ 4,20,000', pendingDisbursalAmt: '₹ 1,40,000', conversionPercent: 65, dropoffRatePercent: 15, performanceScore: 4.5 },
-        { id: 5, name: 'Olivia K', role: 'EXEC', leads: 120, followup: 60, disbursed: 30, rejected: 30, sanctionedAmount: '₹ 4,80,000', disbursedAmount: '₹ 3,60,000', pendingDisbursalAmt: '₹ 1,20,000', conversionPercent: 60, dropoffRatePercent: 12, performanceScore: 4.0 },
-        { id: 6, name: 'Mason H', role: 'EXEC', leads: 100, followup: 50, disbursed: 25, rejected: 25, sanctionedAmount: '₹ 4,00,000', disbursedAmount: '₹ 3,00,000', pendingDisbursalAmt: '₹ 1,00,000', conversionPercent: 55, dropoffRatePercent: 10, performanceScore: 3.5 },
-        { id: 7, name: 'Ava M', role: 'EXEC', leads: 200, followup: 100, disbursed: 50, rejected: 50, sanctionedAmount: '₹ 8,00,000', disbursedAmount: '₹ 6,00,000', pendingDisbursalAmt: '₹ 2,00,000', conversionPercent: 80, dropoffRatePercent: 21, performanceScore: 7.5 },
-        { id: 8, name: 'Lucas B', role: 'EXEC', leads: 180, followup: 90, disbursed: 45, rejected: 45, sanctionedAmount: '₹ 7,20,000', disbursedAmount: '₹ 5,40,000', pendingDisbursalAmt: '₹ 1,80,000', conversionPercent: 75, dropoffRatePercent: 20, performanceScore: 6.5 },
-        { id: 9, name: 'Bella C', role: 'EXEC', leads: 160, followup: 80, disbursed: 40, rejected: 40, sanctionedAmount: '₹ 6,40,000', disbursedAmount: '₹ 4,80,000', pendingDisbursalAmt: '₹ 1,60,000', conversionPercent: 70, dropoffRatePercent: 18, performanceScore: 5.5 },
-        { id: 10, name: 'Ethan D', role: 'EXEC', leads: 140, followup: 70, disbursed: 35, rejected: 35, sanctionedAmount: '₹ 5,60,000', disbursedAmount: '₹ 4,20,000', pendingDisbursalAmt: '₹ 1,40,000', conversionPercent: 65, dropoffRatePercent: 15, performanceScore: 4.5 },
+        { id: 1, name: 'Sofia T', role: 'EXEC', leads: 200, followup: 100, disbursed: 50, rejected: 50, sanctionedAmount: 800000, disbursedAmount: 600000, pendingDisbursalAmt: 200000, conversionPercent: 80, dropoffRatePercent: 21, performanceScore: 7.5 },
+        { id: 2, name: 'Liam A', role: 'EXEC', leads: 180, followup: 90, disbursed: 45, rejected: 45, sanctionedAmount: 720000, disbursedAmount: 540000, pendingDisbursalAmt: 180000, conversionPercent: 75, dropoffRatePercent: 20, performanceScore: 6.5 },
+        { id: 3, name: 'Emma J', role: 'EXEC', leads: 160, followup: 80, disbursed: 40, rejected: 40, sanctionedAmount: 640000, disbursedAmount: 480000, pendingDisbursalAmt: 160000, conversionPercent: 70, dropoffRatePercent: 18, performanceScore: 5.5 },
+        { id: 4, name: 'Noah R', role: 'EXEC', leads: 140, followup: 70, disbursed: 35, rejected: 35, sanctionedAmount: 560000, disbursedAmount: 420000, pendingDisbursalAmt: 140000, conversionPercent: 65, dropoffRatePercent: 15, performanceScore: 4.5 },
+        { id: 5, name: 'Olivia K', role: 'EXEC', leads: 120, followup: 60, disbursed: 30, rejected: 30, sanctionedAmount: 480000, disbursedAmount: 360000, pendingDisbursalAmt: 120000, conversionPercent: 60, dropoffRatePercent: 12, performanceScore: 4.0 },
+        { id: 6, name: 'Mason H', role: 'EXEC', leads: 100, followup: 50, disbursed: 25, rejected: 25, sanctionedAmount: 400000, disbursedAmount: 300000, pendingDisbursalAmt: 100000, conversionPercent: 55, dropoffRatePercent: 10, performanceScore: 3.5 },
+        { id: 7, name: 'Ava M', role: 'EXEC', leads: 200, followup: 100, disbursed: 50, rejected: 50, sanctionedAmount: 800000, disbursedAmount: 600000, pendingDisbursalAmt: 200000, conversionPercent: 80, dropoffRatePercent: 21, performanceScore: 7.5 },
+        { id: 8, name: 'Lucas B', role: 'EXEC', leads: 180, followup: 90, disbursed: 45, rejected: 45, sanctionedAmount: 720000, disbursedAmount: 540000, pendingDisbursalAmt: 180000, conversionPercent: 75, dropoffRatePercent: 20, performanceScore: 6.5 },
+        { id: 9, name: 'Bella C', role: 'EXEC', leads: 160, followup: 80, disbursed: 40, rejected: 40, sanctionedAmount: 640000, disbursedAmount: 480000, pendingDisbursalAmt: 160000, conversionPercent: 70, dropoffRatePercent: 18, performanceScore: 5.5 },
+        { id: 10, name: 'Ethan D', role: 'EXEC', leads: 140, followup: 70, disbursed: 35, rejected: 35, sanctionedAmount: 560000, disbursedAmount: 420000, pendingDisbursalAmt: 140000, conversionPercent: 65, dropoffRatePercent: 15, performanceScore: 4.5 },
     ]
 };
-
 
 // --- Components ---
 
@@ -130,12 +131,19 @@ const StatBox = ({ label, value }: { label: React.ReactNode, value: React.ReactN
     </div>
 );
 
-export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPerformanceData }) {
+export default function CollectionPerformance({ data = MOCK_DATA }: { data?: SalesPerformanceData }) {
     const [isExpanded, setIsExpanded] = useState(true);
+
+    if (!data) {
+        return (
+            <div className="p-4">
+                <ErrorMessage message="Sales performance data could not be loaded." />
+            </div>
+        );
+    }
 
     return (
         <div className="bg-[#fafafa] rounded-2xl overflow-hidden border border-gray-100 shadow-sm w-full font-sans">
-
             {/* --- Top Header --- */}
             <div
                 className="px-4 2xl:px-6 py-3 2xl:py-4 flex justify-between items-center border-b border-gray-200/60 bg-white cursor-pointer select-none"
@@ -151,7 +159,6 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
 
             {isExpanded && (
                 <div className="p-3 2xl:p-6 space-y-3 2xl:space-y-5">
-
                     {/* --- Manager Banner Row --- */}
                     <div className="bg-white rounded-xl border border-gray-200 px-3 2xl:px-5 py-3 2xl:py-4 flex flex-wrap gap-3 2xl:gap-4 justify-between items-center">
                         <div className="flex flex-wrap items-center gap-4 2xl:gap-6">
@@ -191,7 +198,6 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
 
                     {/* --- Middle Summary Cards --- */}
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-3 2xl:gap-5">
-
                         {/* Lead Bucket */}
                         <div className="bg-white rounded-xl border border-gray-200 p-3 2xl:p-5">
                             <h3 className="text-[12px] 2xl:text-[14px] font-semibold text-gray-800 mb-2 2xl:mb-4">Lead Bucket</h3>
@@ -212,7 +218,6 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
                                 <StatBox label="Rejected :" value={data.teamAndPerformance.rejected} />
                             </div>
                         </div>
-
                     </div>
 
                     {/* --- Lead Funnel Overview --- */}
@@ -220,11 +225,11 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
                         <h3 className="text-[12px] 2xl:text-[14px] font-semibold text-gray-800 mb-2 2xl:mb-4">Lead Funnel Overview</h3>
                         <div className="flex flex-wrap items-center justify-between gap-2 2xl:gap-4 w-full">
                             <StatBox label="Followup Leads :" value={data.leadFunnel.followupLeads} />
-                            <StatBox label="Sanctioned :" value={<>{data.leadFunnel.sanctionedCount} <span className="text-gray-300 mx-1 font-normal">|</span> {data.leadFunnel.sanctionedAmt}</>} />
-                            <StatBox label="Disbursed :" value={<>{data.leadFunnel.disbursedCount} <span className="text-gray-300 mx-1 font-normal">|</span> {data.leadFunnel.disbursedAmt}</>} />
-                            <StatBox label="Pending Disbursal :" value={<>{data.leadFunnel.pendingCount} <span className="text-gray-300 mx-1 font-normal">|</span> {data.leadFunnel.pendingAmt}</>} />
+                            <StatBox label="Sanctioned :" value={<>{data.leadFunnel.sanctionedCount} <span className="text-gray-300 mx-1 font-normal">|</span> {Conversion.formatCurrency(data.leadFunnel.sanctionedAmt)}</>} />
+                            <StatBox label="Disbursed :" value={<>{data.leadFunnel.disbursedCount} <span className="text-gray-300 mx-1 font-normal">|</span> {Conversion.formatCurrency(data.leadFunnel.disbursedAmt)}</>} />
+                            <StatBox label="Pending Disbursal :" value={<>{data.leadFunnel.pendingCount} <span className="text-gray-300 mx-1 font-normal">|</span> {Conversion.formatCurrency(data.leadFunnel.pendingAmt)}</>} />
                             <StatBox label="Rejected :" value={data.leadFunnel.rejected} />
-                            <StatBox label="Avg Loan :" value={data.leadFunnel.avgLoan} />
+                            <StatBox label="Avg Loan :" value={Conversion.formatCurrency(data.leadFunnel.avgLoan)} />
                         </div>
                     </div>
 
@@ -263,9 +268,9 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
                                             <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-600 text-center">{exec.followup}</td>
                                             <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-600 text-center">{exec.disbursed}</td>
                                             <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-600 text-center">{exec.rejected}</td>
-                                            <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-800 font-medium text-center">{exec.sanctionedAmount}</td>
-                                            <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-800 font-medium text-center">{exec.disbursedAmount}</td>
-                                            <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-800 font-medium text-center">{exec.pendingDisbursalAmt}</td>
+                                            <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-800 font-medium text-center">{Conversion.formatCurrency(exec.sanctionedAmount)}</td>
+                                            <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-800 font-medium text-center">{Conversion.formatCurrency(exec.disbursedAmount)}</td>
+                                            <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-gray-800 font-medium text-center">{Conversion.formatCurrency(exec.pendingDisbursalAmt)}</td>
                                             <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-[#3b82f6] font-semibold text-center">{exec.conversionPercent}%</td>
                                             <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-[#ef4444] font-semibold text-center">{exec.dropoffRatePercent}%</td>
                                             <td className="px-2 2xl:px-4 py-2 2xl:py-4 text-center">
@@ -276,12 +281,12 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
                                             </td>
                                         </tr>
                                     ))}
-                                </tbody> 
+                                </tbody>
                             </table>
                         </div>
 
                         {/* Pagination Footer */}
-                        <div className="px-4 2xl:px-6 py-2 2xl:py-4 flex items-center justify-between border-t border-gray-200">
+                        {/* <div className="px-4 2xl:px-6 py-2 2xl:py-4 flex items-center justify-between border-t border-gray-200">
                             <div className="text-[12px] 2xl:text-[13px] text-gray-500 font-medium">
                                 1–50 of 2,619
                             </div>
@@ -293,9 +298,8 @@ export default function SalesPerformance({ data = MOCK_DATA }: { data?: SalesPer
                                     <ChevronRightIcon />
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
-
                 </div>
             )}
         </div>

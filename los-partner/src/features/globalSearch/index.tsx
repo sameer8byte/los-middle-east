@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Conversion } from "../../utils/conversion";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   HiMagnifyingGlass,
@@ -104,13 +105,13 @@ export function GlobalSearchComponent() {
           prev.map((tab) =>
             tab.id === activeSearchTabId
               ? {
-                  ...tab,
-                  searchTerm,
-                  results: searchResults,
-                  label:
-                    searchTerm.substring(0, 20) +
-                    (searchTerm.length > 20 ? "..." : ""),
-                }
+                ...tab,
+                searchTerm,
+                results: searchResults,
+                label:
+                  searchTerm.substring(0, 20) +
+                  (searchTerm.length > 20 ? "..." : ""),
+              }
               : tab,
           ),
         );
@@ -166,13 +167,9 @@ export function GlobalSearchComponent() {
     return [firstName, middleName, lastName].filter(Boolean).join(" ");
   };
 
+
   const formatCurrency = (amount: number | string) => {
-    const num = typeof amount === "string" ? Number.parseFloat(amount) : amount;
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(num || 0);
+    return Conversion.formatCurrency(amount);
   };
 
   const getStatusBadge = (status?: string) => {
@@ -278,11 +275,10 @@ export function GlobalSearchComponent() {
           {label}
         </span>
         <span
-          className={`text-sm ${mono ? "font-mono" : ""} ${
-            highlight
-              ? "text-emerald-600 font-bold"
-              : "text-[var(--on-surface)]/70"
-          } block truncate`}
+          className={`text-sm ${mono ? "font-mono" : ""} ${highlight
+            ? "text-emerald-600 font-bold"
+            : "text-[var(--on-surface)]/70"
+            } block truncate`}
         >
           {value || "N/A"}
         </span>
@@ -386,21 +382,19 @@ export function GlobalSearchComponent() {
                 }}
                 className={`
                   flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-                  ${
-                    activeSearchTabId === tab.id
-                      ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25"
-                      : "bg-[var(--muted)]/10 text-[var(--on-surface)]/70 hover:bg-[var(--muted)]/20"
+                  ${activeSearchTabId === tab.id
+                    ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/25"
+                    : "bg-[var(--muted)]/10 text-[var(--on-surface)]/70 hover:bg-[var(--muted)]/20"
                   }
                 `}
               >
                 <HiMagnifyingGlass className="w-3.5 h-3.5" />
                 <span className="max-w-[120px] truncate">{tab.label}</span>
                 <span
-                  className={`text-xs px-1.5 py-0.5 rounded ${
-                    activeSearchTabId === tab.id
-                      ? "bg-white/20"
-                      : "bg-[var(--muted)]/20"
-                  }`}
+                  className={`text-xs px-1.5 py-0.5 rounded ${activeSearchTabId === tab.id
+                    ? "bg-white/20"
+                    : "bg-[var(--muted)]/20"
+                    }`}
                 >
                   {tab.results?.totalResults || 0}
                 </span>
@@ -409,11 +403,10 @@ export function GlobalSearchComponent() {
                     e.stopPropagation();
                     closeSearchTab(tab.id);
                   }}
-                  className={`p-0.5 rounded hover:bg-red-500 hover:text-white transition-colors ${
-                    activeSearchTabId === tab.id
-                      ? "text-white/70"
-                      : "text-[var(--on-surface)]/40"
-                  }`}
+                  className={`p-0.5 rounded hover:bg-red-500 hover:text-white transition-colors ${activeSearchTabId === tab.id
+                    ? "text-white/70"
+                    : "text-[var(--on-surface)]/40"
+                    }`}
                 >
                   <HiXMark className="w-3.5 h-3.5" />
                 </button>
@@ -598,18 +591,18 @@ export function GlobalSearchComponent() {
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {(loan.status === "ACTIVE" ||
                             loan.status === "PARTIALLY_PAID") && (
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              onClick={() => {
-                                setNonGetwayPaymentLoanId(loan.id);
-                                setNonGetwayPaymentUserId(loan.user.id);
-                              }}
-                            >
-                              <HiCollectPayment className="w-4 h-4 mr-1.5" />
-                              Collect Payment
-                            </Button>
-                          )}
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                  setNonGetwayPaymentLoanId(loan.id);
+                                  setNonGetwayPaymentUserId(loan.user.id);
+                                }}
+                              >
+                                <HiCollectPayment className="w-4 h-4 mr-1.5" />
+                                Collect Payment
+                              </Button>
+                            )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -1090,39 +1083,39 @@ export function GlobalSearchComponent() {
                                             {(tx.totalFees > 0 ||
                                               tx.totalTaxes > 0 ||
                                               tx.totalPenalties > 0) && (
-                                              <div className="grid grid-cols-3 gap-3 mt-2 pt-2 border-t border-emerald-200 text-xs">
-                                                <div>
-                                                  <span className="text-emerald-600 font-medium block">
-                                                    Fees
-                                                  </span>
-                                                  <span className="text-emerald-800">
-                                                    {formatCurrency(
-                                                      tx.totalFees,
-                                                    )}
-                                                  </span>
+                                                <div className="grid grid-cols-3 gap-3 mt-2 pt-2 border-t border-emerald-200 text-xs">
+                                                  <div>
+                                                    <span className="text-emerald-600 font-medium block">
+                                                      Fees
+                                                    </span>
+                                                    <span className="text-emerald-800">
+                                                      {formatCurrency(
+                                                        tx.totalFees,
+                                                      )}
+                                                    </span>
+                                                  </div>
+                                                  <div>
+                                                    <span className="text-emerald-600 font-medium block">
+                                                      Taxes
+                                                    </span>
+                                                    <span className="text-emerald-800">
+                                                      {formatCurrency(
+                                                        tx.totalTaxes,
+                                                      )}
+                                                    </span>
+                                                  </div>
+                                                  <div>
+                                                    <span className="text-emerald-600 font-medium block">
+                                                      Penalties
+                                                    </span>
+                                                    <span className="text-emerald-800">
+                                                      {formatCurrency(
+                                                        tx.totalPenalties,
+                                                      )}
+                                                    </span>
+                                                  </div>
                                                 </div>
-                                                <div>
-                                                  <span className="text-emerald-600 font-medium block">
-                                                    Taxes
-                                                  </span>
-                                                  <span className="text-emerald-800">
-                                                    {formatCurrency(
-                                                      tx.totalTaxes,
-                                                    )}
-                                                  </span>
-                                                </div>
-                                                <div>
-                                                  <span className="text-emerald-600 font-medium block">
-                                                    Penalties
-                                                  </span>
-                                                  <span className="text-emerald-800">
-                                                    {formatCurrency(
-                                                      tx.totalPenalties,
-                                                    )}
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            )}
+                                              )}
                                             {/* <div className="text-[10px] text-emerald-600/60 mt-2 font-mono">ID: {tx.id}</div> */}
                                           </div>
                                         ))}
@@ -1231,7 +1224,7 @@ export function GlobalSearchComponent() {
                                 {/* Partial Collection Transactions */}
                                 {pr.partialCollectionTransactions &&
                                   pr.partialCollectionTransactions.length >
-                                    0 && (
+                                  0 && (
                                     <div>
                                       <div className="flex items-center justify-between mb-2">
                                         <h6 className="text-xs font-semibold text-amber-700">
@@ -1403,39 +1396,39 @@ export function GlobalSearchComponent() {
                                               {(tx.totalFees > 0 ||
                                                 tx.totalTaxes > 0 ||
                                                 tx.totalPenalties > 0) && (
-                                                <div className="grid grid-cols-3 gap-3 mt-2 pt-2 border-t border-amber-200 text-xs">
-                                                  <div>
-                                                    <span className="text-amber-600 font-medium block">
-                                                      Fees
-                                                    </span>
-                                                    <span className="text-amber-800">
-                                                      {formatCurrency(
-                                                        tx.totalFees,
-                                                      )}
-                                                    </span>
+                                                  <div className="grid grid-cols-3 gap-3 mt-2 pt-2 border-t border-amber-200 text-xs">
+                                                    <div>
+                                                      <span className="text-amber-600 font-medium block">
+                                                        Fees
+                                                      </span>
+                                                      <span className="text-amber-800">
+                                                        {formatCurrency(
+                                                          tx.totalFees,
+                                                        )}
+                                                      </span>
+                                                    </div>
+                                                    <div>
+                                                      <span className="text-amber-600 font-medium block">
+                                                        Taxes
+                                                      </span>
+                                                      <span className="text-amber-800">
+                                                        {formatCurrency(
+                                                          tx.totalTaxes,
+                                                        )}
+                                                      </span>
+                                                    </div>
+                                                    <div>
+                                                      <span className="text-amber-600 font-medium block">
+                                                        Penalties
+                                                      </span>
+                                                      <span className="text-amber-800">
+                                                        {formatCurrency(
+                                                          tx.totalPenalties,
+                                                        )}
+                                                      </span>
+                                                    </div>
                                                   </div>
-                                                  <div>
-                                                    <span className="text-amber-600 font-medium block">
-                                                      Taxes
-                                                    </span>
-                                                    <span className="text-amber-800">
-                                                      {formatCurrency(
-                                                        tx.totalTaxes,
-                                                      )}
-                                                    </span>
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-amber-600 font-medium block">
-                                                      Penalties
-                                                    </span>
-                                                    <span className="text-amber-800">
-                                                      {formatCurrency(
-                                                        tx.totalPenalties,
-                                                      )}
-                                                    </span>
-                                                  </div>
-                                                </div>
-                                              )}
+                                                )}
                                               {/* <div className="text-[10px] text-amber-600/60 mt-2 font-mono">ID: {tx.id}</div> */}
                                             </div>
                                           ),
