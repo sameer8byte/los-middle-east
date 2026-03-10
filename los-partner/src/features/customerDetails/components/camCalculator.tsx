@@ -245,8 +245,8 @@ export function CamCalculator({
   const [tenures, setTenures] = useState<TenureOption[]>([]);
   // @ts-ignore
   const [loadingTenures, setLoadingTenures] = useState(false);
-  const [existingCalculations, setExistingCalculations] = useState<any[]>([]);
-  const [loadingExisting, setLoadingExisting] = useState(false);
+  // const [existingCalculations, setExistingCalculations] = useState<any[]>([]);
+  // const [loadingExisting, setLoadingExisting] = useState(false);
   const [formData, setFormData] = useState<FormData>(() => ({
     ...INITIAL_DATA,
     disbursalDate: formatDate(new Date()),
@@ -258,10 +258,10 @@ export function CamCalculator({
   );
   const [repaymentError, setRepaymentError] = useState<string | null>(null);
   const [isCalculatingRepayment, setIsCalculatingRepayment] = useState(false);
-  const [manuallyEditedFields, setManuallyEditedFields] = useState<
-    Set<keyof FormData>
-  >(new Set());
-  const [loadingError, setLoadingError] = useState<string | null>(null);
+  // const [manuallyEditedFields, setManuallyEditedFields] = useState<
+  //   Set<keyof FormData>
+  // >(new Set());
+  // const [loadingError, setLoadingError] = useState<string | null>(null);
   const [creditRiskData, setCreditRiskData] = useState<any>(null);
   const [loadingCreditRisk, setLoadingCreditRisk] = useState(false);
   const [creditRiskError, setCreditRiskError] = useState<string | null>(null);
@@ -359,8 +359,8 @@ export function CamCalculator({
 
   const fetchExistingCalculations = async () => {
     if (!loan?.userId || !brandId) return;
-    setLoadingExisting(true);
-    setLoadingError(null);
+    // setLoadingExisting(true);
+    // setLoadingError(null);
     try {
       const result = await getCAMCalculatorByUser(loan.userId, brandId);
       if (result.success && result.data && result.data.length > 0) {
@@ -380,7 +380,7 @@ export function CamCalculator({
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        setExistingCalculations(uniqueCalculations);
+        // setExistingCalculations(uniqueCalculations);
         if (uniqueCalculations.length > 0) {
           setShowLoadDialog(true);
         }
@@ -388,55 +388,55 @@ export function CamCalculator({
         setShowLoadDialog(false);
       }
     } catch (error) {
-      const errorMsg =
-        error instanceof Error ? error.message : "Failed to load calculations";
-      setLoadingError(errorMsg);
+      // const errorMsg =
+      //   error instanceof Error ? error.message : "Failed to load calculations";
+      // setLoadingError(errorMsg);
     } finally {
-      setLoadingExisting(false);
+      // setLoadingExisting(false);
     }
   };
 
-  const loadExistingCalculation = (calculationId: string) => {
-    const calculation = existingCalculations.find(
-      (calc) => calc.loanId === calculationId
-    );
-    if (calculation) {
-      setFormData({
-        salaryCreditDate1: calculation.salaryCreditDate1 || "",
-        salaryCreditDate2: calculation.salaryCreditDate2 || "",
-        salaryCreditDate3: calculation.salaryCreditDate3 || "",
-        salaryAmount1: calculation.salaryAmount1?.toString() || "",
-        salaryAmount2: calculation.salaryAmount2?.toString() || "",
-        salaryAmount3: calculation.salaryAmount3?.toString() || "",
-        nextPayDate: calculation.nextPayDate || "",
-        salaryVariance: calculation.salaryVariance?.toString() || "",
-        actualSalary: calculation.actualSalary?.toString() || "",
-        eligibleFoir: calculation.eligibleFoir?.toString() || "",
-        loanApplied: calculation.loanApplied?.toString() || "",
-        finalFoir: "",
-        processingFee: "18",
-        totalProcessingFee: "",
-        repayDate: calculation.repayDate || "",
-        tenureId: calculation.tenureId || "",
-        repayAmount: "",
-        avgSalary: calculation.avgSalary?.toString() || "",
-        obligations: calculation.obligations?.toString() || "",
-        eligibleLoan: calculation.eligibleLoan?.toString() || "",
-        loanRecommended: calculation.loanRecommended?.toString() || "",
-        foirAchieved: calculation.foirAchieved?.toString() || "",
-        proposedFoir: calculation.proposedFoir?.toString() || "",
-        disbursalDate: calculation.disbursalDate || formatDate(new Date()),
-        salaryFrequency: "monthly",
-      });
+  // const loadExistingCalculation = (calculationId: string) => {
+  //   const calculation = existingCalculations.find(
+  //     (calc) => calc.loanId === calculationId
+  //   );
+  //   if (calculation) {
+  //     setFormData({
+  //       salaryCreditDate1: calculation.salaryCreditDate1 || "",
+  //       salaryCreditDate2: calculation.salaryCreditDate2 || "",
+  //       salaryCreditDate3: calculation.salaryCreditDate3 || "",
+  //       salaryAmount1: calculation.salaryAmount1?.toString() || "",
+  //       salaryAmount2: calculation.salaryAmount2?.toString() || "",
+  //       salaryAmount3: calculation.salaryAmount3?.toString() || "",
+  //       nextPayDate: calculation.nextPayDate || "",
+  //       salaryVariance: calculation.salaryVariance?.toString() || "",
+  //       actualSalary: calculation.actualSalary?.toString() || "",
+  //       eligibleFoir: calculation.eligibleFoir?.toString() || "",
+  //       loanApplied: calculation.loanApplied?.toString() || "",
+  //       finalFoir: "",
+  //       processingFee: "18",
+  //       totalProcessingFee: "",
+  //       repayDate: calculation.repayDate || "",
+  //       tenureId: calculation.tenureId || "",
+  //       repayAmount: "",
+  //       avgSalary: calculation.avgSalary?.toString() || "",
+  //       obligations: calculation.obligations?.toString() || "",
+  //       eligibleLoan: calculation.eligibleLoan?.toString() || "",
+  //       loanRecommended: calculation.loanRecommended?.toString() || "",
+  //       foirAchieved: calculation.foirAchieved?.toString() || "",
+  //       proposedFoir: calculation.proposedFoir?.toString() || "",
+  //       disbursalDate: calculation.disbursalDate || formatDate(new Date()),
+  //       salaryFrequency: "monthly",
+  //     });
 
-      // FIX: Force the repayment data into state so UI cards appear
-      if (calculation?.repaymentData) {
-        setRepaymentData(calculation.repaymentData);
-      }
-      setManuallyEditedFields(new Set(["loanRecommended"]));
-      setShowLoadDialog(false);
-    }
-  };
+  //     // FIX: Force the repayment data into state so UI cards appear
+  //     if (calculation?.repaymentData) {
+  //       setRepaymentData(calculation.repaymentData);
+  //     }
+  //     setManuallyEditedFields(new Set(["loanRecommended"]));
+  //     setShowLoadDialog(false);
+  //   }
+  // };
 
   // Auto-calculate derived fields
   useEffect(() => {
@@ -485,32 +485,32 @@ export function CamCalculator({
   ]);
 
   // ADDED: useEffect to handle recommended field auto-updates
-  useEffect(() => {
-    const loanApplied = parseNum(formData.loanApplied);
-    const eligibleLoan = parseNum(formData.eligibleLoan);
-    const isRecommendedManuallyEdited =
-      manuallyEditedFields.has("loanRecommended");
-    const currentRecommended = formData.loanRecommended;
+  // useEffect(() => {
+  //   const loanApplied = parseNum(formData.loanApplied);
+  //   const eligibleLoan = parseNum(formData.eligibleLoan);
+    // const isRecommendedManuallyEdited =
+    //   manuallyEditedFields.has("loanRecommended");
+    // const currentRecommended = formData.loanRecommended;
 
-    if (
-      !isRecommendedManuallyEdited &&
-      (loanApplied > 0 || eligibleLoan > 0) &&
-      currentRecommended !== ""
-    ) {
-      const recommendedValue = Math.min(loanApplied, eligibleLoan);
+    // if (
+    //   !isRecommendedManuallyEdited &&
+    //   (loanApplied > 0 || eligibleLoan > 0) &&
+    //   currentRecommended !== ""
+    // ) {
+    //   const recommendedValue = Math.min(loanApplied, eligibleLoan);
 
-      // Only update if the calculated value is different from current
-      if (
-        recommendedValue > 0 &&
-        recommendedValue !== parseNum(currentRecommended)
-      ) {
-        setFormData((prev) => ({
-          ...prev,
-          loanRecommended: recommendedValue.toFixed(2),
-        }));
-      }
-    }
-  }, [formData.loanApplied, formData.eligibleLoan, manuallyEditedFields]);
+    //   // Only update if the calculated value is different from current
+    //   if (
+    //     recommendedValue > 0 &&
+    //     recommendedValue !== parseNum(currentRecommended)
+    //   ) {
+    //     setFormData((prev) => ({
+    //       ...prev,
+    //       loanRecommended: recommendedValue.toFixed(2),
+    //     }));
+    //   }
+    // }
+  // }, [formData.loanApplied, formData.eligibleLoan, manuallyEditedFields]);
 
   const calculateDerivedFields = () => {
     const updates: Partial<FormData> = {};
@@ -561,15 +561,15 @@ export function CamCalculator({
       recommendedValue = eligibleLoan;
     }
 
-    const isRecommendedManuallyEdited =
-      manuallyEditedFields.has("loanRecommended");
-    const currentRecommended = formData.loanRecommended;
+    // const isRecommendedManuallyEdited =
+    //   manuallyEditedFields.has("loanRecommended");
+    // const currentRecommended = formData.loanRecommended;
 
-    if (!isRecommendedManuallyEdited) {
-      updates.loanRecommended = recommendedValue.toFixed(2);
-    } else if (currentRecommended === "") {
-      updates.loanRecommended = "";
-    }
+    // if (!isRecommendedManuallyEdited) {
+    updates.loanRecommended = recommendedValue.toFixed(2);
+    // } else if (currentRecommended === "") {
+    //   updates.loanRecommended = "";
+    // }
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 

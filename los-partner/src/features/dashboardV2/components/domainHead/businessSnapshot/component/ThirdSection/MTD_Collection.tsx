@@ -11,7 +11,7 @@ const MTD_Collection: React.FC<MTDCollectionProps> = ({
     title = "MTD Collection %",
     percentage = 82,
     variance = "-18%",
-    lastUpdated = "Last Updated “Time Stamp”",
+    // lastUpdated = "Last Updated “Time Stamp”",
 }) => {
     // Gauge Configuration - SCALED UP
     const width = 450;

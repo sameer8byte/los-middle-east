@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import SalesPerformance from './SalesPerformance';
 import CreditPerformance from './CreditPerformance';
 import CollectionPerformance from './CollectionPerformance';

@@ -9,7 +9,7 @@ import {
   FaTimes,
   FaClock,
   FaLock,
-  FaExclamationTriangle,
+  // FaExclamationTriangle,
   FaBolt,
 } from "react-icons/fa";
 import {
