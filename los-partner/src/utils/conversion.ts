@@ -5,7 +5,7 @@ export class Conversion {
         // If input is in INR and we want to display in BHD, convert it
         if (currency === "BHD") {
             // Convert from INR to BHD (1 BHD = ₹242)
-            const INR_TO_BHD_RATE = 242;
+            const INR_TO_BHD_RATE = 243;
             num = num / INR_TO_BHD_RATE;
         }
 
@@ -98,7 +98,7 @@ export class Conversion {
         if (upperName.includes("AADHAAR")) {
             return "CPR";
         }
-        if (upperName.includes("PAN")) { 
+        if (upperName.includes("PAN")) {
             return "CPR Validation";
         }
         return name;
