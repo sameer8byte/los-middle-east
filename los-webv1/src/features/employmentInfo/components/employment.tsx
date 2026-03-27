@@ -8,7 +8,7 @@ import {
   FiAlertCircle,
   FiInfo,
   FiCalendar,
-  FiDollarSign,
+  // FiDollarSign,
   // FiMapPin,
   FiBriefcase,
 } from "react-icons/fi";
