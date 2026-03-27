@@ -66,6 +66,8 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
   const [loading, setLoading] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [hasDeclinedTerms, setHasDeclinedTerms] = useState(false);
+  // Stores what the user typed in BHD (display only); formData.monthlySalary stores the INR value
+  const [bhdSalary, setBhdSalary] = useState("");
 
   const formatPanCard = (value: string): string => {
     let formatted = value.toUpperCase();
@@ -83,8 +85,12 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
     if (name === "panCard") {
       formattedValue = formatPanCard(value);
     } else if (name === "monthlySalary") {
-      if (!/^\d*$/.test(value)) return;
-      if (Number(value) > 9999999) return;
+      // User types in BHD — only allow numbers and decimals
+      if (!/^\d*\.?\d*$/.test(value)) return;
+      setBhdSalary(value);
+      // Convert BHD → INR and store in formData
+      const bhdNum = parseFloat(value);
+      formattedValue = isNaN(bhdNum) ? "" : String(Math.round(bhdNum * 242));
     } else if (name === "phoneNumber") {
       formattedValue = value.replace(/\D/g, "").slice(0, 10);
     } else if (
@@ -478,16 +484,13 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
                         Monthly Salary <span className="text-error">*</span>
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-on-background font-semibold text-sm">
-                          BHD
-                        </span>
                         <input
                           type="text"
                           name="monthlySalary"
-                          value={formData.monthlySalary}
+                          value={bhdSalary}
                           onChange={handleChange}
-                          placeholder="50000"
-                          className={`w-full pl-7 pr-3 py-2.5 rounded-lg border-2 transition-all duration-200 focus:outline-none bg-background text-on-background text-sm ${
+                          placeholder="BHD 300"
+                          className={`w-full pl-3 pr-3 py-2.5 rounded-lg border-2 transition-all duration-200 focus:outline-none bg-background text-on-background text-sm ${
                             errors.monthlySalary
                               ? "border-error focus:border-error focus:ring-2 focus:ring-error/20"
                               : "border-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -513,8 +516,8 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
                         Phone <span className="text-error">*</span>
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-on-background font-semibold text-sm">
-                          +91
+                        <span className="absolute left-1 top-1/2 transform -translate-y-1/2 text-on-background font-semibold text-sm">
+                          +973
                         </span>
                         <input
                           type="tel"
@@ -523,7 +526,7 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
                           onChange={handleChange}
                           placeholder="XXXXXXXXXX" 
                           maxLength={10}
-                          className={`w-full pl-10 pr-3 py-2.5 rounded-lg border-2 transition-all duration-200 focus:outline-none bg-background text-on-background text-sm ${
+                          className={`w-full pl-10 py-2.5 rounded-lg border-2 transition-all duration-200 focus:outline-none bg-background text-on-background text-sm ${
                             errors.phoneNumber
                               ? "border-error focus:border-error focus:ring-2 focus:ring-error/20"
                               : "border-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -541,7 +544,7 @@ const SignupV2: React.FC<SignupV2Props> = ({ onSwitchToLogin }) => {
                     {/* PAN Card */}
                     <div>
                       <label className="block text-xs font-semibold text-on-surface mb-1.5 uppercase tracking-wide">
-                        PAN Card <span className="text-error">*</span>
+                        CRP Validation<span className="text-error">*</span>
                       </label>
                       <input
                         type="text"

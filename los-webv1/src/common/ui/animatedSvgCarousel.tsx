@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector } from "../../redux/store";
-import {
-  preloadImages,
-  createOptimizedImageUrl,
-  createPlaceholderImage,
-} from "../../utils/imageUtils";
+import mainBanner from "../../assets/images/main_banner.png";
+import stcBanner2 from "../../assets/images/stcbanner2.jpg";
 
 interface Card {
   title: string;
@@ -23,7 +20,6 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({});
-  const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const minSwipeDistance = 50;
@@ -38,17 +34,9 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
     setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
   }, [cards.length]);
 
-  useEffect(() => {
-    if (cards.length > 0) {
-      const imageUrls = cards.map((card) => card.imageUrl);
-      preloadImages(imageUrls)
-        .then(() => setImagesPreloaded(true))
-        .catch(() => setImagesPreloaded(true));
-    }
-  }, [cards]);
 
   useEffect(() => {
-    if (!isHovered && cards.length > 1 && imagesPreloaded) {
+    if (!isHovered && cards.length > 1) {
       intervalRef.current = setInterval(nextSlide, 3500);
     } else {
       if (intervalRef.current) {
@@ -59,7 +47,7 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isHovered, nextSlide, cards.length, imagesPreloaded]);
+  }, [isHovered, nextSlide, cards.length]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -183,7 +171,7 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
           >
             {cards[idx]?.imageUrl && (
               <img
-                src={createOptimizedImageUrl(cards[idx].imageUrl, 600, 400)}
+                src={cards[idx].imageUrl}
                 alt={cards[idx].title}
                 className="w-full h-full object-cover"
                 style={{ filter: `brightness(${0.9 - depth * 0.1})` }}
@@ -227,13 +215,14 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
           >
             {imageErrors[currentIndex] ? (
               <img
-                src={createPlaceholderImage(600, 400, "Image unavailable")}
+                src={mainBanner}
                 alt="Placeholder"
                 className="w-full h-full object-cover opacity-50"
               />
+              
             ) : (
               <img
-                src={createOptimizedImageUrl(currentCard.imageUrl, 600, 400)}
+                src={currentCard.imageUrl}
                 alt={currentCard.title}
                 className="w-full h-full object-cover"
                 onError={() => setImageErrors((prev) => ({ ...prev, [currentIndex]: true }))}
@@ -324,7 +313,28 @@ const ImageCarousel: React.FC<{ cards: Card[] }> = ({ cards }) => {
 
 export default function AnimatedSvgCarousel() {
   const brand = useAppSelector((state) => state.index);
-  const cards: Card[] = brand?.brandCards || [];
+  
+  // Define local default cards with the requested images
+  const defaultCards: Card[] = [
+    {
+      title: "Fast & Secure Loans",
+      description: "Get approved in minutes with our advanced risk assessment.",
+      imageUrl: mainBanner,
+    },
+    {
+      title: "Flexible Repayment",
+      description: "Choose a tenure that works for you.",
+      imageUrl: stcBanner2,
+    }
+  ];
+
+  // Combine or choose between default and backend cards
+  const cards: Card[] = brand?.brandCards && brand.brandCards.length > 0
+    ? brand.brandCards.map((card, idx) => ({
+        ...card,
+        imageUrl: idx % 2 === 0 ? mainBanner : stcBanner2
+      }))
+    : defaultCards;
 
   if (!brand) {
     return (

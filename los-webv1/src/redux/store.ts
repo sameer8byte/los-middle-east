@@ -3,10 +3,10 @@ import {
 } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { initialUserState, UserSlice } from "./slices/user";
-import { USER_SLICE_LABEL } from "./storeLabels";
+import { USER_SLICE_LABEL, USER_EMPLOYMENT_SLICE_LABEL } from "./storeLabels";
 import { listenerMiddleware } from "./middleware";
 import { IndexSlice } from "./slices";
-import { EmploymentSlice } from "./slices/employment";
+import { EmploymentSlice, initialEmploymentState } from "./slices/employment";
 import { BankAccountSlice } from "./slices/bankAccount";
 import { UserDetailsSlice } from "./slices/userDetails";
 import { DocumetnsSlice } from "./slices/documents";
@@ -34,6 +34,9 @@ export const store = configureStore({
     user: localStorage.getItem(USER_SLICE_LABEL)
       ? JSON.parse(localStorage.getItem(USER_SLICE_LABEL) as string)
       : initialUserState,
+    employment: localStorage.getItem(USER_EMPLOYMENT_SLICE_LABEL)
+      ? JSON.parse(localStorage.getItem(USER_EMPLOYMENT_SLICE_LABEL) as string)
+      : initialEmploymentState,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

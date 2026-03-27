@@ -28,7 +28,7 @@ const api: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     domain: window.location.host || "localhost",
-      
+
   },
   withCredentials: true, // Important for sending/receiving cookies
 });

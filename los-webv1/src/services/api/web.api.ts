@@ -16,8 +16,6 @@ export const getIndex = async () => {
   }
 };
 
-// GET
-// /api/web/home/document-review/{userId}
 
 export const getDocumentReview = async (userId: string) => {
   try {
@@ -25,6 +23,37 @@ export const getDocumentReview = async (userId: string) => {
     return response.data;
   } catch (error) {
     console.error("Error getting document review:", error);
+    throw error;
+  }
+};
+
+
+export const getPersonalDetails = async (id: string) => {
+  try {
+    const response = await api.get(`/web/personal-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting personal details:", error);
+    throw error;
+  }
+};
+
+export const getEmployment = async (id: string) => {
+  try {
+    const response = await api.get(`/web/employment/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting employment details:", error);
+    throw error;
+  }
+};
+
+export const getUserLoansCredibility = async (userId: string) => {
+  try {
+    const response = await api.get(`/loans/user/${userId}/loans-credibility`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting loan credibility:", error);
     throw error;
   }
 };

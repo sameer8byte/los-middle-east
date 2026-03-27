@@ -61,7 +61,7 @@ export function UserBankAccount() {
             />
             <BankField
               icon="🔍"
-              label="IFSC Code"
+              label="SWIFT Code"
               value={userBankAccount.ifscCode}
             />
           </div>

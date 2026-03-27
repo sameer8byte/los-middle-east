@@ -32,7 +32,7 @@ export const LoanCredibilitySlice = createSlice({
   reducers: {
     // ? Update user data
     updateLoanRulesData: (state, action: PayloadAction<ILoanCredibility>) => {
-      return {
+      return { 
         ...state,
         ...action.payload,
       };

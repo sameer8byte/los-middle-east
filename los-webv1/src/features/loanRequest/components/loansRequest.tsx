@@ -28,6 +28,7 @@ import { useQueryParams } from "../../../hooks/useQueryParams";
 import { NeedHelpDialog } from "../../../layouts/needHelpDialog";
 import { LoanStatusEnum } from "../../../constant/enum";
 
+
 export function LoanRequest() {
   const brandConfig = useAppSelector((state) => state.index.brandConfig);
   const { setQuery } = useQueryParams();
@@ -114,13 +115,18 @@ export function LoanRequest() {
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
+  // const formatCurrency = (value: number) => {
+  //   return new Intl.NumberFormat("en-IN", {
+  //     style: "currency",
+  //     currency: "INR",
+  //     minimumFractionDigits: 0,
+  //     maximumFractionDigits: 0,
+  //   }).format(value);
+  // };
+
+  const formatCurrency = (val: number) => {
+    const bhd = (val / 242).toFixed(2);
+    return `BHD ${bhd}`;
   };
 
   if (isLoading) {
@@ -571,9 +577,9 @@ function DetailCard({
               : "text-gray-800 text-sm md:text-base"
           }`}
         >
-          {value}
+          {value} 
         </p>
       </div>
     </div>
-  );
+  ); 
 }

@@ -7,8 +7,8 @@ const Footer = () => {
   const fullDomain = window.location.hostname.replace("www.", "");
   const baseDomain = fullDomain.split(".").slice(-2).join(".");
   const isFastsalary = baseDomain === "fastsalary.com";
-  const isPaisapop = baseDomain === "paisapop.com" || fullDomain === "localhost";
-  const isSalary4Sure = fullDomain === "web2.salary4sure.com" || fullDomain === "localhost";
+  const isPaisapop = baseDomain === "paisapop.com";
+  const isSalary4Sure = fullDomain === "web2.salary4sure.com";
 
   return (
     <footer
