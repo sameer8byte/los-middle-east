@@ -274,7 +274,7 @@ const EmploymentInfo = () => {
                 className="bg-white shadow-lg rounded-brand p-6 border border-gray-100 mt-2 relative"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <motion.div variants={inputVariants}>
+                  {/* <motion.div variants={inputVariants}>
                     <label className="block text-sm font-medium text-label mb-2">
                       Salary (BHD)
                     </label>
@@ -291,7 +291,7 @@ const EmploymentInfo = () => {
                         placeholder="Enter salary"
                       />
                     </div>
-                  </motion.div>
+                  </motion.div> */}
                 </div>
               </motion.section>
             )}

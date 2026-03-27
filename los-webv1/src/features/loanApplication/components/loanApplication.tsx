@@ -198,8 +198,8 @@ const LoanApplication = () => {
               </div>
 
               <div className="flex-1">
-                <h3 className="font-medium text-lg">{step.title}</h3>
-                <p className="text-sm text-muted">{step.description}</p>
+                <h3 className="font-medium text-lg">{step.title === "PAN Verification" ? "CRP Validation" : step.title}</h3>
+                <p className="text-sm text-muted">{step.description === "Verify your identity using your PAN card" ? "Verify your identity using your CRP card" : step.description}</p>
               </div>
 
               {/* Lock icon on right if locked */}

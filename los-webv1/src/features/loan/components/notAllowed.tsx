@@ -76,6 +76,11 @@ export function NotAllowed() {
     }
   };
 
+  const formatCurrency = (val: number) => {
+    const bhd = (val / 242).toFixed(2);
+    return `BHD ${bhd}`;
+  };
+
   const workflowUrl = loanCredibility?.workflowUrl;
   const statusMapping: Record<string, string> = {
     PENDING:
@@ -213,12 +218,12 @@ export function NotAllowed() {
           <div className="p-6 space-y-4 text-sm">
             <div className="flex justify-between">
               <span>Loan ID</span>
-              <span className="font-semibold">{loan.formattedLoanId}</span>
+              <span className="font-semibold">{loan.id.split("-")[0]}</span>
             </div>
             <div className="flex justify-between">
               <span>Amount</span>
               <span className="font-bold">
-                BHD {loan.amount?.toLocaleString()}
+                {formatCurrency(loan.amount)}
               </span>
             </div>
             <div className="flex justify-between">

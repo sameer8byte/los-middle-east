@@ -23,7 +23,7 @@ export function Navbar() {
             className="flex items-center gap-2 transition-transform hover:scale-105"
           >
          {brand?.logoUrl&&   <img
-              src={brand.logoUrl}
+              src="https://8byte-middle-east-logo.s3.ap-south-1.amazonaws.com/Stc_pay.svg.png"
               alt="Brand Logo"
               height={40}
               className="h-10 object-cover"

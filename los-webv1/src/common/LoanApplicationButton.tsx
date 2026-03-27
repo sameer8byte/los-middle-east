@@ -67,7 +67,7 @@ export const LoanApplicationButton = ({
     } catch (err) {
       setError(
 
-          "Failed to update onboarding step. Please try again."
+        "Failed to update onboarding step. Please try again."
       );
       console.error("Onboarding step update failed:", err);
     } finally {
