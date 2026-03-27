@@ -18,6 +18,9 @@ import {
 } from "../../../utils/utils";
 import LoadingSpinner from "../../../common/ui/loadingSpinner";
 import { camelOrSnakeToTitle } from "../../../utils/camelOrSnakeToTitle";
+import { USER_DETAILS_SLICE_LABEL } from "../../../redux/storeLabels";
+
+const USER_DETAILS_DRAFT_KEY = `${USER_DETAILS_SLICE_LABEL}_draft`;
 
 const UserDetails = () => {
   const dispatch = useAppDispatch();
@@ -59,25 +62,40 @@ const UserDetails = () => {
         IndianStatesWithCapitals
       );
 
+      // Try to load draft from localStorage
+      const draftData = localStorage.getItem(USER_DETAILS_DRAFT_KEY);
+      const parsedDraft = draftData ? JSON.parse(draftData) : null;
+
       const newFormData = {
-        firstName: userDetails.firstName || "",
-        lastName: userDetails.lastName || "",
-        gender: userDetails.gender || GenderEnum.MALE,
+        firstName: userDetails.firstName || parsedDraft?.firstName || "",
+        lastName: userDetails.lastName || parsedDraft?.lastName || "",
+        gender: userDetails.gender || parsedDraft?.gender || GenderEnum.MALE,
         dateOfBirth: userDetails.dateOfBirth
           ? dayjs(userDetails.dateOfBirth).format("YYYY-MM-DD")
-          : "",
-        middleName: userDetails.middleName || "",
-        address: userDetails.address || "",
-        city: userDetails.city || "",
-        state: matchedState?.value || "",
-        pincode: userDetails.pincode || "",
-        maritalStatus: userDetails.maritalStatus || MaritalStatusEnum.SINGLE,
-        religion: userDetails.religion || ReligionEnum.HINDUISM,
-        spouseName: userDetails.spouseName || "",
-        fathersName: userDetails.fathersName || "",
-        isCommunicationAddress: userDetails.isCommunicationAddress ?? true,
-        residenceType: userDetails.residenceType || ResidenceTypeEnum.RENTED,
-        filePrivateKey: userDetails.filePrivateKey || "",
+          : parsedDraft?.dateOfBirth || "",
+        middleName: userDetails.middleName || parsedDraft?.middleName || "",
+        address: userDetails.address || parsedDraft?.address || "",
+        city: userDetails.city || parsedDraft?.city || "",
+        state: matchedState?.value || parsedDraft?.state || "",
+        pincode: userDetails.pincode || parsedDraft?.pincode || "",
+        maritalStatus:
+          userDetails.maritalStatus ||
+          parsedDraft?.maritalStatus ||
+          MaritalStatusEnum.SINGLE,
+        religion:
+          userDetails.religion || parsedDraft?.religion || ReligionEnum.HINDUISM,
+        spouseName: userDetails.spouseName || parsedDraft?.spouseName || "",
+        fathersName: userDetails.fathersName || parsedDraft?.fathersName || "",
+        isCommunicationAddress:
+          userDetails.isCommunicationAddress ??
+          parsedDraft?.isCommunicationAddress ??
+          true,
+        residenceType:
+          userDetails.residenceType ||
+          parsedDraft?.residenceType ||
+          ResidenceTypeEnum.RENTED,
+        filePrivateKey:
+          userDetails.filePrivateKey || parsedDraft?.filePrivateKey || "",
       };
 
       setFormData(newFormData);
@@ -85,6 +103,13 @@ const UserDetails = () => {
       formDataRef.current = newFormData;
     }
   }, [userDetails]);
+
+  // Sync formData to localStorage as draft
+  useEffect(() => {
+    if (formData && formData !== initialFormDataRef.current) {
+      localStorage.setItem(USER_DETAILS_DRAFT_KEY, JSON.stringify(formData));
+    }
+  }, [formData]);
 
   // Update formData ref whenever formData changes
   useEffect(() => {

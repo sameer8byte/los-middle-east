@@ -9,8 +9,9 @@ import {
   updateUserOnboardingStep,
   updateUserPhone,
  } from "./slices/user";
+import { updateUserDetails } from "./slices/userDetails";
 import { updateEmployment } from "./slices/employment";
-import { USER_SLICE_LABEL, USER_EMPLOYMENT_SLICE_LABEL } from "./storeLabels";
+import { USER_SLICE_LABEL, USER_EMPLOYMENT_SLICE_LABEL, USER_DETAILS_SLICE_LABEL } from "./storeLabels";
 import { RootState } from "./store";
 
 export const listenerMiddleware = createListenerMiddleware();
@@ -40,6 +41,15 @@ listenerMiddleware.startListening({
     localStorage.setItem(
       USER_EMPLOYMENT_SLICE_LABEL,
       JSON.stringify((listenerApi.getState() as unknown as RootState).employment),
+    );
+  },
+});
+listenerMiddleware.startListening({
+  matcher: isAnyOf(updateUserDetails),
+  effect: (_, listenerApi) => {
+    localStorage.setItem(
+      USER_DETAILS_SLICE_LABEL,
+      JSON.stringify((listenerApi.getState() as unknown as RootState).userDetails),
     );
   },
 });
