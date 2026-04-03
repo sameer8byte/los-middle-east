@@ -49,6 +49,8 @@ async function bootstrap() {
         "https://crm.8byte.ai",
         "https://apilm.8byte.ai",
         "https://app.8byte.ai",
+        "https://middle.apilm.8byte.ai",
+        
 
         // Qualoan
         "https://web.qualoan.com",
