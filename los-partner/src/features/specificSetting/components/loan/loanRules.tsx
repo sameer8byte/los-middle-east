@@ -11,6 +11,7 @@ import {
 } from "../../../../shared/services/api/settings/loanRules.setting.api";
 import { LoanRule } from "../../../../shared/types/loan";
 import { Button } from "../../../../common/ui/button";
+import { Conversion } from "../../../../utils/conversion";
 // import { LoanRulesPenalty } from "./loanRulesPenalty";
 
 export function LoanRules() {
@@ -206,9 +207,9 @@ export function LoanRules() {
                 Min Amount
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-on-surface)] opacity-70">
-                  ₹
-                </span>
+                {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-on-surface)] opacity-70">
+                  BHD
+                </span> */}
                 <input
                   id="minAmount"
                   name="minAmount"
@@ -217,7 +218,7 @@ export function LoanRules() {
                   type="number"
                   required
                   placeholder="0"
-                  className="w-full pl-8 pr-4 py-3 border border-[var(--color-muted)] border-opacity-50 rounded-lg shadow-sm focus:border-[#EA5E18] focus:ring-[#EA5E18] focus:ring-1 transition-colors"
+                  className="w-full pl-2 pr-4 py-3 border border-[var(--color-muted)] border-opacity-50 rounded-lg shadow-sm focus:border-[#EA5E18] focus:ring-[#EA5E18] focus:ring-1 transition-colors"
                 />
               </div>
             </div>
@@ -229,9 +230,9 @@ export function LoanRules() {
                 Max Amount
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-on-surface)] opacity-70">
+                {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-on-surface)] opacity-70">
                   ₹
-                </span>
+                </span> */}
                 <input
                   id="maxAmount"
                   name="maxAmount"
@@ -240,7 +241,7 @@ export function LoanRules() {
                   type="number"
                   required
                   placeholder="0"
-                  className="w-full pl-8 pr-4 py-3 border border-[var(--color-muted)] border-opacity-50 rounded-lg shadow-sm focus:border-[#EA5E18] focus:ring-[#EA5E18] focus:ring-1 transition-colors"
+                  className="w-full pl-2 pr-4 py-3 border border-[var(--color-muted)] border-opacity-50 rounded-lg shadow-sm focus:border-[#EA5E18] focus:ring-[#EA5E18] focus:ring-1 transition-colors"
                 />
               </div>
             </div>
@@ -464,15 +465,15 @@ export function LoanRules() {
                           </span>
                         </td>
                         <td className="px-6 py-4 font-medium text-[var(--color-on-background)]">
-                          ₹{rule.minAmount?.toLocaleString()}
+                          {Conversion.formatCurrency(rule.minAmount)}
                         </td>
                         <td className="px-6 py-4 font-medium text-[var(--color-on-background)]">
-                          ₹{rule.maxAmount?.toLocaleString()}
-                        </td>
+                          {Conversion.formatCurrency(rule.maxAmount)}  
+                        </td> 
                         <td className="px-6 py-4 text-[var(--color-on-surface)] opacity-70">
                           {rule.maxCompleteLoanCount || "N/A"}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4"> 
                           <Button
                             onClick={() =>
                               setQuery("tenureLoanRuleId", rule.id)

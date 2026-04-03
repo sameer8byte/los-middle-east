@@ -1229,7 +1229,7 @@ export function NonGetwayPayment({
                           Amount
                         </span>
                         <span className="text-lg font-bold text-[var(--color-on-primary)]">
-                          ₹{paymentResponse?.amount || formData.amount.total}
+                          BHD {paymentResponse?.amount || formData.amount.total}
                         </span>
                       </div>
                       <div>
@@ -1296,7 +1296,7 @@ export function NonGetwayPayment({
                               Principal
                             </span>
                             <span className="font-semibold">
-                              ₹
+                              BHD 
                               {paymentResponse?.principalAmount ||
                                 formData.amount.principal}
                             </span>
@@ -1306,10 +1306,10 @@ export function NonGetwayPayment({
                           formData.amount.interest > 0) && (
                           <div className="text-center">
                             <span className="text-[var(--color-on-surface)] opacity-60 block">
-                              Interest
+                              Murabaha margin
                             </span>
                             <span className="font-semibold">
-                              ₹
+                              BHD 
                               {paymentResponse?.totalFees ||
                                 formData.amount.interest}
                             </span>
@@ -1322,7 +1322,7 @@ export function NonGetwayPayment({
                               Penalty
                             </span>
                             <span className="font-semibold">
-                              ₹
+                              BHD 
                               {paymentResponse?.totalPenalties ||
                                 formData.amount.penalty}
                             </span>
@@ -1335,7 +1335,7 @@ export function NonGetwayPayment({
                               Discount
                             </span>
                             <span className="font-semibold text-green-600">
-                              -₹
+                              -BHD 
                               {paymentResponse?.penaltyDiscount ||
                                 formData.amount.penalty_discount}
                             </span>
@@ -1678,7 +1678,7 @@ export function NonGetwayPayment({
                                   applied loan amount
                                 </span>
                                 <span className="text-lg font-bold text-[var(--color-primary)]">
-                                  ₹{loanDetails?.amount?.toLocaleString()}
+                                  BHD {loanDetails?.amount?.toLocaleString()}
                                 </span>
                               </div>
 
@@ -1759,7 +1759,7 @@ export function NonGetwayPayment({
                                     )
                                   </span>
                                   <span className="font-medium">
-                                    ₹{loanDetails.repayment.totalObligation}
+                                    BHD {loanDetails.repayment.totalObligation}
                                   </span>
                                 </div>
                               )}
@@ -1775,7 +1775,7 @@ export function NonGetwayPayment({
                                     Fees & Charges
                                   </span>
                                   <span className="font-medium">
-                                    ₹{loanDetails.repayment.totalFees}
+                                    BHD {loanDetails.repayment.totalFees}
                                   </span>
                                 </div>
 
@@ -1794,7 +1794,7 @@ export function NonGetwayPayment({
                                             <span className="opacity-60">
                                               {fee.type}
                                             </span>
-                                            <span>₹{fee.total}</span>
+                                            <span>BHD {fee.total}</span>
                                           </div>
 
                                           {/* Tax Sub-lines (Ultra compact) */}
@@ -1808,7 +1808,7 @@ export function NonGetwayPayment({
                                                   + {tax.type} (
                                                   {tax.chargeValue}%)
                                                 </span>
-                                                <span>₹{tax.amount}</span>
+                                                <span>BHD {tax.amount}</span>
                                               </div>
                                             ))}
                                         </div>
@@ -1985,7 +1985,7 @@ export function NonGetwayPayment({
                                                       Amount:
                                                     </span>
                                                     <span className="ml-1 font-semibold">
-                                                      ₹
+                                                      BHD 
                                                       {tx.amount.toLocaleString()}
                                                     </span>
                                                   </div>
@@ -2317,7 +2317,7 @@ export function NonGetwayPayment({
 
                           {isRazorpayAutopay && (
                             <div className="text-xs text-blue-700 bg-blue-50 p-2 rounded -mt-2">
-                              Razorpay Autopay initiates recurring UPI.
+                              Razorpay Autopay initiates recurring BENEFIT Pay.
                               Processed 48 hours before due.
                             </div>
                           )}
@@ -2377,7 +2377,7 @@ export function NonGetwayPayment({
                                               .principalDueAtPayment,
                                         },
                                         {
-                                          label: "Interest",
+                                          label: "Murabaha margin",
                                           value:
                                             initialPartialPaymentSummary
                                               .paymentDetails
@@ -2396,7 +2396,7 @@ export function NonGetwayPayment({
                                             {item.label}:
                                           </span>
                                           <span className="ml-1 font-semibold text-[var(--color-on-primary)]">
-                                            ₹{item.value?.toLocaleString()}
+                                            BHD {item.value?.toLocaleString()}
                                           </span>
                                         </div>
                                       ))}
@@ -2541,7 +2541,7 @@ export function NonGetwayPayment({
                                   <div className="flex flex-row items-center gap-2">
                                     <div className="relative flex-1">
                                       <span className="absolute left-3 top-2 text-[var(--color-on-surface)] opacity-70">
-                                        ₹
+                                        BHD 
                                       </span>
                                       <input
                                         type="number"
@@ -2661,7 +2661,7 @@ export function NonGetwayPayment({
                                   {/* Interest Discount */}
                                   <div>
                                     <label className="block text-xs font-medium text-[var(--color-on-surface)] opacity-80 mb-1">
-                                      Interest Disc.
+                                      Murabaha margin Disc.
                                       <span className="text-[10px] opacity-60 ml-1">
                                         (Max:{" "}
                                         {Math.min(
@@ -2673,7 +2673,7 @@ export function NonGetwayPayment({
                                     </label>
                                     <div className="relative">
                                       <span className="absolute left-2.5 top-2 text-[var(--color-on-surface)] opacity-70">
-                                        ₹
+                                        BHD 
                                       </span>
                                       <input
                                         type="number"
@@ -2722,7 +2722,7 @@ export function NonGetwayPayment({
                                     </label>
                                     <div className="relative">
                                       <span className="absolute left-2.5 top-2 text-[var(--color-on-surface)] opacity-70">
-                                        ₹
+                                        BHD 
                                       </span>
                                       <input
                                         type="number"
@@ -2767,7 +2767,7 @@ export function NonGetwayPayment({
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-2.5 top-2 opacity-70">
-                                      ₹
+                                      BHD 
                                     </span>
                                     <FaLock className="absolute right-2.5 top-2.5 opacity-30 text-xs" />
                                     <input
@@ -2783,7 +2783,7 @@ export function NonGetwayPayment({
                                 {/* Interest */}
                                 <div>
                                   <label className="block text-xs font-medium opacity-80 mb-1">
-                                    Interest
+                                    Murabaha margin
                                     {formData.amount.interest_discount > 0 && (
                                       <span className="ml-1 text-[10px] text-green-600">
                                         (-{formData.amount.interest_discount})
@@ -2792,7 +2792,7 @@ export function NonGetwayPayment({
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-2.5 top-2 opacity-70">
-                                      ₹
+                                      BHD 
                                     </span>
                                     <FaLock className="absolute right-2.5 top-2.5 opacity-30 text-xs" />
                                     <input
@@ -2823,7 +2823,7 @@ export function NonGetwayPayment({
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-2.5 top-2 opacity-70">
-                                      ₹
+                                      BHD 
                                     </span>
                                     <FaLock className="absolute right-2.5 top-2.5 opacity-30 text-xs" />
                                     <input
@@ -2849,7 +2849,7 @@ export function NonGetwayPayment({
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-2.5 top-2 opacity-70 font-bold">
-                                      ₹
+                                      BHD 
                                     </span>
                                     <FaLock className="absolute right-2.5 top-2.5 opacity-30 text-xs" />
                                     <input
@@ -2878,7 +2878,7 @@ export function NonGetwayPayment({
                                   <div>
                                     <span className="opacity-70">Amt:</span>
                                     <span className="ml-1 font-medium text-green-900">
-                                      ₹
+                                      BHD 
                                       {partialPaymentSummary.amount?.toLocaleString()}
                                     </span>
                                   </div>
@@ -2887,7 +2887,7 @@ export function NonGetwayPayment({
                                       Prin Paid:
                                     </span>
                                     <span className="ml-1 font-medium text-green-900">
-                                      ₹
+                                      BHD 
                                       {partialPaymentSummary.principalAmount?.toLocaleString()}
                                     </span>
                                   </div>
@@ -2896,7 +2896,7 @@ export function NonGetwayPayment({
                                       Int Paid:
                                     </span>
                                     <span className="ml-1 font-medium text-green-900">
-                                      ₹
+                                      BHD 
                                       {partialPaymentSummary.totalFees?.toLocaleString()}
                                     </span>
                                   </div>
@@ -2905,20 +2905,20 @@ export function NonGetwayPayment({
                                       Pen Paid:
                                     </span>
                                     <span className="ml-1 font-medium text-green-900">
-                                      ₹
+                                      BHD 
                                       {partialPaymentSummary.totalPenalties?.toLocaleString()}
                                     </span>
                                   </div>
                                   {/* Discounts */}
                                   <div className="col-span-2 md:col-span-4 border-t border-green-200 mt-1 pt-1 flex flex-wrap gap-3">
                                     <span className="font-semibold text-green-900">
-                                      Disc: ₹
+                                      Disc: BHD 
                                       {partialPaymentSummary.discountSummary
                                         ?.roundOffDiscount?.total ?? 0}{" "}
                                       (Round)
                                     </span>
                                     <span className="font-semibold text-red-900">
-                                      Disc: ₹
+                                      Disc: BHD 
                                       {partialPaymentSummary.discountSummary?.penalty?.toLocaleString() ??
                                         0}{" "}
                                       (Penalty)
@@ -2930,11 +2930,11 @@ export function NonGetwayPayment({
                                       Remaining:
                                     </span>
                                     <span>
-                                      Total: ₹
+                                      Total: BHD 
                                       {partialPaymentSummary.paymentDetails.remainingDueAfterPayment?.toLocaleString()}
                                     </span>
                                     <span>
-                                      Prin: ₹
+                                      Prin: BHD 
                                       {partialPaymentSummary.paymentDetails.principalDueAfterPayment?.toLocaleString()}
                                     </span>
                                   </div>

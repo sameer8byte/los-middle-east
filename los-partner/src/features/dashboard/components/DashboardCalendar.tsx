@@ -536,10 +536,10 @@ export function DashboardCalendar({ loading: externalLoading }: DashboardCalenda
                 if (hasData) {
                   if (dataViewType === DataViewType.DUE_AMOUNT) {
                     const loanData = dataForDate as LoanData;
-                    return `Due loans: ${loanData.totalCases} cases, ₹${formatIndianCurrency(loanData.totalAmount)}`;
+                    return `Due loans: ${loanData.totalCases} cases, BHD${formatIndianCurrency(loanData.totalAmount)}`;
                   } else {
                     const disbursementData = dataForDate as DisbursementData;
-                    return `Disbursed loans: ${disbursementData.totalCases} cases, ₹${formatIndianCurrency(disbursementData.totalDisbursedAmount)}`;
+                    return `Disbursed loans: ${disbursementData.totalCases} cases, BHD${formatIndianCurrency(disbursementData.totalDisbursedAmount)}`;
                   }
                 }
                 
@@ -589,7 +589,7 @@ export function DashboardCalendar({ loading: externalLoading }: DashboardCalenda
                       </div>
                       <div className="leading-tight truncate w-full">
                         <span className={dataViewType === DataViewType.DUE_AMOUNT ? "text-green-600" : "text-indigo-600"}>
-                          ₹{dataViewType === DataViewType.DUE_AMOUNT 
+                          BHD{dataViewType === DataViewType.DUE_AMOUNT 
                             ? formatIndianCurrency((dataForDate as LoanData).totalAmount)
                             : formatIndianCurrency((dataForDate as DisbursementData).totalDisbursedAmount)
                           }
@@ -670,7 +670,7 @@ export function DashboardCalendar({ loading: externalLoading }: DashboardCalenda
               Total Amount
             </p>
             <p className={`text-lg font-bold ${dataViewType === DataViewType.DUE_AMOUNT ? 'text-purple-900' : 'text-blue-900'} mt-1`}>
-              ₹{formatIndianCurrency(totalAmount)}
+              BHD{formatIndianCurrency(totalAmount)}
             </p>
           </div>
         </div>

@@ -664,7 +664,7 @@ export function PreCollection() {
         <div className="flex flex-col items-start gap-1">
           {/* Amount: Primary Brand Color or High Contrast */}
           <span className="text-base font-bold text-[var(--color-on-surface)] tracking-tight">
-            ₹{(item.amount || 0).toLocaleString("en-IN")}
+            BHD{(item.amount || 0).toLocaleString("en-IN")}
           </span>
 
           {/* Status Badge */}

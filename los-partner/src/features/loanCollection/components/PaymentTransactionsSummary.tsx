@@ -141,7 +141,7 @@ export function PaymentTransactionsSummary({
           bg="bg-green-50"
         />
         <SummaryCard
-          label="Interest Earned"
+          label="Murabaha margin Earned"
           amount={summary.interest}
           icon={<FiActivity />}
           color="text-blue-600"
@@ -519,7 +519,7 @@ const DetailItem = ({
   let displayValue = value;
   if (isDate)
     displayValue = new Date(value as string).toLocaleDateString("en-IN");
-  if (isCurrency) displayValue = `₹${Number(value).toLocaleString()}`;
+  if (isCurrency) displayValue = `BHD ${Number(value).toLocaleString()}`;
 
   return (
     <div>

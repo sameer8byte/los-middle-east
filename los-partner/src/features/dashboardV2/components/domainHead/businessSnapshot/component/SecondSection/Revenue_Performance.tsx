@@ -8,6 +8,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from 'recharts';
+import { Conversion } from "../../../../../../../utils/conversion";
 
 export interface RevenueDataPoint {
     date: string;
@@ -18,7 +19,7 @@ export interface RevenueDataPoint {
 export interface RevenuePerformanceProps {
     title?: string;
     totalRevenueLabel?: string;
-    totalRevenueValue?: string;
+    totalRevenueValue?: string | number;
     data?: RevenueDataPoint[];
 }
 
@@ -41,7 +42,7 @@ const CustomTooltip = ({ active, payload }: any) => {
                 <span className="text-gray-500 text-sm font-medium">{data.date}</span>
                 <div className="flex items-center gap-2">
                     <span className="text-gray-900 text-xl font-semibold">
-                        {data.value.toLocaleString('en-IN')}
+                        {Conversion.formatCurrency(data.value)}
                     </span>
                     <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-md">
                         {data.percentageChange}
@@ -91,9 +92,12 @@ const CustomCursor = (props: any) => {
 const RevenuePerformance: React.FC<RevenuePerformanceProps> = ({
     title = "Revenue Performance",
     totalRevenueLabel = "Total Revenue Generated",
-    totalRevenueValue = "₹8.6 Cr",
+    totalRevenueValue = 86000000,  // BHD 8.6 Cr
     data = MOCK_DATA,
 }) => {
+    // Format total revenue value
+    const formattedTotalRevenue = Conversion.formatCurrency(totalRevenueValue);
+
     return (
         <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm w-full">
             {/* Header */}
@@ -105,7 +109,7 @@ const RevenuePerformance: React.FC<RevenuePerformanceProps> = ({
                 {/* Total Revenue Overview */}
                 <div className="mb-2 2xl:mb-4">
                     <div className="text-gray-500 text-[10px] 2xl:text-xs font-medium mb-0.5">{totalRevenueLabel}</div>
-                    <div className="text-gray-900 text-xl 2xl:text-2xl font-bold tracking-tight">{totalRevenueValue}</div>
+                    <div className="text-gray-900 text-xl 2xl:text-2xl font-bold tracking-tight">{formattedTotalRevenue}</div>
                 </div>
 
                 {/* Chart */}
@@ -140,7 +144,7 @@ const RevenuePerformance: React.FC<RevenuePerformanceProps> = ({
                                 axisLine={false}
                                 tickLine={false}
                                 tick={{ fill: '#6b7280', fontSize: 12 }}
-                                tickFormatter={() => '₹ XXX'}
+                                tickFormatter={(value) => Conversion.formatCurrency(value)}
                                 width={60}
                             />
 

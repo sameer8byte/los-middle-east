@@ -105,7 +105,7 @@ export function CsvUpload({ onUploadSuccess }: CsvUploadProps) {
   const downloadSampleCsv = () => {
     const sampleData = [
       'id,created_time,ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,form_id,form_name,is_organic,platform,are_you_a_salaried_employee?,what_is_your_monthly_salary?,enter_your_pan_no.?,email,full_name,phone,street_address,city',
-      '2005841990185513,9/18/25,120231416659170434,Sample Ad,120231416659160434,Sample AdSet,120231416659050434,Sample Campaign,1425897142005191,Sample Form,false,ig,yes,"below_₹35,000",MKSPS5529L,sample@example.com,John Doe,+919876543210,123 Sample Street,Sample City'
+      '2005841990185513,9/18/25,120231416659170434,Sample Ad,120231416659160434,Sample AdSet,120231416659050434,Sample Campaign,1425897142005191,Sample Form,false,ig,yes,"below_BHD 500",MKSPS5529L,sample@example.com,John Doe,+919876543210,123 Sample Street,Sample City'
     ];
     
     const csvContent = sampleData.join('\n');

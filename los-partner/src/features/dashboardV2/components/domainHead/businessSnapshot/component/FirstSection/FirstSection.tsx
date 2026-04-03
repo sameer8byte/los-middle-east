@@ -1,4 +1,5 @@
 import React from 'react';
+import { Conversion } from "../../../../../../../utils/conversion";
 
 // -------------- Icons -------------- //
 const FileUserIcon = () => (
@@ -126,10 +127,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
 
 // -------------- Data Types -------------- //
 export interface AUMData {
-    totalLoansDueAmount: string;
-    totalAmountCollected: string;
+    totalLoansDueAmount: number | string;
+    totalAmountCollected: number | string;
     totalAmountOutstanding: string;
-    postDueAmount: string;
+    postDueAmount: number | string;
     totalLoansIssued: number;
     ongoingLoans: number;
     closedLoans: number;
@@ -139,16 +140,24 @@ export interface AUMData {
 
 // -------------- Main Section Component -------------- //
 export default function FirstSection({ data }: { data?: AUMData }) {
-    // Mock Dynamic Data fallback
-    const currentData = data ?? {
-        totalLoansDueAmount: "₹14.8 Cr",
-        totalAmountCollected: "₹3.24 Cr",
+    // Mock Dynamic Data fallback (values in numbers for proper formatting)
+    const rawData = data ?? {
+        totalLoansDueAmount: 148000000,  // BHD 14.8 Cr
+        totalAmountCollected: 32400000,  // BHD 3.24 Cr
         totalAmountOutstanding: "82%",
-        postDueAmount: "₹1.2 Cr",
+        postDueAmount: 12000000,  // BHD 1.2 Cr
         totalLoansIssued: 300,
         ongoingLoans: 224,
         closedLoans: 76,
         overdueLoans: 44,
+    };
+
+    // Format currency values using Conversion class
+    const currentData = {
+        ...rawData,
+        totalLoansDueAmount: Conversion.formatCurrency(rawData.totalLoansDueAmount),
+        totalAmountCollected: Conversion.formatCurrency(rawData.totalAmountCollected),
+        postDueAmount: Conversion.formatCurrency(rawData.postDueAmount),
     };
 
     return (

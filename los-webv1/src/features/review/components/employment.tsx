@@ -3,6 +3,11 @@ import { useAppSelector } from "../../../redux/store";
 export function Employment() {
   const userEmployment = useAppSelector((state) => state.employment);
 
+    const formatCurrency = (val: number) => {
+    const bhd = (val / 242).toFixed(2);
+    return `BHD ${bhd}`;
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
       {/* Header */}
@@ -65,7 +70,7 @@ export function Employment() {
                 label="Monthly Salary"
                 value={
                   userEmployment.salary
-                    ? `₹${userEmployment.salary?.toLocaleString()}`
+                    ? `${formatCurrency(userEmployment.salary)}`
                     : undefined
                 }
               />

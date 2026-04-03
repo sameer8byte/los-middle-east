@@ -50,6 +50,7 @@ import { SkipEvaluationApproval } from "./skipEvaluationApproval";
 import { AddRemarksButton } from "../../../common/ui/AddRemarksButton";
 import { AcefoneClickToDialButton } from "../../acefone";
 import { RemarksCommentModal } from "../../../common/ui/RemarksCommentModal";
+import { Conversion } from "../../../utils/conversion";
 
 export function CustomerLoans(
   { isOnlyPendingLoans = false }: { isOnlyPendingLoans?: boolean } = {
@@ -694,7 +695,7 @@ export function CustomerLoans(
                               {getStatusIcon(loan.status)}
                             </div>
                             <span className="text-[13px] font-semibold text-slate-800">
-                              {loan.formattedLoanId || "N/A"}
+                              {loan.formattedLoanId || loan.id.split('-')[0]}
                             </span>
                             {loan.id && (
                               <AcefoneClickToDialButton
@@ -719,7 +720,7 @@ export function CustomerLoans(
                         {/* Amount */}
                         <td className="px-3 py-3">
                           <span className="text-[13px] font-bold text-slate-900">
-                            ₹{loan.amount.toLocaleString()}
+                            {Conversion.formatCurrency(loan.amount)}
                           </span>
                           {loan.purpose && (
                             <p className="text-[10px] text-slate-400 capitalize truncate max-w-[120px] mt-0.5">
@@ -754,7 +755,7 @@ export function CustomerLoans(
                             const penaltyAmount = getPenaltyPaid(loan);
                             return penaltyAmount !== null ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-xl text-[13px] font-semibold bg-orange-100 text-orange-700 border-orange-200 whitespace-nowrap">
-                                ₹{penaltyAmount.toLocaleString()}
+                                BHD{penaltyAmount.toLocaleString()}
                               </span>
                             ) : (
                               <span className="text-slate-300">—</span>
@@ -861,7 +862,7 @@ export function CustomerLoans(
                                         }
                                       >
                                         <FaFileAlt className="w-3.5 h-3.5" />
-                                        <span>Evaluate</span>
+                                        <span>Risk</span>
                                       </Button>
                                     )}
                                   </>
@@ -949,7 +950,7 @@ export function CustomerLoans(
                                             Principal
                                           </span>
                                           <span className="font-bold text-[var(--color-on-background)]">
-                                            ₹
+                                            BHD
                                             {loan.amount.toLocaleString()}
                                           </span>
                                         </div>
@@ -960,7 +961,7 @@ export function CustomerLoans(
                                             Obligation
                                           </span>
                                           <span className="font-bold text-[var(--color-on-error)]">
-                                            ₹
+                                            BHD
                                             {loan.repayment.totalObligation.toLocaleString()}
                                           </span>
                                         </div>
@@ -971,7 +972,7 @@ export function CustomerLoans(
                                             Fees
                                           </span>
                                           <span className="font-bold text-[var(--color-on-warning)]">
-                                            ₹
+                                            BHD
                                             {loan.repayment.totalFees.toLocaleString()}
                                           </span>
                                         </div>
@@ -982,7 +983,7 @@ export function CustomerLoans(
                                             Taxes
                                           </span>
                                           <span className="font-bold text-[var(--color-on-secondary)]">
-                                            ₹
+                                            BHD
                                             {loan.costSummary.totalTaxes.toLocaleString()}
                                           </span>
                                         </div>
@@ -1007,7 +1008,7 @@ export function CustomerLoans(
                                               Gross
                                             </span>
                                             <span className="font-bold text-[var(--color-on-background)]">
-                                              ₹
+                                              BHD
                                               {(
                                                 loan.disbursement
                                                   ?.grossAmount ?? 0
@@ -1019,7 +1020,7 @@ export function CustomerLoans(
                                               Net
                                             </span>
                                             <span className="font-bold text-[var(--color-on-success)]">
-                                              ₹
+                                              BHD
                                               {(
                                                 loan.disbursement?.netAmount ??
                                                 0
@@ -1139,17 +1140,17 @@ export function CustomerLoans(
                                                     {fee.type}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-[var(--color-on-surface)] opacity-70">
-                                                    ₹
+                                                    BHD
                                                     {fee.calculationBaseAmount?.toLocaleString() &&
                                                       fee.calculationBaseAmount?.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-[var(--color-on-surface)] opacity-70">
-                                                    ₹
+                                                    BHD
                                                     {fee.calculationTaxAmount &&
                                                       fee.calculationTaxAmount?.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-[var(--color-on-background)]">
-                                                    ₹
+                                                    BHD
                                                     {fee.total &&
                                                       fee.total?.toLocaleString()}
                                                   </td>
@@ -1186,11 +1187,11 @@ export function CustomerLoans(
                                             </div>
                                             <div className="flex justify-between text-[11px]">
                                               <span className="text-red-600">
-                                                ₹
+                                                BHD
                                                 {penalty.chargeValue.toLocaleString()}
                                               </span>
                                               <span className="text-red-500">
-                                                +Tax: ₹
+                                                +Tax: BHD
                                                 {penalty.taxChargeValue.toLocaleString()}
                                               </span>
                                             </div>
@@ -1237,21 +1238,21 @@ export function CustomerLoans(
                                                     {d.type}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
-                                                    ₹
+                                                    BHD
                                                     {(
                                                       d.calculationBaseAmount ??
                                                       0
                                                     ).toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">
-                                                    ₹
+                                                    BHD
                                                     {(
                                                       d.calculationTaxAmount ??
                                                       0
                                                     ).toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-slate-800">
-                                                    ₹
+                                                    BHD
                                                     {(
                                                       d.total ?? 0
                                                     ).toLocaleString()}
@@ -1272,7 +1273,7 @@ export function CustomerLoans(
                                       Customer Details
                                     </h6>
                                     <div className="grid grid-cols-2 gap-2.5 text-xs">
-                                      <div className="bg-white/80 rounded-md p-2">
+                                      {/* <div className="bg-white/80 rounded-md p-2">
                                         <span className="text-blue-500 text-[10px] block">
                                           Name
                                         </span>
@@ -1280,7 +1281,7 @@ export function CustomerLoans(
                                           {loan.user.userDetails?.firstName}{" "}
                                           {loan.user.userDetails?.lastName}
                                         </span>
-                                      </div>
+                                      </div> */}
                                       <div className="bg-white/80 rounded-md p-2">
                                         <span className="text-blue-500 text-[10px] block">
                                           Phone
@@ -1554,7 +1555,7 @@ export function CustomerLoans(
                                                     {partner.partnerUser.email}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 font-bold text-emerald-600">
-                                                    ₹
+                                                    BHD
                                                     {partner.amount.toLocaleString()}
                                                   </td>
                                                   <td className="text-right py-2 px-2.5 text-slate-600">

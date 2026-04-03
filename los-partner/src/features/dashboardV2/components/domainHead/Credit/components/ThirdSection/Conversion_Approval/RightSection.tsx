@@ -18,7 +18,7 @@ interface ChartProps {
 }
 
 const defaultData: ChartData[] = [
-    { name: 'Low Cibil', count: 82, value: 26, color: '#bde0fe' },
+    { name: 'Low Credit Score', count: 82, value: 26, color: '#bde0fe' },
     { name: 'No Response', count: 64, value: 20, color: '#74b1fa' },
     { name: 'High Foir', count: 52, value: 16, color: '#3b82f6' },
     { name: 'Customer Declined', count: 48, value: 15, color: '#2b84fb' },

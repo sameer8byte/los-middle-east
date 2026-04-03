@@ -7,10 +7,12 @@ import {
   FiTarget,
   FiCheck,
 } from "react-icons/fi";
-import { FaRupeeSign } from "react-icons/fa";
 import { BiLoaderAlt } from "react-icons/bi";
 import { useAppSelector } from "../../../redux/store";
 import { createLoan } from "../../../services/api/loans.api";
+import {
+  getUser,
+} from "../../../services/api/web.api";
 import { useNavigate } from "react-router-dom";
 interface TenureType {
   id: string;
@@ -21,7 +23,6 @@ interface TenureType {
 export default function AmountTenureSelector() {
   const navigate = useNavigate();
   const loanCredibility = useAppSelector((state) => state.loanCredibility);
-  const userData = useAppSelector((state) => state.user);
 
   // --- Derived Constants ---
   const minAmt = loanCredibility.minAmount;
@@ -30,10 +31,37 @@ export default function AmountTenureSelector() {
   const minTermDays = loanCredibility?.tenures?.minTermDays;
   const maxTermDays = loanCredibility?.tenures?.maxTermDays;
 
-  // --- State ---
-  const [amount, setAmount] = useState<string | number>(
-    loanCredibility?.suggestedAmount || Math.round((maxAmt + minAmt) / 2),
-  );
+  // --- AI Assessment Helper ---
+  const getStoredAssessment = () => {
+    const stored = localStorage.getItem("credit_risk_assessment");
+    if (!stored) return null;
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed.micro_lending_eligibility && parsed.micro_lending_eligibility.eligible && parsed.micro_lending_eligibility.max_loan_amount_bhd) {
+        return parsed.micro_lending_eligibility;
+      }
+    } catch (e) {
+      console.error("Error parsing assessment:", e);
+    }
+    return null;
+  };
+
+  const assessment = getStoredAssessment();
+
+  // --- Initial Calculated States ---
+  const initialMaxBhd = assessment ? assessment.max_loan_amount_bhd : 1000;
+  const initialRecommendedBhd = assessment 
+    ? Number(assessment.recommended_loan_amount_bhd || assessment.max_loan_amount_bhd).toFixed(2)
+    : (loanCredibility?.suggestedAmount ? (loanCredibility.suggestedAmount / 242).toFixed(2) : (Math.round((maxAmt + minAmt) / 2) / 242).toFixed(2));
+
+  const initialAmount = assessment 
+    ? (assessment.recommended_loan_amount_bhd || assessment.max_loan_amount_bhd) * 242
+    : (loanCredibility?.suggestedAmount || Math.round((maxAmt + minAmt) / 2));
+
+  // --- Persistent & Enforced State ---
+  const [amount, setAmount] = useState<string | number>(Math.round(Number(initialAmount)));
+  const [bhdInputValue, setBhdInputValue] = useState(String(initialRecommendedBhd));
+  const [maxBhdAllowed, setMaxBhdAllowed] = useState(initialMaxBhd);
 
   const [purpose, setPurpose] = useState("");
   const [otherPurpose, setOtherPurpose] = useState("");
@@ -64,9 +92,10 @@ export default function AmountTenureSelector() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showIneligibleModal, setShowIneligibleModal] = useState(false);
 
-  const numAmount = Number(amount);
-  const isAmountValid = numAmount >= minAmt && numAmount <= maxAmt;
+  // BHD range enforced at submit time only
+  const MIN_BHD = 50;
 
   // Helper to format date as YYYY-MM-DD without timezone issues
   const toDateString = (date: Date) => {
@@ -91,14 +120,27 @@ export default function AmountTenureSelector() {
   }, []);
 
   useEffect(() => {
-    if (loanCredibility.suggestedAmount)
-      setAmount(loanCredibility.suggestedAmount);
-    else if (loanCredibility.minAmount) setAmount(loanCredibility.minAmount);
+    // 1. Prioritize Dynamic Risk Assessment Limits if they changed
+    const currentAssessment = getStoredAssessment();
+    if (currentAssessment) {
+      setMaxBhdAllowed(currentAssessment.max_loan_amount_bhd);
+    } else {
+      // 2. Fallback to loanCredibility from Redux only if no assessment exists
+      if (loanCredibility.suggestedAmount) {
+        setAmount(loanCredibility.suggestedAmount);
+        setBhdInputValue((loanCredibility.suggestedAmount / 242).toFixed(2));
+      } else if (loanCredibility.minAmount) {
+        setAmount(loanCredibility.minAmount);
+        setBhdInputValue((loanCredibility.minAmount / 242).toFixed(2));
+      }
+    }
 
+    // 3. Set Tenure independently
     const defaultTenure = Array.isArray(loanCredibility.tenures)
       ? loanCredibility.tenures[0]
       : loanCredibility.tenures;
     if (defaultTenure) setSelectedTenure(defaultTenure);
+
   }, [
     loanCredibility.minAmount,
     loanCredibility.tenures,
@@ -108,15 +150,29 @@ export default function AmountTenureSelector() {
   // --- Handlers ---
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    setAmount(val === "" ? "" : Number(val));
+    // Allow only digits and a single decimal point
+    if (!/^\d*\.?\d*$/.test(val)) return;
+    
+    const bhdVal = parseFloat(val);
+    
+    // Prevent entering amount greater than max allowed
+    if (!isNaN(bhdVal) && bhdVal > maxBhdAllowed) {
+      setError(`Maximum allowed amount is BHD ${maxBhdAllowed}`);
+      return;
+    }
+
+    setBhdInputValue(val); // Always update display value as typed
+    
+    if (val === "" || isNaN(bhdVal)) {
+      setAmount("");
+    } else {
+      setAmount(Math.round(bhdVal * 242));
+    }
     if (error) setError(null);
   };
 
   const handleInputBlur = () => {
-    let val = Number(amount);
-    if (amount === "" || val < minAmt) val = minAmt;
-    if (val > maxAmt) val = maxAmt;
-    setAmount(val);
+    // No auto-clamping; validate only on submit
   };
 
   const handleDateChange = (dateValue: string) => {
@@ -151,10 +207,35 @@ export default function AmountTenureSelector() {
 
   const availableDates = getAllDatesInRange();
 
+  const formatCurrency = (val: number) => {
+    const bhd = (val / 242).toFixed(2);
+    return `BHD ${bhd}`;
+  };
+
+  const formatDate = (input?: string | Date | null): string => {
+    if (!input) return "";
+    let date: Date;
+    if (input instanceof Date) {
+      date = input;
+    } else if (typeof input === "string" && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
+      const [year, month, day] = input.split("-").map(Number);
+      date = new Date(year, month - 1, day);
+    } else {
+      date = new Date(input as any);
+    }
+    if (isNaN(date.getTime())) return "";
+    return new Intl.DateTimeFormat("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  };
+
   const handleCreateLoan = async () => {
     try {
-      if (!isAmountValid)
-        throw new Error(`Amount must be between ${minAmt} and ${maxAmt}`);
+      const bhdAmount = Number(amount) / 242;
+      if (!amount || bhdAmount < MIN_BHD || bhdAmount > maxBhdAllowed)
+        throw new Error(`Amount must be between BHD ${MIN_BHD} and BHD ${maxBhdAllowed}`);
       if (!purpose) throw new Error("Please select a purpose");
       if (purpose === "Others" && !otherPurpose.trim())
         throw new Error("Please specify the purpose");
@@ -170,12 +251,17 @@ export default function AmountTenureSelector() {
       setIsSubmitting(true);
       setError(null);
 
+      // 1. Fetch User Summary (to get employmentId and userDetailsId)
+      const userSummary = await getUser();
+      if (!userSummary) throw new Error("Failed to fetch user summary");
+
+
       const finalPurpose = purpose === "Others" ? otherPurpose : purpose;
 
-      const response = await createLoan(userData.user.id, {
+      const response = await createLoan(userSummary.id, {
         purpose: finalPurpose,
-        userId: userData.user.id,
-        requestAmount: numAmount,
+        userId: userSummary.id,
+        requestAmount: Number(amount),
         tenureId: selectedTenure.id,
         dueDate: dueDate,
       });
@@ -183,7 +269,7 @@ export default function AmountTenureSelector() {
       navigate(`/loan/${response.id}/request`, {
         state: {
           loanId: response.id,
-          amount: numAmount,
+          amount: Number(amount),
           tenure: selectedTenure,
           dueDate: dueDate,
         },
@@ -195,44 +281,38 @@ export default function AmountTenureSelector() {
     }
   };
 
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(val);
-  const formatDate = (input?: string | Date | null): string => {
-    if (!input) return "";
-
-    let date: Date;
-
-    // If already Date object
-    if (input instanceof Date) {
-      date = input;
-    }
-    // If string in YYYY-MM-DD format (no timezone conversion)
-    else if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
-      const [year, month, day] = input.split("-").map(Number);
-      date = new Date(year, month - 1, day);
-    }
-    // ISO or other string formats
-    else {
-      date = new Date(input);
-    }
-
-    if (isNaN(date.getTime())) return "";
-
-    return new Intl.DateTimeFormat("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(date);
-  };
 
   if (isLoading) return <LoadingSkeleton />;
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] pb-32">
+
+      {/* ---- Ineligibility Modal ---- */}
+      {showIneligibleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate-fadeIn">
+            {/* Icon */}
+            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-5 rounded-full bg-red-100">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Not Eligible</h2>
+            <p className="text-sm text-gray-500 leading-relaxed mb-6">
+              Sorry, you are not eligible for a loan at this time based on our risk assessment. Please try again later or contact support.
+            </p>
+
+            <button
+              onClick={() => setShowIneligibleModal(false)}
+              className="w-full py-3 rounded-xl bg-[var(--color-primary)] text-white font-semibold text-sm hover:bg-[var(--color-primary)]/90 transition-all active:scale-95"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Top Background Decoration */}
       <div className="bg-[var(--color-primary)] h-48 w-full absolute top-0 left-0 rounded-b-[2.5rem] shadow-lg z-0" />
 
@@ -246,11 +326,11 @@ export default function AmountTenureSelector() {
 
         {/* Error Notification */}
         {error && (
-          <div className="bg-[var(--color-error)]/10 border-l-4 border-[var(--color-error)] p-4 rounded-r-lg shadow-sm mb-6 flex items-start gap-3 animate-pulse">
-            <FiAlertCircle className="text-[var(--color-error)] mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-[var(--color-error)] font-medium">
+          <div className="bg-red-500 border-l-4 border-[var(--color-error)] p-4 rounded-r-lg shadow-sm mb-6 flex items-start gap-3">
+            <FiAlertCircle className="text-white mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-white font-medium">
               {error}
-            </p>
+            </p> 
           </div>
         )}
 
@@ -307,50 +387,36 @@ export default function AmountTenureSelector() {
               </div>
             )}
 
-          {/* Input Field Wrapper */}
           <div className="relative mb-6">
             <div
-              className={`flex items-center border-2 rounded-2xl px-4 py-3 transition-all duration-200 bg-[var(--color-surface)]
-              ${
-                isAmountValid
-                  ? "border-gray-200 focus-within:border-[var(--color-primary)] focus-within:ring-4 focus-within:ring-[var(--color-primary)]/10"
-                  : "border-[var(--color-error)] bg-[var(--color-error)]/10 focus-within:border-[var(--color-error)]"
-              }`}
+              className="flex items-center border-2 rounded-2xl px-4 py-3 transition-all duration-200 bg-[var(--color-surface)] border-gray-200 focus-within:border-[var(--color-primary)] focus-within:ring-4 focus-within:ring-[var(--color-primary)]/10"
             >
-              <div
-                className={`p-2 rounded-lg mr-3 ${
-                  isAmountValid ? "bg-gray-100" : "bg-[var(--color-error)]/20"
-                }`}
-              >
-                <FaRupeeSign
-                  className={`text-lg ${
-                    isAmountValid
-                      ? "text-gray-500"
-                      : "text-[var(--color-error)]"
-                  }`}
-                />
+              <div className="flex flex-col flex-1">
+                {/* BHD prefix label */}
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold text-gray-400">BHD</span>
+                  <input
+                    type="text"
+                    value={bhdInputValue}
+                    onChange={handleAmountChange}
+                    onBlur={handleInputBlur}
+                    placeholder="0.00"
+                    maxLength={4}
+                    className="w-full text-3xl font-bold text-gray-900 bg-transparent outline-none placeholder-gray-300"
+                  />
+                </div>
+               
               </div>
-
-              <input
-                type="number"
-                value={amount}
-                onChange={handleAmountChange}
-                onBlur={handleInputBlur}
-                placeholder="Enter amount"
-                className="w-full text-3xl font-bold text-gray-900 bg-transparent outline-none placeholder-gray-300"
-              />
             </div>
 
-            {/* Validation Message */}
-            {!isAmountValid && (
-              <p className="absolute -bottom-6 left-1 text-[var(--color-error)] text-xs font-semibold flex items-center gap-1">
-                Limit: {formatCurrency(minAmt)} - {formatCurrency(maxAmt)}
-              </p>
-            )}
+            {/* Range hint */}
+            <p className="mt-2 left-1 text-gray-400 text-xs">
+              Range: BHD {MIN_BHD} – BHD {maxBhdAllowed}
+            </p>
           </div>
 
           {/* Quick Select Chips */}
-          <div className="flex justify-between gap-3 mt-8">
+          {/* <div className="flex justify-between gap-3 mt-8">
             {[minAmt, Math.round((maxAmt + minAmt) / 2), maxAmt].map((val) => (
               <button
                 key={val}
@@ -360,7 +426,7 @@ export default function AmountTenureSelector() {
                 {formatCurrency(val)}
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* --- Card 2: Details (Purpose & Date) --- */}
@@ -479,12 +545,12 @@ export default function AmountTenureSelector() {
         </div>
 
         {/* --- Card 3: Summary --- */}
-        {dueDate && isAmountValid && (
+        {dueDate && amount && (
           <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm border border-[var(--color-primary)]/20 p-5 mb-24 animate-fade-in">
             <div className="flex justify-between items-center mb-2">
               <span className="text-gray-500 text-sm">Total Request</span>
               <span className="text-gray-900 font-bold text-lg">
-                {formatCurrency(numAmount)}
+                {formatCurrency(Number(amount))}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -503,7 +569,6 @@ export default function AmountTenureSelector() {
           <button
             onClick={handleCreateLoan}
             disabled={
-              !isAmountValid ||
               !purpose ||
               !dueDate ||
               dueDate < minDateStr ||
@@ -512,7 +577,6 @@ export default function AmountTenureSelector() {
             }
             className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all transform active:scale-95
               ${
-                !isAmountValid ||
                 !purpose ||
                 !dueDate ||
                 dueDate < minDateStr ||

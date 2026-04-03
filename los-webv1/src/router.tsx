@@ -40,16 +40,12 @@ import { PaymentStatusSync } from "./features/paytering/payment-status-sync";
 import { UserStatusEnum } from "./constant/enum";
 
 const ProtectedRoutes = () => {
-  const token = useAppSelector((state) => state.user?.accessToken);
-  const location = useLocation();
+  // const token = useAppSelector((state) => state.user?.accessToken);
+  // const location = useLocation();
 
-  const query = location.search || "";
+  // const query = location.search || "";
 
-  return token ? (
-    <Outlet />
-  ) : (
-    <Navigate to={`/phone-verification${query}`} replace />
-  );
+  return <Outlet />;
 };
 
 const PublicRoutes = () => {
@@ -108,7 +104,7 @@ export default function InternalPages() {
           dispatch(updateUser(response));
           if (
             Number(response?.status_id) === UserStatusEnum.BLOCKED ||
-            Number(response?.status_id )=== UserStatusEnum.SUSPENDED
+            Number(response?.status_id) === UserStatusEnum.SUSPENDED
           ) {
             navigate("/rejected", { replace: true }); // <-- correct way to navigate imperatively
             return;

@@ -185,7 +185,7 @@ export function ConfirmationDialog({
                     Requested:
                   </span>
                   <span className="font-semibold text-[var(--color-on-background)]">
-                    ₹{loan?.amount?.toLocaleString() || "N/A"}
+                    BHD{loan?.amount?.toLocaleString() || "N/A"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ export function ConfirmationDialog({
                     Salary:
                   </span>
                   <span className="font-semibold text-[var(--color-on-background)]">
-                    ₹{salary?.toLocaleString() || "N/A"}
+                    BHD{salary?.toLocaleString() || "N/A"}
                   </span>
                 </div>
               </div>
@@ -253,7 +253,7 @@ export function ConfirmationDialog({
                     />
                   </div>
                   <p className="text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
-                    Maximum recommended: ₹
+                    Maximum recommended: BHD
                     {loan?.amount?.toLocaleString() || "N/A"}
                   </p>
                 </div>
@@ -384,7 +384,7 @@ export function ConfirmationDialog({
                     <FaCheck className="w-4 h-4" />
                     Confirm Approval{" "}
                     {approvedLoanAmount
-                      ? ` - ₹${approvedLoanAmount.toLocaleString()}`
+                      ? ` - BHD${approvedLoanAmount.toLocaleString()}`
                       : ""}
                     {approvedDueDate
                       ? `, DueDate: ${new Date(

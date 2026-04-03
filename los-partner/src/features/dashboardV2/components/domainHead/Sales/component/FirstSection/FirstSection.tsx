@@ -1,4 +1,5 @@
 import React from 'react';
+import { Conversion } from "../../../../../../../utils/conversion";
 
 // -------------- Icons -------------- //
 const FileUserIcon = () => (
@@ -141,14 +142,14 @@ export interface AUMData {
 export default function FirstSection({ data }: { data?: AUMData }) {
     // Mock Dynamic Data fallback
     const currentData = data ?? {
-        totalLoansDueAmount: "₹14.8 Cr",
-        totalAmountCollected: "₹3.24 Cr",
-        totalAmountOutstanding: "82%",
-        postDueAmount: "₹1.2 Cr",
-        totalLoansIssued: 300,
-        ongoingLoans: 224,
-        closedLoans: 76,
-        overdueLoans: 44,
+        totalLoansDueAmount: 92000000,
+        totalAmountCollected: 15000000,
+        totalAmountOutstanding: "84%",
+        postDueAmount: 12000000,
+        totalLoansIssued: 210,
+        ongoingLoans: 170,
+        closedLoans: 40,
+        overdueLoans: 60,
     };
 
     return (
@@ -165,21 +166,21 @@ export default function FirstSection({ data }: { data?: AUMData }) {
                         variant="large"
                         largeTheme="solid-blue"
                         title="Asset Under Management"
-                        value={currentData.totalLoansDueAmount}
+                        value={Conversion.formatCurrency(currentData.totalLoansDueAmount)}
                         icon={<FileUserIcon />}
                     />
                     <CommonCard
                         variant="large"
                         largeTheme="light-green"
                         title="Disbursed Amount"
-                        value={currentData.totalAmountCollected}
+                        value={Conversion.formatCurrency(currentData.totalAmountCollected)}
                         icon={<SplitArrowSVG />}
                     />
                     <CommonCard
                         variant="large"
                         largeTheme="light-red"
                         title="Bank Balance"
-                        value={currentData.postDueAmount}
+                        value={Conversion.formatCurrency(currentData.postDueAmount)}
                         icon={<CheckDocIcon />}
                     />
                     <CommonCard

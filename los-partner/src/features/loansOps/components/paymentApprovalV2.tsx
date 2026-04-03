@@ -83,7 +83,7 @@ const TransactionCard = ({
           </div>
           <div>
             <div className="text-lg font-bold text-slate-800 tabular-nums leading-tight">
-              ₹{Number(tx?.amount || 0).toLocaleString()}
+              BHD {Number(tx?.amount || 0).toLocaleString()}
             </div>
             <div className="text-[10px] text-slate-500 leading-tight">
               {tx.type === "collection" ? "Full" : "Partial"} •{" "}
@@ -149,21 +149,21 @@ const TransactionCard = ({
             </span>
           )}
           {tx.totalFees > 0 && (
-            <span>Fees: ₹{tx.totalFees.toLocaleString()}</span>
+            <span>Fees: BHD {tx.totalFees.toLocaleString()}</span>
           )}
           {tx.totalPenalties > 0 && (
             <span className="text-red-600">
-              Penalties: ₹{tx.totalPenalties.toLocaleString()}
+              Penalties: BHD {tx.totalPenalties.toLocaleString()}
             </span>
           )}
           {tx.penaltyDiscount > 0 && (
             <span className="text-emerald-600">
-              Discount: -₹{tx.penaltyDiscount.toLocaleString()}
+              Discount: -BHD {tx.penaltyDiscount.toLocaleString()}
             </span>
           )}
           {tx.excessAmount > 0 && (
             <span className="text-blue-600">
-              Excess: ₹{tx.excessAmount.toLocaleString()}
+              Excess: BHD {tx.excessAmount.toLocaleString()}
             </span>
           )}
         </div>
@@ -473,7 +473,7 @@ export function PaymentApprovalV2({
                     Loan Amount
                   </span>
                   <div className="text-2xl font-bold text-[var(--color-primary)]">
-                    ₹{loanDetails?.amount?.toLocaleString() || "0"}
+                    BHD {loanDetails?.amount?.toLocaleString() || "0"}
                   </div>
                 </div>
                 {loanDetails?.loanDetails?.dueDate && (
@@ -526,7 +526,7 @@ export function PaymentApprovalV2({
                   <div className="flex justify-between items-center bg-[var(--color-muted)]/5 rounded-lg px-2.5 py-1.5">
                     <span className="opacity-60">Obligation</span>
                     <span className="font-semibold">
-                      ₹{loanDetails.repayment.totalObligation?.toLocaleString()}
+                      BHD {loanDetails.repayment.totalObligation?.toLocaleString()}
                     </span>
                   </div>
                 )}
@@ -539,14 +539,14 @@ export function PaymentApprovalV2({
                         Fees & Charges
                       </span>
                       <span className="font-bold">
-                        ₹{loanDetails.repayment.totalFees?.toLocaleString()}
+                        BHD {loanDetails.repayment.totalFees?.toLocaleString()}
                       </span>
                     </div>
                     {loanDetails.repayment.feeBreakdowns?.map((fee: any) => (
                       <div key={fee.id} className="text-[11px] opacity-70 mb-1">
                         <div className="flex justify-between">
                           <span>{fee.type}</span>
-                          <span>₹{fee.total?.toLocaleString()}</span>
+                          <span>BHD {fee.total?.toLocaleString()}</span>
                         </div>
                         {fee.taxes?.map((tax: any) => (
                           <div
@@ -554,7 +554,7 @@ export function PaymentApprovalV2({
                             className="flex justify-between pl-3 opacity-60"
                           >
                             <span>+ {tax.type}</span>
-                            <span>₹{tax.amount?.toLocaleString()}</span>
+                            <span>BHD {tax.amount?.toLocaleString()}</span>
                           </div>
                         ))}
                       </div>
@@ -704,7 +704,7 @@ export function PaymentApprovalV2({
                       • {confirmationDialog.transactionData?.method || "—"}
                     </div>
                     <div className="text-lg font-bold text-slate-800 tabular-nums leading-tight">
-                      ₹
+                      BHD 
                       {Number(
                         confirmationDialog.transactionData?.amount || 0,
                       ).toLocaleString()}

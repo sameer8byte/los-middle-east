@@ -82,9 +82,9 @@ export function BlocklistForm (){
     } else if (type === "aadhar") {
       const aadhaar = formData.aadharNumber?.trim();
       if (!aadhaar) {
-        errors.aadharNumber = "Aadhaar number is required";
+        errors.aadharNumber = "CPR Card number is required";
       } else if (!validateAadhaar(aadhaar)) {
-        errors.aadharNumber = "Invalid Aadhaar format. Must be exactly 12 digits";
+        errors.aadharNumber = "Invalid CPR Card format. Must be exactly 12 digits";
       }
     } else if (type === "pincode") {
       const pincode = formData.pincode?.trim();
@@ -154,9 +154,9 @@ export function BlocklistForm (){
 
   const getTypeDisplayName = (type: BlocklistType) => {
     switch (type) {
-      case "pan": return "PAN Card";
+      case "pan": return "TaxID";
       case "mobile": return "Mobile Number";
-      case "aadhar": return "Aadhaar Number";
+      case "aadhar": return "CPR Card Number";
       case "pincode": return "Pincode";
       case "accountNumber": return "Account Number";
       default: return type;
@@ -191,9 +191,9 @@ export function BlocklistForm (){
                 onChange={(e) => setType(e.target.value as BlocklistType)}
                 className="w-full px-3 py-2 border border-[var(--color-muted)] border-opacity-50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#EA5E18] focus:border-[#EA5E18] transition-colors duration-200 var(--color-background) text-[var(--color-on-background)]"
               >
-                <option value="pan">PAN Card</option>
+                <option value="pan">TaxID</option>
                 <option value="mobile">Mobile Number</option>
-                <option value="aadhar">Aadhaar Number</option>
+                <option value="aadhar">CPR Card Number</option>
                 <option value="pincode">Pincode</option>
                 <option value="accountNumber">Account Number</option>
               </select>
@@ -247,7 +247,7 @@ export function BlocklistForm (){
                   <input
                     type="text"
                     name="aadharNumber"
-                    placeholder="Enter Aadhaar number (12 digits)"
+                    placeholder="Enter CPR Card number (12 digits)"
                     onChange={handleChange}
                     className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#EA5E18] focus:border-[#EA5E18] transition-colors duration-200 placeholder-gray-400 ${
                       validationErrors.aadharNumber ? 'border-error' : 'border-[var(--color-muted)] border-opacity-50'

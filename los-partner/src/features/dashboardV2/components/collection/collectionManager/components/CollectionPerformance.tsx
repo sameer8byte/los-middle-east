@@ -61,7 +61,7 @@ export const CollectionPerformance = () => {
             </svg>
             <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
               <div className="text-3xl font-bold text-gray-900">{animatedPercentage}%</div>
-              <div className="text-xs text-gray-600">₹{performanceData.collected}Cr / ₹{performanceData.total}Cr</div>
+              <div className="text-xs text-gray-600">BHD {performanceData.collected}Cr / BHD {performanceData.total}Cr</div>
             </div>
           </div>
 

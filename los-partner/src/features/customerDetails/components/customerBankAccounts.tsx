@@ -287,9 +287,9 @@ export function CustomerBankAccounts() {
   };
 
   const validateIFSC = (ifsc: string): string | undefined => {
-    if (!ifsc) return "IFSC code is required";
+    if (!ifsc) return "IBAN code is required";
     if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc.toUpperCase()))
-      return "Invalid IFSC code format";
+      return "Invalid IBAN code format";
     return undefined;
   };
 
@@ -321,10 +321,10 @@ export function CustomerBankAccounts() {
         }));
         showSuccess("Bank details fetched successfully!");
       } else {
-        showError("Unable to fetch bank details for this IFSC code");
+        showError("Unable to fetch bank details for this IBAN code");
       }
     } catch (error) {
-      console.error("Error fetching IFSC details:", error);
+      console.error("Error fetching IBAN details:", error);
       showError("Failed to fetch bank details");
     } finally {
       setFetchingIfsc(false);
@@ -396,7 +396,7 @@ export function CustomerBankAccounts() {
 
     // Check if bank name is filled (from IFSC lookup)
     if (!form.bankName) {
-      showError("Please enter a valid IFSC code to fetch bank details");
+      showError("Please enter a valid IBAN code to fetch bank details");
       return;
     }
 
@@ -430,7 +430,7 @@ export function CustomerBankAccounts() {
 
     // Check if bank name is filled (from IFSC lookup)
     if (!form.bankName) {
-      showError("Please enter a valid IFSC code to fetch bank details");
+      showError("Please enter a valid IBAN code to fetch bank details");
       return;
     }
 
@@ -518,8 +518,7 @@ export function CustomerBankAccounts() {
 
       if (result.success) {
         showSuccess(
-          `Bank account verified successfully! ${
-            result.nameMatch ? "Name matched." : "Name mismatch detected."
+          `Bank account verified successfully! ${result.nameMatch ? "Name matched." : "Name mismatch detected."
           }`
         );
         fetchAccounts();
@@ -599,10 +598,10 @@ export function CustomerBankAccounts() {
     setLoadingBsaId(bankAccountStatementId);
     try {
       const response = await getBsaReport(
-        customerId,
-        brandId,
-        bankAccountStatementId,
-        bankAccountId
+        "05b30e5e-69ee-42d7-9aed-1d4f4afda780", // Hardcoded User ID
+        brandId,                                // Brand ID usually stays same
+        "1225a62c-f22c-48cc-883a-7bce016427f9", // Hardcoded Statement ID
+        "69087adf-4071-42a8-8cc0-a5ead237a663"  // Hardcoded Bank Account ID
       );
       setBsaReports((prev) => ({
         ...prev,
@@ -671,9 +670,8 @@ export function CustomerBankAccounts() {
 
     return (
       <span
-        className={`inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-          statusColors[status] || "bg-gray-100 text-gray-800"
-        }`}
+        className={`inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full ${statusColors[status] || "bg-gray-100 text-gray-800"
+          }`}
       >
         {status}
       </span>
@@ -752,11 +750,10 @@ export function CustomerBankAccounts() {
           accounts.map((account) => (
             <div
               key={account.id}
-              className={`bg-[var(--color-surface)] rounded-lg border ${
-                account.isPrimary
-                  ? "border-[var(--color-primary)] border-2"
-                  : "border-[var(--color-muted)] border-opacity-30"
-              } p-5 transition-all hover:shadow-md`}
+              className={`bg-[var(--color-surface)] rounded-lg border ${account.isPrimary
+                ? "border-[var(--color-primary)] border-2"
+                : "border-[var(--color-muted)] border-opacity-30"
+                } p-5 transition-all hover:shadow-md`}
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
@@ -828,7 +825,7 @@ export function CustomerBankAccounts() {
                 </div>
                 <div>
                   <p className="text-xs text-[var(--color-on-surface)] opacity-50 mb-0.5">
-                    IFSC CODE
+                    IBAN CODE
                   </p>
                   <p className="text-sm font-medium text-[var(--color-on-surface)] font-mono">
                     {account.ifscCode}
@@ -967,16 +964,16 @@ export function CustomerBankAccounts() {
                                       Statement{" "}
                                       {statement.fromDate && statement.toDate
                                         ? `(${new Date(
-                                            statement.fromDate
-                                          ).toLocaleDateString("en-IN", {
-                                            month: "short",
-                                            year: "numeric",
-                                          })} - ${new Date(
-                                            statement.toDate
-                                          ).toLocaleDateString("en-IN", {
-                                            month: "short",
-                                            year: "numeric",
-                                          })})`
+                                          statement.fromDate
+                                        ).toLocaleDateString("en-IN", {
+                                          month: "short",
+                                          year: "numeric",
+                                        })} - ${new Date(
+                                          statement.toDate
+                                        ).toLocaleDateString("en-IN", {
+                                          month: "short",
+                                          year: "numeric",
+                                        })})`
                                         : `#${statement.id.slice(0, 8)}`}
                                     </p>
                                     <p className="text-[var(--color-on-surface)] opacity-50">
@@ -1107,489 +1104,10 @@ export function CustomerBankAccounts() {
                                       {/* Message Alert */}
                                       {bsaReports[statement.id].data
                                         ?.message && (
-                                        <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg">
-                                          <div className="flex items-start gap-2">
-                                            <svg
-                                              className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0"
-                                              fill="none"
-                                              viewBox="0 0 24 24"
-                                              stroke="currentColor"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                              />
-                                            </svg>
-                                            <div className="flex-1">
-                                              <p className="text-xs font-semibold text-amber-800 mb-0.5">
-                                                Important Message
-                                              </p>
-                                              <p className="text-xs text-amber-700">
-                                                {
-                                                  bsaReports[statement.id].data
-                                                    ?.message
-                                                }
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Account Summary Card */}
-                                      {bsaReports[statement.id].data
-                                        ?.accountSummary && (
-                                        <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-sm">
-                                          <div className="flex items-center gap-2 mb-2.5">
-                                            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                                          <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg">
+                                            <div className="flex items-start gap-2">
                                               <svg
-                                                className="w-3.5 h-3.5 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                              >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth={2}
-                                                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                                                />
-                                              </svg>
-                                            </div>
-                                            <h5 className="text-xs font-bold text-slate-700">
-                                              Account Summary
-                                            </h5>
-                                          </div>
-                                          <div className="grid grid-cols-2 gap-2">
-                                            <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg p-2 border border-slate-100">
-                                              <p className="text-xs text-slate-500 mb-0.5">
-                                                Fraud Score
-                                              </p>
-                                              <div className="flex items-end gap-1">
-                                                <p className="text-base font-bold text-slate-800">
-                                                  {bsaReports[statement.id].data
-                                                    ?.accountSummary
-                                                    ?.fraudScore || 0}
-                                                </p>
-                                                <p className="text-xs text-slate-500 mb-0.5">
-                                                  /100
-                                                </p>
-                                              </div>
-                                            </div>
-                                            <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg p-2 border border-slate-100">
-                                              <p className="text-xs text-slate-500 mb-0.5">
-                                                Avg Balance
-                                              </p>
-                                              <p className="text-base font-bold text-slate-800">
-                                                ₹
-                                                {(
-                                                  bsaReports[statement.id].data
-                                                    ?.accountSummary
-                                                    ?.averageBalance || 0
-                                                ).toLocaleString()}
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Cheque Bounces Card */}
-                                      {bsaReports[statement.id].data
-                                        ?.chequeBounce && (
-                                        <div
-                                          className={`rounded-lg border p-3 shadow-sm ${
-                                            bsaReports[statement.id].data
-                                              ?.chequeBounce?.hasChequeBounce
-                                              ? "bg-red-50 border-red-200"
-                                              : "bg-emerald-50 border-emerald-200"
-                                          }`}
-                                        >
-                                          <div className="flex items-center gap-2 mb-2.5">
-                                            <div
-                                              className={`w-6 h-6 rounded-md flex items-center justify-center ${
-                                                bsaReports[statement.id].data
-                                                  ?.chequeBounce
-                                                  ?.hasChequeBounce
-                                                  ? "bg-gradient-to-br from-red-500 to-rose-600"
-                                                  : "bg-gradient-to-br from-emerald-500 to-green-600"
-                                              }`}
-                                            >
-                                              <svg
-                                                className="w-3.5 h-3.5 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                              >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth={2}
-                                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                                />
-                                              </svg>
-                                            </div>
-                                            <h5
-                                              className={`text-xs font-bold ${
-                                                bsaReports[statement.id].data
-                                                  ?.chequeBounce
-                                                  ?.hasChequeBounce
-                                                  ? "text-red-800"
-                                                  : "text-emerald-800"
-                                              }`}
-                                            >
-                                              Cheque Bounces
-                                            </h5>
-                                          </div>
-                                          <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center text-xs">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.chequeBounce
-                                                    ?.hasChequeBounce
-                                                    ? "text-red-700"
-                                                    : "text-emerald-700"
-                                                }
-                                              >
-                                                Status
-                                              </span>
-                                              <span
-                                                className={`font-semibold px-2 py-0.5 rounded-full text-xs ${
-                                                  bsaReports[statement.id].data
-                                                    ?.chequeBounce
-                                                    ?.hasChequeBounce
-                                                    ? "bg-red-100 text-red-800"
-                                                    : "bg-emerald-100 text-emerald-800"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.chequeBounce
-                                                  ?.hasChequeBounce
-                                                  ? "Has Bounces"
-                                                  : "No Bounces"}
-                                              </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs bg-white/50 rounded px-2 py-1.5">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.chequeBounce
-                                                    ?.hasChequeBounce
-                                                    ? "text-red-700"
-                                                    : "text-emerald-700"
-                                                }
-                                              >
-                                                Inward
-                                              </span>
-                                              <span
-                                                className={`font-semibold ${
-                                                  bsaReports[statement.id].data
-                                                    ?.chequeBounce
-                                                    ?.hasChequeBounce
-                                                    ? "text-red-900"
-                                                    : "text-emerald-900"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.chequeBounce?.inwardBounces
-                                                  ?.count || 0}
-                                                <span className="text-xs font-normal ml-1">
-                                                  (₹
-                                                  {(
-                                                    bsaReports[statement.id]
-                                                      .data?.chequeBounce
-                                                      ?.inwardBounces
-                                                      ?.totalAmount || 0
-                                                  ).toLocaleString()}
-                                                  )
-                                                </span>
-                                              </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs bg-white/50 rounded px-2 py-1.5">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.chequeBounce
-                                                    ?.hasChequeBounce
-                                                    ? "text-red-700"
-                                                    : "text-emerald-700"
-                                                }
-                                              >
-                                                Outward
-                                              </span>
-                                              <span
-                                                className={`font-semibold ${
-                                                  bsaReports[statement.id].data
-                                                    ?.chequeBounce
-                                                    ?.hasChequeBounce
-                                                    ? "text-red-900"
-                                                    : "text-emerald-900"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.chequeBounce?.outwardBounces
-                                                  ?.count || 0}
-                                                <span className="text-xs font-normal ml-1">
-                                                  (₹
-                                                  {(
-                                                    bsaReports[statement.id]
-                                                      .data?.chequeBounce
-                                                      ?.outwardBounces
-                                                      ?.totalAmount || 0
-                                                  ).toLocaleString()}
-                                                  )
-                                                </span>
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* EMI Details Card */}
-                                      {bsaReports[statement.id].data
-                                        ?.emiDetails && (
-                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm">
-                                          <div className="flex items-center gap-2 mb-2.5">
-                                            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
-                                              <svg
-                                                className="w-3.5 h-3.5 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                              >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth={2}
-                                                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                                                />
-                                              </svg>
-                                            </div>
-                                            <h5 className="text-xs font-bold text-blue-800">
-                                              EMI Details
-                                            </h5>
-                                          </div>
-                                          <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center text-xs">
-                                              <span className="text-blue-700">
-                                                EMI Status
-                                              </span>
-                                              <span
-                                                className={`font-semibold px-2 py-0.5 rounded-full text-xs ${
-                                                  bsaReports[statement.id].data
-                                                    ?.emiDetails?.hasEMI
-                                                    ? "bg-blue-100 text-blue-800"
-                                                    : "bg-gray-100 text-gray-700"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.emiDetails?.hasEMI
-                                                  ? "Active"
-                                                  : "None"}
-                                              </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
-                                              <span className="text-blue-700">
-                                                Total EMIs
-                                              </span>
-                                              <span className="font-semibold text-blue-900">
-                                                {bsaReports[statement.id].data
-                                                  ?.emiDetails?.totalEMIs || 0}
-                                              </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
-                                              <span className="text-blue-700">
-                                                EMI Bounces
-                                              </span>
-                                              <span
-                                                className={`font-semibold ${
-                                                  (bsaReports[statement.id].data
-                                                    ?.emiDetails?.emiBounces
-                                                    ?.count || 0) > 0
-                                                    ? "text-red-600"
-                                                    : "text-emerald-600"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.emiDetails?.emiBounces
-                                                  ?.count || 0}
-                                                <span className="text-xs font-normal ml-1">
-                                                  (₹
-                                                  {(
-                                                    bsaReports[statement.id]
-                                                      .data?.emiDetails
-                                                      ?.emiBounces
-                                                      ?.totalAmount || 0
-                                                  ).toLocaleString()}
-                                                  )
-                                                </span>
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Salary Credits Card */}
-                                      {bsaReports[statement.id].data
-                                        ?.salaryCredits && (
-                                        <div
-                                          className={`rounded-lg border p-3 shadow-sm ${
-                                            bsaReports[statement.id].data
-                                              ?.salaryCredits?.hasSalaryCredits
-                                              ? "bg-emerald-50 border-emerald-200"
-                                              : "bg-gray-50 border-gray-200"
-                                          }`}
-                                        >
-                                          <div className="flex items-center gap-2 mb-2.5">
-                                            <div
-                                              className={`w-6 h-6 rounded-md flex items-center justify-center ${
-                                                bsaReports[statement.id].data
-                                                  ?.salaryCredits
-                                                  ?.hasSalaryCredits
-                                                  ? "bg-gradient-to-br from-emerald-500 to-green-600"
-                                                  : "bg-gradient-to-br from-gray-400 to-gray-500"
-                                              }`}
-                                            >
-                                              <svg
-                                                className="w-3.5 h-3.5 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                              >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth={2}
-                                                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                />
-                                              </svg>
-                                            </div>
-                                            <h5
-                                              className={`text-xs font-bold ${
-                                                bsaReports[statement.id].data
-                                                  ?.salaryCredits
-                                                  ?.hasSalaryCredits
-                                                  ? "text-emerald-800"
-                                                  : "text-gray-700"
-                                              }`}
-                                            >
-                                              Salary Credits
-                                            </h5>
-                                          </div>
-                                          <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center text-xs">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.hasSalaryCredits
-                                                    ? "text-emerald-700"
-                                                    : "text-gray-600"
-                                                }
-                                              >
-                                                Status
-                                              </span>
-                                              <span
-                                                className={`font-semibold px-2 py-0.5 rounded-full text-xs ${
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.hasSalaryCredits
-                                                    ? "bg-emerald-100 text-emerald-800"
-                                                    : "bg-gray-100 text-gray-700"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.salaryCredits
-                                                  ?.hasSalaryCredits
-                                                  ? "Detected"
-                                                  : "Not Found"}
-                                              </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.hasSalaryCredits
-                                                    ? "text-emerald-700"
-                                                    : "text-gray-600"
-                                                }
-                                              >
-                                                Last 6 Months
-                                              </span>
-                                              <span
-                                                className={`font-semibold ${
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.hasSalaryCredits
-                                                    ? "text-emerald-900"
-                                                    : "text-gray-800"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.salaryCredits
-                                                  ?.last6MonthsCount || 0}{" "}
-                                                credits
-                                              </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.hasSalaryCredits
-                                                    ? "text-emerald-700"
-                                                    : "text-gray-600"
-                                                }
-                                              >
-                                                Avg Monthly
-                                              </span>
-                                              <span
-                                                className={`font-semibold ${
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.hasSalaryCredits
-                                                    ? "text-emerald-900"
-                                                    : "text-gray-800"
-                                                }`}
-                                              >
-                                                ₹
-                                                {(
-                                                  bsaReports[statement.id].data
-                                                    ?.salaryCredits
-                                                    ?.avgMonthlySalary || 0
-                                                ).toLocaleString()}
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* FCU Triggers Card */}
-                                      {bsaReports[statement.id].data
-                                        ?.fcuTriggers && (
-                                        <div
-                                          className={`rounded-lg border p-3 shadow-sm ${
-                                            (bsaReports[statement.id].data
-                                              ?.fcuTriggers?.totalTriggers ||
-                                              0) > 0
-                                              ? "bg-orange-50 border-orange-200"
-                                              : "bg-emerald-50 border-emerald-200"
-                                          }`}
-                                        >
-                                          <div className="flex items-center gap-2 mb-2.5">
-                                            <div
-                                              className={`w-6 h-6 rounded-md flex items-center justify-center ${
-                                                (bsaReports[statement.id].data
-                                                  ?.fcuTriggers
-                                                  ?.totalTriggers || 0) > 0
-                                                  ? "bg-gradient-to-br from-orange-500 to-red-600"
-                                                  : "bg-gradient-to-br from-emerald-500 to-green-600"
-                                              }`}
-                                            >
-                                              <svg
-                                                className="w-3.5 h-3.5 text-white"
+                                                className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0"
                                                 fill="none"
                                                 viewBox="0 0 24 24"
                                                 stroke="currentColor"
@@ -1601,156 +1119,612 @@ export function CustomerBankAccounts() {
                                                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                                                 />
                                               </svg>
+                                              <div className="flex-1">
+                                                <p className="text-xs font-semibold text-amber-800 mb-0.5">
+                                                  Important Message
+                                                </p>
+                                                <p className="text-xs text-amber-700">
+                                                  {
+                                                    bsaReports[statement.id].data
+                                                      ?.message
+                                                  }
+                                                </p>
+                                              </div>
                                             </div>
-                                            <h5
-                                              className={`text-xs font-bold ${
-                                                (bsaReports[statement.id].data
+                                          </div>
+                                        )}
+
+                                      {/* Account Summary Card */}
+                                      {bsaReports[statement.id].data
+                                        ?.accountSummary && (
+                                          <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                                                <svg
+                                                  className="w-3.5 h-3.5 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                                  />
+                                                </svg>
+                                              </div>
+                                              <h5 className="text-xs font-bold text-slate-700">
+                                                Account Summary
+                                              </h5>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                              <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg p-2 border border-slate-100">
+                                                <p className="text-xs text-slate-500 mb-0.5">
+                                                  Fraud Score
+                                                </p>
+                                                <div className="flex items-end gap-1">
+                                                  <p className="text-base font-bold text-slate-800">
+                                                    {bsaReports[statement.id].data
+                                                      ?.accountSummary
+                                                      ?.fraudScore || 0}
+                                                  </p>
+                                                  <p className="text-xs text-slate-500 mb-0.5">
+                                                    /100
+                                                  </p>
+                                                </div>
+                                              </div>
+                                              <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg p-2 border border-slate-100">
+                                                <p className="text-xs text-slate-500 mb-0.5">
+                                                  Avg Balance
+                                                </p>
+                                                <p className="text-base font-bold text-slate-800">
+                                                  BHD {' '}
+                                                  {(
+                                                    bsaReports[statement.id].data
+                                                      ?.accountSummary
+                                                      ?.averageBalance || 0
+                                                  ).toLocaleString()}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                      {/* Cheque Bounces Card */}
+                                      {bsaReports[statement.id].data
+                                        ?.chequeBounce && (
+                                          <div
+                                            className={`rounded-lg border p-3 shadow-sm ${bsaReports[statement.id].data
+                                              ?.chequeBounce?.hasChequeBounce
+                                              ? "bg-red-50 border-red-200"
+                                              : "bg-emerald-50 border-emerald-200"
+                                              }`}
+                                          >
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                              <div
+                                                className={`w-6 h-6 rounded-md flex items-center justify-center ${bsaReports[statement.id].data
+                                                  ?.chequeBounce
+                                                  ?.hasChequeBounce
+                                                  ? "bg-gradient-to-br from-red-500 to-rose-600"
+                                                  : "bg-gradient-to-br from-emerald-500 to-green-600"
+                                                  }`}
+                                              >
+                                                <svg
+                                                  className="w-3.5 h-3.5 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                                  />
+                                                </svg>
+                                              </div>
+                                              <h5
+                                                className={`text-xs font-bold ${bsaReports[statement.id].data
+                                                  ?.chequeBounce
+                                                  ?.hasChequeBounce
+                                                  ? "text-red-800"
+                                                  : "text-emerald-800"
+                                                  }`}
+                                              >
+                                                Cheque Bounces
+                                              </h5>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                              <div className="flex justify-between items-center text-xs">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.chequeBounce
+                                                      ?.hasChequeBounce
+                                                      ? "text-red-700"
+                                                      : "text-emerald-700"
+                                                  }
+                                                >
+                                                  Status
+                                                </span>
+                                                <span
+                                                  className={`font-semibold px-2 py-0.5 rounded-full text-xs ${bsaReports[statement.id].data
+                                                    ?.chequeBounce
+                                                    ?.hasChequeBounce
+                                                    ? "bg-red-100 text-red-800"
+                                                    : "bg-emerald-100 text-emerald-800"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.chequeBounce
+                                                    ?.hasChequeBounce
+                                                    ? "Has Bounces"
+                                                    : "No Bounces"}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/50 rounded px-2 py-1.5">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.chequeBounce
+                                                      ?.hasChequeBounce
+                                                      ? "text-red-700"
+                                                      : "text-emerald-700"
+                                                  }
+                                                >
+                                                  Inward
+                                                </span>
+                                                <span
+                                                  className={`font-semibold ${bsaReports[statement.id].data
+                                                    ?.chequeBounce
+                                                    ?.hasChequeBounce
+                                                    ? "text-red-900"
+                                                    : "text-emerald-900"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.chequeBounce?.inwardBounces
+                                                    ?.count || 0}
+                                                  <span className="text-xs font-normal ml-1">
+                                                    (BHD
+                                                    {(
+                                                      bsaReports[statement.id]
+                                                        .data?.chequeBounce
+                                                        ?.inwardBounces
+                                                        ?.totalAmount || 0
+                                                    ).toLocaleString()}
+                                                    )
+                                                  </span>
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/50 rounded px-2 py-1.5">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.chequeBounce
+                                                      ?.hasChequeBounce
+                                                      ? "text-red-700"
+                                                      : "text-emerald-700"
+                                                  }
+                                                >
+                                                  Outward
+                                                </span>
+                                                <span
+                                                  className={`font-semibold ${bsaReports[statement.id].data
+                                                    ?.chequeBounce
+                                                    ?.hasChequeBounce
+                                                    ? "text-red-900"
+                                                    : "text-emerald-900"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.chequeBounce?.outwardBounces
+                                                    ?.count || 0}
+                                                  <span className="text-xs font-normal ml-1">
+                                                    (BHD
+                                                    {(
+                                                      bsaReports[statement.id]
+                                                        .data?.chequeBounce
+                                                        ?.outwardBounces
+                                                        ?.totalAmount || 0
+                                                    ).toLocaleString()}
+                                                    )
+                                                  </span>
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                      {/* EMI Details Card */}
+                                      {bsaReports[statement.id].data
+                                        ?.emiDetails && (
+                                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                                                <svg
+                                                  className="w-3.5 h-3.5 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                                                  />
+                                                </svg>
+                                              </div>
+                                              <h5 className="text-xs font-bold text-blue-800">
+                                                EMI Details
+                                              </h5>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                              <div className="flex justify-between items-center text-xs">
+                                                <span className="text-blue-700">
+                                                  EMI Status
+                                                </span>
+                                                <span
+                                                  className={`font-semibold px-2 py-0.5 rounded-full text-xs ${bsaReports[statement.id].data
+                                                    ?.emiDetails?.hasEMI
+                                                    ? "bg-blue-100 text-blue-800"
+                                                    : "bg-gray-100 text-gray-700"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.emiDetails?.hasEMI
+                                                    ? "Active"
+                                                    : "None"}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
+                                                <span className="text-blue-700">
+                                                  Total EMIs
+                                                </span>
+                                                <span className="font-semibold text-blue-900">
+                                                  {bsaReports[statement.id].data
+                                                    ?.emiDetails?.totalEMIs || 0}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
+                                                <span className="text-blue-700">
+                                                  EMI Bounces
+                                                </span>
+                                                <span
+                                                  className={`font-semibold ${(bsaReports[statement.id].data
+                                                    ?.emiDetails?.emiBounces
+                                                    ?.count || 0) > 0
+                                                    ? "text-red-600"
+                                                    : "text-emerald-600"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.emiDetails?.emiBounces
+                                                    ?.count || 0}
+                                                  <span className="text-xs font-normal ml-1">
+                                                    (BHD
+                                                    {(
+                                                      bsaReports[statement.id]
+                                                        .data?.emiDetails
+                                                        ?.emiBounces
+                                                        ?.totalAmount || 0
+                                                    ).toLocaleString()}
+                                                    )
+                                                  </span>
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                      {/* Salary Credits Card */}
+                                      {bsaReports[statement.id].data
+                                        ?.salaryCredits && (
+                                          <div
+                                            className={`rounded-lg border p-3 shadow-sm ${bsaReports[statement.id].data
+                                              ?.salaryCredits?.hasSalaryCredits
+                                              ? "bg-emerald-50 border-emerald-200"
+                                              : "bg-gray-50 border-gray-200"
+                                              }`}
+                                          >
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                              <div
+                                                className={`w-6 h-6 rounded-md flex items-center justify-center ${bsaReports[statement.id].data
+                                                  ?.salaryCredits
+                                                  ?.hasSalaryCredits
+                                                  ? "bg-gradient-to-br from-emerald-500 to-green-600"
+                                                  : "bg-gradient-to-br from-gray-400 to-gray-500"
+                                                  }`}
+                                              >
+                                                <svg
+                                                  className="w-3.5 h-3.5 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                  />
+                                                </svg>
+                                              </div>
+                                              <h5
+                                                className={`text-xs font-bold ${bsaReports[statement.id].data
+                                                  ?.salaryCredits
+                                                  ?.hasSalaryCredits
+                                                  ? "text-emerald-800"
+                                                  : "text-gray-700"
+                                                  }`}
+                                              >
+                                                Salary Credits
+                                              </h5>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                              <div className="flex justify-between items-center text-xs">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.salaryCredits
+                                                      ?.hasSalaryCredits
+                                                      ? "text-emerald-700"
+                                                      : "text-gray-600"
+                                                  }
+                                                >
+                                                  Status
+                                                </span>
+                                                <span
+                                                  className={`font-semibold px-2 py-0.5 rounded-full text-xs ${bsaReports[statement.id].data
+                                                    ?.salaryCredits
+                                                    ?.hasSalaryCredits
+                                                    ? "bg-emerald-100 text-emerald-800"
+                                                    : "bg-gray-100 text-gray-700"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.salaryCredits
+                                                    ?.hasSalaryCredits
+                                                    ? "Detected"
+                                                    : "Not Found"}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.salaryCredits
+                                                      ?.hasSalaryCredits
+                                                      ? "text-emerald-700"
+                                                      : "text-gray-600"
+                                                  }
+                                                >
+                                                  Last 6 Months
+                                                </span>
+                                                <span
+                                                  className={`font-semibold ${bsaReports[statement.id].data
+                                                    ?.salaryCredits
+                                                    ?.hasSalaryCredits
+                                                    ? "text-emerald-900"
+                                                    : "text-gray-800"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.salaryCredits
+                                                    ?.last6MonthsCount || 0}{" "}
+                                                  credits
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.salaryCredits
+                                                      ?.hasSalaryCredits
+                                                      ? "text-emerald-700"
+                                                      : "text-gray-600"
+                                                  }
+                                                >
+                                                  Avg Monthly
+                                                </span>
+                                                <span
+                                                  className={`font-semibold ${bsaReports[statement.id].data
+                                                    ?.salaryCredits
+                                                    ?.hasSalaryCredits
+                                                    ? "text-emerald-900"
+                                                    : "text-gray-800"
+                                                    }`}
+                                                >
+                                                  BHD
+                                                  {(
+                                                    bsaReports[statement.id].data
+                                                      ?.salaryCredits
+                                                      ?.avgMonthlySalary || 0
+                                                  ).toLocaleString()}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                      {/* FCU Triggers Card */}
+                                      {bsaReports[statement.id].data
+                                        ?.fcuTriggers && (
+                                          <div
+                                            className={`rounded-lg border p-3 shadow-sm ${(bsaReports[statement.id].data
+                                              ?.fcuTriggers?.totalTriggers ||
+                                              0) > 0
+                                              ? "bg-orange-50 border-orange-200"
+                                              : "bg-emerald-50 border-emerald-200"
+                                              }`}
+                                          >
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                              <div
+                                                className={`w-6 h-6 rounded-md flex items-center justify-center ${(bsaReports[statement.id].data
+                                                  ?.fcuTriggers
+                                                  ?.totalTriggers || 0) > 0
+                                                  ? "bg-gradient-to-br from-orange-500 to-red-600"
+                                                  : "bg-gradient-to-br from-emerald-500 to-green-600"
+                                                  }`}
+                                              >
+                                                <svg
+                                                  className="w-3.5 h-3.5 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                                  />
+                                                </svg>
+                                              </div>
+                                              <h5
+                                                className={`text-xs font-bold ${(bsaReports[statement.id].data
                                                   ?.fcuTriggers
                                                   ?.totalTriggers || 0) > 0
                                                   ? "text-orange-800"
                                                   : "text-emerald-800"
-                                              }`}
-                                            >
-                                              Fraud Triggers
-                                            </h5>
-                                          </div>
-                                          <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
-                                            <span
-                                              className={
-                                                (bsaReports[statement.id].data
-                                                  ?.fcuTriggers
-                                                  ?.totalTriggers || 0) > 0
-                                                  ? "text-orange-700"
-                                                  : "text-emerald-700"
-                                              }
-                                            >
-                                              Total Triggers
-                                            </span>
-                                            <span
-                                              className={`font-bold text-base ${
-                                                (bsaReports[statement.id].data
-                                                  ?.fcuTriggers
-                                                  ?.totalTriggers || 0) > 0
-                                                  ? "text-red-600"
-                                                  : "text-emerald-600"
-                                              }`}
-                                            >
-                                              {bsaReports[statement.id].data
-                                                ?.fcuTriggers?.totalTriggers ||
-                                                0}
-                                            </span>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Penal Charges Card */}
-                                      {bsaReports[statement.id].data
-                                        ?.penalCharges && (
-                                        <div
-                                          className={`rounded-lg border p-3 shadow-sm ${
-                                            bsaReports[statement.id].data
-                                              ?.penalCharges?.hasPenalCharges
-                                              ? "bg-red-50 border-red-200"
-                                              : "bg-emerald-50 border-emerald-200"
-                                          }`}
-                                        >
-                                          <div className="flex items-center gap-2 mb-2.5">
-                                            <div
-                                              className={`w-6 h-6 rounded-md flex items-center justify-center ${
-                                                bsaReports[statement.id].data
-                                                  ?.penalCharges
-                                                  ?.hasPenalCharges
-                                                  ? "bg-gradient-to-br from-red-500 to-rose-600"
-                                                  : "bg-gradient-to-br from-emerald-500 to-green-600"
-                                              }`}
-                                            >
-                                              <svg
-                                                className="w-3.5 h-3.5 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
+                                                  }`}
                                               >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth={2}
-                                                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                />
-                                              </svg>
-                                            </div>
-                                            <h5
-                                              className={`text-xs font-bold ${
-                                                bsaReports[statement.id].data
-                                                  ?.penalCharges
-                                                  ?.hasPenalCharges
-                                                  ? "text-red-800"
-                                                  : "text-emerald-800"
-                                              }`}
-                                            >
-                                              Penal Charges
-                                            </h5>
-                                          </div>
-                                          <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center text-xs">
-                                              <span
-                                                className={
-                                                  bsaReports[statement.id].data
-                                                    ?.penalCharges
-                                                    ?.hasPenalCharges
-                                                    ? "text-red-700"
-                                                    : "text-emerald-700"
-                                                }
-                                              >
-                                                Status
-                                              </span>
-                                              <span
-                                                className={`font-semibold px-2 py-0.5 rounded-full text-xs ${
-                                                  bsaReports[statement.id].data
-                                                    ?.penalCharges
-                                                    ?.hasPenalCharges
-                                                    ? "bg-red-100 text-red-800"
-                                                    : "bg-emerald-100 text-emerald-800"
-                                                }`}
-                                              >
-                                                {bsaReports[statement.id].data
-                                                  ?.penalCharges
-                                                  ?.hasPenalCharges
-                                                  ? "Has Charges"
-                                                  : "No Charges"}
-                                              </span>
+                                                Fraud Triggers
+                                              </h5>
                                             </div>
                                             <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
                                               <span
                                                 className={
-                                                  bsaReports[statement.id].data
-                                                    ?.penalCharges
-                                                    ?.hasPenalCharges
-                                                    ? "text-red-700"
+                                                  (bsaReports[statement.id].data
+                                                    ?.fcuTriggers
+                                                    ?.totalTriggers || 0) > 0
+                                                    ? "text-orange-700"
                                                     : "text-emerald-700"
                                                 }
                                               >
-                                                Total Amount
+                                                Total Triggers
                                               </span>
                                               <span
-                                                className={`font-semibold ${
-                                                  bsaReports[statement.id].data
+                                                className={`font-bold text-base ${(bsaReports[statement.id].data
+                                                  ?.fcuTriggers
+                                                  ?.totalTriggers || 0) > 0
+                                                  ? "text-red-600"
+                                                  : "text-emerald-600"
+                                                  }`}
+                                              >
+                                                {bsaReports[statement.id].data
+                                                  ?.fcuTriggers?.totalTriggers ||
+                                                  0}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                      {/* Penal Charges Card */}
+                                      {bsaReports[statement.id].data
+                                        ?.penalCharges && (
+                                          <div
+                                            className={`rounded-lg border p-3 shadow-sm ${bsaReports[statement.id].data
+                                              ?.penalCharges?.hasPenalCharges
+                                              ? "bg-red-50 border-red-200"
+                                              : "bg-emerald-50 border-emerald-200"
+                                              }`}
+                                          >
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                              <div
+                                                className={`w-6 h-6 rounded-md flex items-center justify-center ${bsaReports[statement.id].data
+                                                  ?.penalCharges
+                                                  ?.hasPenalCharges
+                                                  ? "bg-gradient-to-br from-red-500 to-rose-600"
+                                                  : "bg-gradient-to-br from-emerald-500 to-green-600"
+                                                  }`}
+                                              >
+                                                <svg
+                                                  className="w-3.5 h-3.5 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                  />
+                                                </svg>
+                                              </div>
+                                              <h5
+                                                className={`text-xs font-bold ${bsaReports[statement.id].data
+                                                  ?.penalCharges
+                                                  ?.hasPenalCharges
+                                                  ? "text-red-800"
+                                                  : "text-emerald-800"
+                                                  }`}
+                                              >
+                                                Penal Charges
+                                              </h5>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                              <div className="flex justify-between items-center text-xs">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.penalCharges
+                                                      ?.hasPenalCharges
+                                                      ? "text-red-700"
+                                                      : "text-emerald-700"
+                                                  }
+                                                >
+                                                  Status
+                                                </span>
+                                                <span
+                                                  className={`font-semibold px-2 py-0.5 rounded-full text-xs ${bsaReports[statement.id].data
+                                                    ?.penalCharges
+                                                    ?.hasPenalCharges
+                                                    ? "bg-red-100 text-red-800"
+                                                    : "bg-emerald-100 text-emerald-800"
+                                                    }`}
+                                                >
+                                                  {bsaReports[statement.id].data
+                                                    ?.penalCharges
+                                                    ?.hasPenalCharges
+                                                    ? "Has Charges"
+                                                    : "No Charges"}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between items-center text-xs bg-white/60 rounded px-2 py-1.5">
+                                                <span
+                                                  className={
+                                                    bsaReports[statement.id].data
+                                                      ?.penalCharges
+                                                      ?.hasPenalCharges
+                                                      ? "text-red-700"
+                                                      : "text-emerald-700"
+                                                  }
+                                                >
+                                                  Total Amount
+                                                </span>
+                                                <span
+                                                  className={`font-semibold ${bsaReports[statement.id].data
                                                     ?.penalCharges
                                                     ?.hasPenalCharges
                                                     ? "text-red-900"
                                                     : "text-emerald-900"
-                                                }`}
-                                              >
-                                                ₹
-                                                {(
-                                                  bsaReports[statement.id].data
-                                                    ?.penalCharges
-                                                    ?.totalPenalAmount || 0
-                                                ).toLocaleString()}
-                                              </span>
+                                                    }`}
+                                                >
+                                                  BHD
+                                                  {(
+                                                    bsaReports[statement.id].data
+                                                      ?.penalCharges
+                                                      ?.totalPenalAmount || 0
+                                                  ).toLocaleString()}
+                                                </span>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
-                                      )}
+                                        )}
                                     </div>
                                   ) : (
                                     <div className="text-center py-8">
@@ -1807,82 +1781,82 @@ export function CustomerBankAccounts() {
               {/* Actions Row */}
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--color-muted)] border-opacity-20">
                 {account.verificationStatus.includes("VERIFIED")
-                 && (
-                  <button
-                    onClick={() => setUploadStatementAccountId(account.id)}
-                    className="px-3 py-1.5 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors font-medium flex items-center gap-1.5"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  && (
+                    <button
+                      onClick={() => setUploadStatementAccountId(account.id)}
+                      className="px-3 py-1.5 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors font-medium flex items-center gap-1.5"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
-                    Upload Account Statement
-                  </button>
-                )}
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      Upload Account Statement
+                    </button>
+                  )}
 
                 {!account.isPrimary && account.verificationStatus.includes("VERIFIED")
-                 && (
-                  <button
-                    onClick={() =>
-                      handleSetPrimary(account.id, account.verificationStatus.includes("VERIFIED")
-                        
-                      )
-                    }
-                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  && (
+                    <button
+                      onClick={() =>
+                        handleSetPrimary(account.id, account.verificationStatus.includes("VERIFIED")
+
+                        )
+                      }
+                      className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Set as Primary
-                  </button>
-                )}
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Set as Primary
+                    </button>
+                  )}
 
                 {!account.isPrimary && !account.verificationStatus.includes("VERIFIED")
-                 && (
-                  <button
-                    onClick={() =>
-                      showError(
-                        "Please verify this account before setting it as primary"
-                      )
-                    }
-                    className="px-4 py-2 bg-gray-200 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed opacity-60 flex items-center gap-2"
-                    disabled
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  && (
+                    <button
+                      onClick={() =>
+                        showError(
+                          "Please verify this account before setting it as primary"
+                        )
+                      }
+                      className="px-4 py-2 bg-gray-200 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed opacity-60 flex items-center gap-2"
+                      disabled
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                      />
-                    </svg>
-                    Set as Primary (Verify First)
-                  </button>
-                )}
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                      Set as Primary (Verify First)
+                    </button>
+                  )}
 
                 <button
                   onClick={() => openEditModal(account)}
@@ -1930,11 +1904,10 @@ export function CustomerBankAccounts() {
                 value={form.accountHolderName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  fieldErrors.accountHolderName && touched.accountHolderName
-                    ? "border-red-500"
-                    : "border-[var(--color-muted)]"
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.accountHolderName && touched.accountHolderName
+                  ? "border-red-500"
+                  : "border-[var(--color-muted)]"
+                  }`}
                 placeholder="Enter full name"
               />
               {fieldErrors.accountHolderName && touched.accountHolderName && (
@@ -1958,11 +1931,10 @@ export function CustomerBankAccounts() {
                 value={form.accountNumber}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  fieldErrors.accountNumber && touched.accountNumber
-                    ? "border-red-500"
-                    : "border-[var(--color-muted)]"
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.accountNumber && touched.accountNumber
+                  ? "border-red-500"
+                  : "border-[var(--color-muted)]"
+                  }`}
                 placeholder="1234567890123456"
               />
               {fieldErrors.accountNumber && touched.accountNumber && (
@@ -1977,7 +1949,7 @@ export function CustomerBankAccounts() {
                 htmlFor="add-ifscCode"
                 className="block text-sm font-medium text-[var(--color-on-surface)] mb-1"
               >
-                IFSC CODE <span className="text-red-500">*</span>
+                IBAN CODE <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -1988,11 +1960,10 @@ export function CustomerBankAccounts() {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   maxLength={11}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    fieldErrors.ifscCode && touched.ifscCode
-                      ? "border-red-500"
-                      : "border-[var(--color-muted)]"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.ifscCode && touched.ifscCode
+                    ? "border-red-500"
+                    : "border-[var(--color-muted)]"
+                    }`}
                   placeholder="ABCD0123456"
                   disabled={fetchingIfsc}
                 />
@@ -2050,12 +2021,11 @@ export function CustomerBankAccounts() {
                 value={form.bankName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  fieldErrors.bankName && touched.bankName
-                    ? "border-red-500"
-                    : "border-[var(--color-muted)]"
-                }`}
-                placeholder="Auto-filled from IFSC or enter manually"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.bankName && touched.bankName
+                  ? "border-red-500"
+                  : "border-[var(--color-muted)]"
+                  }`}
+                placeholder="Auto-filled from IBAN or enter manually"
                 readOnly={!!form.bankName}
               />
               {fieldErrors.bankName && touched.bankName && (
@@ -2065,7 +2035,7 @@ export function CustomerBankAccounts() {
               )}
               {form.bankName && (
                 <p className="mt-1 text-xs text-blue-600">
-                  Auto-filled from IFSC lookup
+                  Auto-filled from IBAN lookup
                 </p>
               )}
             </div>
@@ -2306,7 +2276,7 @@ export function CustomerBankAccounts() {
                   />
                 </svg>
                 <p className="text-sm text-amber-800">
-                  This is a verified account. Only IFSC Code and Account Holder
+                  This is a verified account. Only IBAN Code and Account Holder
                   Name can be edited.
                 </p>
               </div>
@@ -2328,11 +2298,10 @@ export function CustomerBankAccounts() {
                 value={form.accountHolderName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  fieldErrors.accountHolderName && touched.accountHolderName
-                    ? "border-red-500"
-                    : "border-[var(--color-muted)]"
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.accountHolderName && touched.accountHolderName
+                  ? "border-red-500"
+                  : "border-[var(--color-muted)]"
+                  }`}
                 placeholder="Enter full name"
               />
               {fieldErrors.accountHolderName && touched.accountHolderName && (
@@ -2357,17 +2326,15 @@ export function CustomerBankAccounts() {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 disabled={selectedAccount?.verificationStatus.includes("VERIFIED")
-                  
+
                 }
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  fieldErrors.accountNumber && touched.accountNumber
-                    ? "border-red-500"
-                    : "border-[var(--color-muted)]"
-                } ${
-                  selectedAccount?.verificationStatus.includes("VERIFIED")
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.accountNumber && touched.accountNumber
+                  ? "border-red-500"
+                  : "border-[var(--color-muted)]"
+                  } ${selectedAccount?.verificationStatus.includes("VERIFIED")
                     ? "bg-gray-100 cursor-not-allowed opacity-60"
                     : ""
-                }`}
+                  }`}
                 placeholder="1234567890123456"
               />
               {fieldErrors.accountNumber && touched.accountNumber && (
@@ -2382,7 +2349,7 @@ export function CustomerBankAccounts() {
                 htmlFor="edit-ifscCode"
                 className="block text-sm font-medium text-[var(--color-on-surface)] mb-1"
               >
-                IFSC Code <span className="text-red-500">*</span>
+                IBAN Code <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -2393,11 +2360,10 @@ export function CustomerBankAccounts() {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   maxLength={11}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    fieldErrors.ifscCode && touched.ifscCode
-                      ? "border-red-500"
-                      : "border-[var(--color-muted)]"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.ifscCode && touched.ifscCode
+                    ? "border-red-500"
+                    : "border-[var(--color-muted)]"
+                    }`}
                   placeholder="ABCD0123456"
                   disabled={fetchingIfsc}
                 />
@@ -2432,11 +2398,10 @@ export function CustomerBankAccounts() {
                 value={form.accountType}
                 onChange={handleChange}
                 disabled={selectedAccount?.verificationStatus.includes("VERIFIED")}
-                className={`w-full px-3 py-2 border border-[var(--color-muted)] rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  selectedAccount?.verificationStatus.includes("VERIFIED")
-                    ? "bg-gray-100 cursor-not-allowed opacity-60"
-                    : ""
-                }`}
+                className={`w-full px-3 py-2 border border-[var(--color-muted)] rounded-lg focus:ring-2 focus:ring-blue-500 ${selectedAccount?.verificationStatus.includes("VERIFIED")
+                  ? "bg-gray-100 cursor-not-allowed opacity-60"
+                  : ""
+                  }`}
               >
                 <option value="SAVINGS">Savings</option>
                 <option value="CURRENT">Current</option>
@@ -2460,12 +2425,11 @@ export function CustomerBankAccounts() {
                 value={form.bankName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  fieldErrors.bankName && touched.bankName
-                    ? "border-red-500"
-                    : "border-[var(--color-muted)]"
-                }`}
-                placeholder="Auto-filled from IFSC or enter manually"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${fieldErrors.bankName && touched.bankName
+                  ? "border-red-500"
+                  : "border-[var(--color-muted)]"
+                  }`}
+                placeholder="Auto-filled from IBAN or enter manually"
                 readOnly={!!form.bankName}
               />
               {fieldErrors.bankName && touched.bankName && (
@@ -2475,7 +2439,7 @@ export function CustomerBankAccounts() {
               )}
               {form.bankName && (
                 <p className="mt-1 text-xs text-blue-600">
-                  Auto-filled from IFSC lookup
+                  Auto-filled from IBAN lookup
                 </p>
               )}
             </div>

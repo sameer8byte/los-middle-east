@@ -303,7 +303,7 @@ const ConversionPerformance: React.FC<Props> = ({ data }) => {
       'Age Criteria',
       'Collateral Insufficient',
       'Business Vintage',
-      'CIBIL < 650',
+      'BENEFIT Credit Bureau < 650',
       'FOIR > 50%'
     ];
     
@@ -366,7 +366,7 @@ const ConversionPerformance: React.FC<Props> = ({ data }) => {
           <p className="text-xs sm:text-sm text-gray-600 mt-4 text-center sm:text-left">
             Avg Converted Loan Amount :
             <span className="ml-2 font-semibold text-gray-800">
-              ₹{data.avgConvertedAmount}
+              BHD {data.avgConvertedAmount}
             </span>
           </p>
 

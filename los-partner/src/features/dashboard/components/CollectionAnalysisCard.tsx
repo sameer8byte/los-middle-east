@@ -144,7 +144,7 @@ export const CollectionAnalysisCard: React.FC<CollectionAnalysisCardProps> = ({
                     Principal
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Interest
+                    Murabaha margin
                   </th>
   
                   <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">

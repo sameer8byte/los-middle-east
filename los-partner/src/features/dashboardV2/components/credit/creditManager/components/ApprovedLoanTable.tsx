@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiChevronLeft, FiChevronRight, FiFilter, FiMoreVertical, FiChevronDown } from 'react-icons/fi';
 import { MdOutlineSort } from 'react-icons/md';
+import { Conversion } from "../../../../../../utils/conversion";
 
 export interface ApprovedLoanData {
   srNo: number;
@@ -124,12 +125,12 @@ const ApprovedLoanTable: React.FC<ApprovedLoanTableProps> = ({ data }) => {
                           {row.loanType}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">₹{row.loanAmount}</td>
-                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">₹{row.amountDisbursed}</td>
-                      <td className="px-4 py-4 text-center text-gray-800 border-r border-gray-50">₹{row.pendingDisbursal}</td>
-                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">₹{row.totalRepayment}</td>
-                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">₹{row.amountCollected}</td>
-                      <td className="px-4 py-4 text-center text-gray-800 border-r border-gray-50">₹{row.outstanding}</td>
+                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">{Conversion.formatCurrency(row.loanAmount)}</td>
+                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">{Conversion.formatCurrency(row.amountDisbursed)}</td>
+                      <td className="px-4 py-4 text-center text-gray-800 border-r border-gray-50">{Conversion.formatCurrency(row.pendingDisbursal)}</td>
+                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">{Conversion.formatCurrency(row.totalRepayment)}</td>
+                      <td className="px-4 py-4 text-gray-800 border-r border-gray-50">{Conversion.formatCurrency(row.amountCollected)}</td>
+                      <td className="px-4 py-4 text-center text-gray-800 border-r border-gray-50">{Conversion.formatCurrency(row.outstanding)}</td>
                       <td className="px-4 py-4 text-center border-r border-gray-50">
                         <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(row.loanStatus)}`}>
                           {row.loanStatus}

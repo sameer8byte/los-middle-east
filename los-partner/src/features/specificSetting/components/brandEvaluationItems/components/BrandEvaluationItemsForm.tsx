@@ -202,7 +202,7 @@ export function BrandEvaluationItemsForm({
                   className={`flex-1 px-3 py-2 border rounded-md focus:ring-[var(--primary)] focus:border-[var(--primary)] ${
                     errors.sources ? 'border-red-500' : 'border-[var(--border)]'
                   }`}
-                  placeholder="e.g., CIBIL, Experian, Internal API"
+                  placeholder="e.g., Credit Score, Experian, Internal API"
                   disabled={loading}
                 />
                 {formData.sources.length > 1 && (

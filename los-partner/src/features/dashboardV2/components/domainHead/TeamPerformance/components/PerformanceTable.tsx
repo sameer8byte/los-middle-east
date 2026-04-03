@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import SalesPerformance from './SalesPerformance';
 import CreditPerformance from './CreditPerformance';
 import CollectionPerformance from './CollectionPerformance';
@@ -62,7 +62,7 @@ const PerformanceTable: React.FC = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          {/* <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <span className="text-sm text-gray-600">1–50 of 2,619</span>
             <div className="flex items-center gap-2">
               <button className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -72,7 +72,7 @@ const PerformanceTable: React.FC = () => {
                 <FiChevronRight size={16} className="text-gray-600" />
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

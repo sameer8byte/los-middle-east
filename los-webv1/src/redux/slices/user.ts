@@ -84,7 +84,7 @@ export const selectUserStatus = (state: RootState) => {
 export const selectUserOccupation = (state: RootState) => {
   return (
     OccupationTypeEnum[
-      state.user.user.occupation_type_id as keyof typeof OccupationTypeEnum
+    state.user.user.occupation_type_id as keyof typeof OccupationTypeEnum
     ] || null
   );
 };

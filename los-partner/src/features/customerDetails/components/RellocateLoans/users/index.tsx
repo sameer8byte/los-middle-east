@@ -945,7 +945,7 @@ export const UserReallocationModal: React.FC<UserReallocationModalProps> = ({
                               </div>
                               <div className="min-w-0">
                                 <p className="font-medium text-gray-900">
-                                  ₹{loan.amount?.toLocaleString('en-IN') || 'N/A'}
+                                  BHD{loan.amount?.toLocaleString('en-IN') || 'N/A'}
                                 </p>
                                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(loan.status)}`}>
                                   {loan.status.split('_').join(' ')}

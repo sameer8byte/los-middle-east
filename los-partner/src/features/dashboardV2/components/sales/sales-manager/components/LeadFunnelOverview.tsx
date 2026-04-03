@@ -94,21 +94,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <div className="w-3 h-3 rounded-full bg-purple-500"></div>
               <span>Sanctioned</span>
             </div>
-            <span className="font-semibold">{payload[1].value} | ₹XX,XXX</span>
+            <span className="font-semibold">{payload[1].value} | BHD XX,XXX</span>
           </div>
           <div className="flex items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <span>Disbursed</span>
             </div>
-            <span className="font-semibold">{payload[2].value} | ₹XX,XXX</span>
+            <span className="font-semibold">{payload[2].value} | BHD XX,XXX</span>
           </div>
           <div className="flex items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <span>Pending Disbursal</span>
             </div>
-            <span className="font-semibold">{payload[3].value} | ₹XX,XXX</span>
+            <span className="font-semibold">{payload[3].value} | BHD XX,XXX</span>
           </div>
           <div className="flex items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2">

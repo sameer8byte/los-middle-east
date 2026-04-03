@@ -20,7 +20,7 @@ export const CustomerFinancialBreakdown: React.FC<CustomerFinancialBreakdownProp
   const finalOutput = parsedData?.finalOutput?.overall;
 
   const formatCurrency = (amount: number) => {
-    if (!amount || isNaN(amount)) return '₹0';
+    if (!amount || isNaN(amount)) return 'BHD0';
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
   };
 

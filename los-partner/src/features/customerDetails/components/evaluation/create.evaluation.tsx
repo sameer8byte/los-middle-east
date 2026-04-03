@@ -419,7 +419,7 @@ export function LoanEvaluation({ loan, onLoanStatusUpdate }: EvaluationProps) {
                       Requested:
                     </span>
                     <span className="font-semibold text-[var(--color-on-background)]">
-                      ₹{loan?.amount?.toLocaleString() || "N/A"}
+                      BHD{loan?.amount?.toLocaleString() || "N/A"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -488,7 +488,7 @@ export function LoanEvaluation({ loan, onLoanStatusUpdate }: EvaluationProps) {
                       />
                     </div>
                     <p className="text-xs text-[var(--color-on-surface)] opacity-70 mt-1">
-                      Maximum recommended: ₹
+                      Maximum recommended: BHD
                       {loan?.amount?.toLocaleString() || "N/A"}
                     </p>
                   </div>

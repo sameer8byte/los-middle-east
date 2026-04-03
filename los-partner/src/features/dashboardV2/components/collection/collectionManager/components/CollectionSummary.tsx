@@ -66,9 +66,9 @@ export const CollectionSummary = () => {
   // Expected Response: { summary: [{ amount, title, percentage? }] }
   // Note: borderColor values are UI constants, keep them hardcoded
   const summaryData = [
-    { amount: "₹4 Cr", title: "Total Loan Due Amount", borderColor: "#3B82F6" },
-    { amount: "₹3 Cr", title: "Total Loan Amount Collected", percentage: "75 %", borderColor: "#10B981" },
-    { amount: "₹1 Cr", title: "Total Amount Outstanding", borderColor: "#F59E0B" },
+    { amount: "BHD 4 Cr", title: "Total Loan Due Amount", borderColor: "#3B82F6" },
+    { amount: "BHD 3 Cr", title: "Total Loan Amount Collected", percentage: "75 %", borderColor: "#10B981" },
+    { amount: "BHD 1 Cr", title: "Total Amount Outstanding", borderColor: "#F59E0B" },
   ];
   // 🔴 API INTEGRATION: Replace above with: const summaryData = data.map((item, idx) => ({ ...item, borderColor: colors[idx] }));
 

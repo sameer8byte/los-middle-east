@@ -46,6 +46,11 @@ async function bootstrap() {
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175",
+        "https://crm.8byte.ai",
+        "https://apilm.8byte.ai",
+        "https://app.8byte.ai",
+        "https://middle.apilm.8byte.ai",
+        
 
         // Qualoan
         "https://web.qualoan.com",

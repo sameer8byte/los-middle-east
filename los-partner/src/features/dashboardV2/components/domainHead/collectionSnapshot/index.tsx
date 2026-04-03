@@ -26,9 +26,9 @@ export default function CollectionSnapshot() {
                         <div className="bg-gray-50/80 px-6 py-4 border-b border-gray-100 max-h-[50px] flex items-center w-full text-left">
                             <h2 className="text-[14px] font-semibold text-gray-800 tracking-tight">Collection Performance (Across Executive)</h2>
                         </div>
-                        <div className="p-3 relative flex flex-col justify-center flex-grow"> 
+                        <div className="p-3 relative flex flex-col justify-center flex-grow">
                             <LeftSection />
-                        </div> 
+                        </div>
                     </div>
 
                     {/* Right Card - Conversion Performance */}

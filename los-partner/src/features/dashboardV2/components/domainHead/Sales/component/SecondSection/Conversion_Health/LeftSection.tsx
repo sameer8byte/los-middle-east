@@ -1,8 +1,19 @@
+import { Conversion } from "../../../../../../../../utils/conversion";
 export default function LeftSection() {
     // Math for the 24% Gauge
     // 180 degrees total. 24% of 180 = 43.2 degrees.
     const percentage = 24;
     const targetAngle = (percentage / 100) * 180;
+
+    // Sample data - Average Converted Loan Amount
+    const totalConvertedAmount = 8640000; // Total amount (360 loans)
+    const totalLoans = 360;
+    const avgConvertedLoanAmount = totalConvertedAmount / totalLoans;
+    
+    // Target and Gap Calculations
+    const achieved = 24; // Current achieved percentage
+    const target = 35; // Target percentage
+    const gap = target - achieved; // Gap percentage
 
     const width = 280;
     const height = 150;
@@ -99,7 +110,7 @@ export default function LeftSection() {
 
                 <div className="mt-2 2xl:mt-4 text-center text-[11px] 2xl:text-[13px] font-medium text-[#64748b] tracking-wide">
                     Avg Converted Loan Amount : <br />
-                    <span className="text-[#334155] font-bold">'XX,XXX'</span>
+                    <span className="text-[#334155] font-bold">{Conversion.formatCurrency(avgConvertedLoanAmount)}</span>
                 </div>
             </div>
 
@@ -126,15 +137,15 @@ export default function LeftSection() {
             <div className="w-full grid grid-cols-3 gap-2 2xl:gap-4 mt-auto">
                 <div className="flex flex-col">
                     <span className="text-[#64748b] text-[11px] 2xl:text-[13px] font-medium mb-1">Target</span>
-                    <span className="text-[13px] 2xl:text-[15px] font-bold text-gray-900">'X' %</span>
+                    <span className="text-[13px] 2xl:text-[15px] font-bold text-gray-900">{target}%</span>
                 </div>
                 <div className="flex flex-col text-center items-center">
                     <span className="text-[#64748b] text-[11px] 2xl:text-[13px] font-medium mb-1">Achieved</span>
-                    <span className="text-[13px] 2xl:text-[15px] font-bold text-gray-900">24%</span>
+                    <span className="text-[13px] 2xl:text-[15px] font-bold text-gray-900">{achieved}%</span>
                 </div>
                 <div className="flex flex-col text-right items-end">
                     <span className="text-[#64748b] text-[11px] 2xl:text-[13px] font-medium mb-1">Gap</span>
-                    <span className="text-[13px] 2xl:text-[15px] font-bold text-gray-900">'Y'%</span>
+                    <span className="text-[13px] 2xl:text-[15px] font-bold text-gray-900">{gap}%</span>
                 </div>
             </div>
 
